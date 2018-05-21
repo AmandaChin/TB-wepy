@@ -1,0 +1,54 @@
+<template>
+  <view>注册页</view>
+</template>
+
+<script>
+import wepy from 'wepy'
+// import { service } from '../config.js'
+import http from '../../mixins/http'
+import base from '../../mixins/base'
+import user from '../../mixins/user'
+
+
+export default class pageUser extends wepy.page {
+  mixins = [base, http, user]
+  config = {
+    navigationBarTitleText: '注册',
+    enablePullDownRefresh: false
+  }
+  data = {}
+
+  computed = {}
+
+  onShow() {
+    // 初始化页面数据
+    this.$getUserInfo(info => {
+      const uinfo = this.getObject(info)
+      const userInfo = this.getObject(this.userInfo)
+      this.userInfo = Object.assign({}, userInfo, uinfo)
+      this.initPageData()
+    })
+  }
+
+  onPullDownRefresh() {
+    this.initPageData()
+  }
+
+  // 初始化页面数据
+  initPageData() {
+    // 根据业务接口处理:获取最新个人信息并更新
+    // this.$get({url: service.user}, {
+    //   success: ({code, data}) => {},
+    //   fail: ({code, data}) => {}
+    // })
+  }
+
+  methods = {};
+
+  components = {}
+}
+</script>
+
+<style lang="less">
+@import "../../styles/custom/fn.less";
+</style>

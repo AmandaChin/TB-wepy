@@ -1,0 +1,155 @@
+<template>
+  <view class="page-user">
+    <view class="weui-panel">
+      <view class="weui-cells weui-cells_after-title">
+        <view class="weui-cell">
+          <view class="weui-cell__bd userinfo clearfix">
+            <navigator url="/pages/user/userinfo/info">
+              <image class="userinfo-avatar" src="{{ userInfo.avatarUrl }}" background-size="cover"/>
+            </navigator>
+            <view class="userinfo-nickname">{{ nickName }}</view>
+            <view class="userinfo-status">志愿时长：{{identity.type}}</view>
+            <view class="userinfo-status">服务次数：{{identity.type}}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view class="weui-panel">
+      <view class="weui-cells weui-cells_after-title">
+        <navigator url="/pages/user/medal/myMedal" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
+          <view class="weui-cell__bd">我的勋章</view>
+          <view class="weui-cell__ft weui-cell__ft_in-access">
+            <text>余额：</text>
+            <text class="color-green">{{packages.times}}</text>
+            <text>VLT</text>
+          </view>
+        </navigator>
+        <navigator url="/pages/user/demand/myDemand" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
+          <view class="weui-cell__bd">我的需求</view>
+          <view class="weui-cell__ft weui-cell__ft_in-access">
+            <text class="color-green">{{packages.status}}</text>
+          </view>
+        </navigator>
+        <navigator url="/pages/user/volunteer/myVolunteer" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
+          <view class="weui-cell__bd">待完成</view>
+          <view class="weui-cell__ft weui-cell__ft_in-access">
+            <text class="color-green">{{identity.collection || '0'}}</text>
+          </view>
+        </navigator>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+// import { service } from '../config.js'
+import http from '../mixins/http'
+import base from '../mixins/base'
+import user from '../mixins/user'
+
+export default class pageUser extends wepy.page {
+  mixins = [base, http, user];
+  config = {
+    navigationBarTitleText: '我的',
+    enablePullDownRefresh: false
+  };
+  data = {
+    userInfo: {
+      nickName: '加载中...',
+      // 头像占位图
+      avatarUrl: '../images/icon/icon-avatar@2x.png',
+      packages: {
+        times: 0,
+        status: '借阅状态'
+      },
+      identity: {
+        type: '订阅状态',
+        collection: 0
+      }
+    }
+  };
+
+  computed = {
+    packages() {
+      return this.getObject(this.getObject(this.userInfo).packages)
+    },
+    identity() {
+      return this.getObject(this.getObject(this.userInfo).identity)
+    },
+    nickName() {
+      const info = this.getObject(this.userInfo)
+      // 名称或头像不为空的，才认为是授权用户
+      return info.nickName || info.avatarUrl ? info.nickName : '未授权用户'
+    }
+  };
+
+  onShow() {
+    // 初始化页面数据
+    this.$getUserInfo(info => {
+      const uinfo = this.getObject(info)
+      const userInfo = this.getObject(this.userInfo)
+      this.userInfo = Object.assign({}, userInfo, uinfo)
+      this.initPageData()
+    })
+  }
+
+  onPullDownRefresh() {
+    this.initPageData()
+  }
+
+  // 初始化页面数据
+  initPageData() {
+    // 根据业务接口处理:获取最新个人信息并更新
+    // this.$get({url: service.user}, {
+    //   success: ({code, data}) => {},
+    //   fail: ({code, data}) => {}
+    // })
+  }
+
+  methods = {}
+
+  components = {}
+}
+</script>
+
+<style lang="less">
+@import "../styles/custom/fn.less";
+
+.page-user {
+  @userinfoHeight: 100rpx;
+  @userinfoSpace: 8rpx;
+
+.userinfo {
+    padding: 20rpx 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.userinfo-avatar {
+    margin-bottom: 24rpx;
+    width: @userinfoHeight;
+    height: @userinfoHeight;
+    border-radius: 50%;
+}
+
+  // space + space
+.userinfo-info {
+    line-height: 1;
+    padding: @userinfoSpace 0;
+    margin-left: 3 * @userinfoSpace;
+}
+
+  // text + space + text
+.userinfo-nickname {
+    color: @uiColorGreen;
+    font-size: (@userinfoHeight - 4 * @userinfoSpace) * (16 / 30);
+    margin-bottom: 2 * @userinfoSpace;
+}
+.userinfo-status {
+    color: #999;
+    font-size: (@userinfoHeight - 4 * @userinfoSpace) * (14 / 30);
+}
+}
+</style>

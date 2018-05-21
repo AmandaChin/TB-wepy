@@ -1,0 +1,175 @@
+<template>
+        <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__hd">
+          <view class="weui-label reset-label-left h4">志愿项目名称</view>
+        </view>
+      </view>
+
+      <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__hd">
+          <view class="weui-label reset-label-left h4">服务类型</view>
+        </view>
+        </view>
+
+      <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__hd">
+          <view class="weui-label reset-label-left h4">日期</view>
+        </view> 
+         </view>
+
+      <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__hd">
+          <view class="weui-label reset-label-left h4">服务内容</view>
+        </view>
+         </view>
+
+      <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__hd">
+          <view class="weui-label reset-label-left h4">勋章金额</view>
+        </view>
+       </view>
+       
+      <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__hd">
+          <view class="weui-label reset-label-left h4">区块链验证</view>
+        </view>
+      </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+export default class v2c extends wepy.page {
+  config = {
+    navigationBarTitleText: '勋章详情',
+    enablePullDownRefresh: false
+  }
+  components = {}
+  data = {}
+  computed = {}
+}
+</script>
+
+<style lang="less">
+ @import "../../styles/custom/fn.less";
+
+  @icon-font-size: 3`4rpx;
+
+  .page-borrow{
+    .borrow-list{
+      .weui-media-box_text{
+        .h4();
+        padding-right: 5em;
+        line-height: 1;
+        vertical-align: middle;
+      }
+    }
+    .borrow-address{
+      .weui-textarea{
+        width: 600rpx;
+      }
+      .weui-media-box{
+        padding-bottom: 1em;
+      }
+      .weui-media-box__title{
+        padding-bottom: 0.5em;
+      }
+      .reset-pull-right{
+        .h4();
+        top: 15px;
+        bottom: auto;
+        margin-top: -0.5em;
+      }
+      .reset-pull-middle{
+        top: 1em;
+      }
+      .icon-location{
+        width: 1.5em;
+        height: 1.5em;
+      }
+    }
+    .borrow-name-wrapper{
+      display: inline-block;
+      position: absolute;
+      top: 0;
+      left: 15px;
+      right: 15px;
+      bottom: 0;
+      height: 1em;
+      padding-left: @icon-font-size + 15rpx;
+      padding-right: 4em;
+      line-height: 1;
+      margin: auto;
+    }
+    .borrow-book-name{
+      width: 100%;
+      .text-ellipsis();
+    }
+    .reset-pull-right,
+    .reset-pull-middle{
+      position: absolute;
+      right: 15px;
+      top: 0;
+      bottom: 0;
+      height: 2em;
+      line-height: 2;
+      padding: 0 1em;
+      margin: auto -1em auto 0;
+    }
+    .reset-label-left{
+      color: #999;
+      margin-right:1em;
+      padding-right: 1em;
+      border-right: 1rpx solid @uiBorderColor;
+    }
+    .icon-order-circle,
+    .icon-order-empty{
+      display: inline-block;
+      width: @icon-font-size;
+      height: @icon-font-size;
+      font-size: 90%;
+      line-height: @icon-font-size;
+      border: 1rpx solid transparent;
+      border-radius: 50%;
+      text-align: center;
+    }
+    .icon-order-circle{
+      color: #fff;
+      background: @weuiColorPrimary;
+      border-color: @weuiColorPrimary;
+    }
+    .icon-order-empty{
+      color: #ddd;
+      background: transparent;
+      border-color: #ddd;
+    }
+    .icon-delete{
+      display: inline-block;
+      width: @icon-font-size;
+      height: @icon-font-size;
+      &:before,
+      &:after{
+        content: '';
+        display: inline-block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 2rpx;
+        height: 100%;
+        margin: auto;
+        background: #999;
+        transform: rotate(45deg);
+      }
+      &:after{
+        transform: rotate(-45deg);
+      }
+    }
+  }
+
+  .page-borrow-tip{
+    .tip-icon{
+      margin-top: 20vh;
+    }
+
+</style>

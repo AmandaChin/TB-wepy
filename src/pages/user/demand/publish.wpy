@@ -1,0 +1,48 @@
+<template>
+  <view class="weui-panel">
+    <view class="weui-media-box weui-media-box_text borrow-address">
+      <view class="weui-media-box__title h4 color-666">发布成功</view>
+    </view>
+      <view class="weui-media-box weui-media-box_text borrow-address">
+       <view class="weui-media-box__title h4 color-666">服务评分
+        <text class="weui-cell__bd h4">{{grades}}分 </text>
+       </view>
+       </view>
+       <view class="weui-media-box weui-media-box_text borrow-address">
+        <view class="weui-media-box__title h4 color-666">勋章奖励
+        <text class="weui-cell__bd h4">{{value}}VLT</text>
+       </view>
+       </view>
+       <view class="weui-media-box weui-media-box_text borrow-address">
+        <view class="weui-media-box__title h4 color-666">审核结果
+        <text class="weui-cell__bd h4">{{state}}</text>
+       </view>
+    </view>
+  </view>
+   <button class="mini-btn">
+        <navigator url="/pages/index"  hover-class="weui-cell_active">一键发布</navigator>
+   </button>
+</template>
+
+<script>
+import wepy from 'wepy'
+export default class v2c extends wepy.page {
+  config = {
+    navigationBarTitleText: '发布勋章',
+    enablePullDownRefresh: false
+  }
+  components = {}
+  data = {
+    grades:82,
+    value:2.36,
+    state:"通过"
+  }
+  computed = {}
+}
+</script>
+
+<style lang="less">
+.page-index {
+  // some style
+}
+</style>

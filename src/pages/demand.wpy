@@ -1,0 +1,237 @@
+<template>
+  <view class="page-borrow">
+    <view class="weui-panel">
+      <view class="weui-media-box weui-media-box_text borrow-address">
+        <view class="weui-media-box__title h1 color-666">老人需要陪护</view>
+        <view bindtap="chooseAddress"  wx:if="{{showChooseAddress}}" class="link link-red reset-pull-middle">
+          <image src="/images/icon/icon-location@2x.png" class="imgicon icon-location" mode="aspectFit"/>
+        </view>
+      </view>
+     
+      <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__hd">
+          <view class="weui-label reset-label-left h2">项目类型</view>
+        </view>
+        <view class="weui-cell__bd">
+            <picker @change="bindtypeChange" value="{{typeIndex}}" range="{{types}}">
+              <view class="weui-select weui-select_in-select-after h2">{{types[typeIndex]}}</view>
+              </picker>
+            </view>
+      </view>
+
+      <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__hd">
+          <view class="weui-label reset-label-left h2">服务位置</view>
+        </view>
+        <view class="weui-cell__bd h2">
+          <input bindinput="typing" class="weui-input"  placeholder="请填写地址" data-wpytyping-a="receiver"/>
+        </view>
+        </view>
+     
+      <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__hd">
+          <view class="weui-label reset-label-left h2">勋章支付</view>
+        </view>
+        <view class="weui-cell__bd">
+            <picker @change="bindpaytypeChange" value="{{paytypeIndex}}" range="{{paytypes}}">
+              <view class="weui-select weui-select_in-select-after h2">{{paytypes[paytypeIndex]}}</view>
+              </picker>
+            </view>
+      </view>
+    </view>
+   
+    <button bindtap="borrow" class="weui-btn btn-primary" type="primary">发布需求</button>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  // import { service } from '../config.js'
+  import http from '../mixins/http'
+  import base from '../mixins/base'
+  import user from '../mixins/user'
+  import cart from '../mixins/cart'
+
+  export default class pageBorrow extends wepy.page {
+    mixins = [base, http, user, cart]
+    config = {
+      navigationBarTitleText: '需求发布',
+      enablePullDownRefresh: false
+    }
+    components = {}
+    data = {
+      loaded: false,
+      loading: false,
+      types: ['陪护', '打扫', '剪发', '做饭'],
+      typeIndex: 0,
+      paytypes: ['平台代付', '自行支付'],
+      paytypeIndex: 0
+    }
+    computed = {
+    }
+    methods = {
+      bindtypeChange (e) {
+        this.typeIndex = e.detail.value
+      },
+      bindpaytypeChange (e) {
+        this.paytypeIndex = e.detail.value
+      },
+      remove(item) {
+        this.removeCart(item, () => {
+          this.updateBorrowList()
+        })
+      },
+      toSubscribe() {
+        wx.navigateTo({url: '/pages/borrow/subscribe'})
+      },
+      goMain() {
+        wx.switchTab({url: '/pages/index'})
+      },
+      typing (type, e) {
+        if (this.isDefined(this[type])) {
+          this[type] = e.detail.value
+        }
+      } 
+    }
+
+    onShow() {
+      // 初始化页面数据
+      this.initPageData()
+    }
+
+    onPullDownRefresh() {
+      this.initPageData()
+    }
+    updateBorrowList() {
+      if (!this.getNumber(this.borrowCount)) return
+
+      // 获取购物车信息
+      this.getCartList((list) => {
+        const realist = this.getArray(list, [])
+        const lenList = []
+        for (var i = 0; i < +this.borrowCount; i++) {
+          lenList.push(realist[i] || {})
+        }
+        this.borrowList = lenList
+      })
+    }
+  }
+</script>
+
+<style lang="less">
+  @import "../styles/custom/fn.less";
+
+  @icon-font-size: 34rpx;
+
+  .page-borrow{
+    
+    .borrow-address{
+      .weui-textarea{
+        width: 600rpx;
+      }
+      .weui-media-box{
+        padding-bottom: 1em;
+      }
+      .weui-media-box__title{
+        padding-left: 70px;
+      }
+      .reset-pull-right{
+        .h4();
+        top: 15px;
+        bottom: auto;
+        margin-top: -0.5em;
+      }
+      .reset-pull-middle{
+        top: 1em;
+      }
+      .icon-location{
+        width: 1.5em;
+        height: 1.5em;
+      }
+    }
+    .borrow-name-wrapper{
+      display: inline-block;
+      position: absolute;
+      top: 0;
+      left: 15px;
+      right: 15px;
+      bottom: 0;
+      height: 1em;
+      padding-left: @icon-font-size + 15rpx;
+      padding-right: 4em;
+      line-height: 1;
+      margin: auto;
+    }
+    .borrow-book-name{
+      width: 100%;
+      .text-ellipsis();
+    }
+    .reset-pull-right,
+    .reset-pull-middle{
+      position: absolute;
+      right: 15px;
+      top: 0;
+      bottom: 0;
+      height: 2em;
+      line-height: 2;
+      padding: 0 1em;
+      margin: auto -1em auto 0;
+    }
+    .reset-label-left{
+      color: #999;
+      margin-right:1em;
+      padding-right: 1em;
+      border-right: 1rpx solid @uiBorderColor;
+    }
+    .icon-order-circle,
+    .icon-order-empty{
+      display: inline-block;
+      width: @icon-font-size;
+      height: @icon-font-size;
+      font-size: 90%;
+      line-height: @icon-font-size;
+      border: 1rpx solid transparent;
+      border-radius: 50%;
+      text-align: center;
+    }
+    .icon-order-circle{
+      color: #fff;
+      background: @weuiColorPrimary;
+      border-color: @weuiColorPrimary;
+    }
+    .icon-order-empty{
+      color: #ddd;
+      background: transparent;
+      border-color: #ddd;
+    }
+    .icon-delete{
+      display: inline-block;
+      width: @icon-font-size;
+      height: @icon-font-size;
+      &:before,
+      &:after{
+        content: '';
+        display: inline-block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 2rpx;
+        height: 100%;
+        margin: auto;
+        background: #999;
+        transform: rotate(45deg);
+      }
+      &:after{
+        transform: rotate(-45deg);
+      }
+    }
+  }
+
+  .page-borrow-tip{
+    .tip-icon{
+      margin-top: 20vh;
+    }
+  }
+</style>

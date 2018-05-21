@@ -1,0 +1,72 @@
+<template>
+  <view class="weui-panel">
+    <view class="weui-media-box weui-media-box_text borrow-address">
+      <view class="weui-media-box__title h4 color-666">{{title}}</view>
+    </view>
+      <view class="weui-media-box weui-media-box_text borrow-address">
+        <view class="weui-media-box__title h4 color-666">服务详情</view>
+           <view class="weui-cell__bd h4">{{name}}</view>
+           <view class="weui-cell__bd h4">{{address}}</view>
+         </view>
+       <view class="weui-media-box weui-media-box_text borrow-address">
+       <view class="weui-media-box__title h4 color-666">勋章金额
+        <text class="weui-cell__bd h4">{{value}}VLT
+        </text>
+       </view>
+        <view class="weui-media-box__title h4 color-666">服务评分
+        <text class="weui-cell__bd h4">{{grades}}</text>
+       </view>
+    </view>
+  </view>
+  <button class="mini-btn">
+        <navigator url="./publish">确定支付</navigator>
+  </button>
+</template>
+
+<script>
+import wepy from 'wepy'
+import base from '../../../mixins/base'
+
+
+export default class payMedal extends wepy.page {
+  config = {
+    navigationBarTitleText: '勋章支付',
+    enablePullDownRefresh: false
+  }
+  data = {
+    title:"津南老人需要陪护",
+    name:"胡天毅",
+    address:"海河教育园区同砚路38号",
+    value:5.3,
+    grades:95
+  }
+  onShow() {
+    // 初始化页面数据
+
+  }
+
+  onPullDownRefresh() {
+    this.initPageData()
+  }
+
+  // 初始化页面数据
+  initPageData() {
+  }
+
+  methods = {}
+
+  components = {}
+}
+</script>
+
+<style lang="less">
+.wux-block {
+  display: block;
+  margin: 0;
+  padding: 0;
+  line-height:100rpx;
+  vertical-align: middle;
+  font-weight: 400;
+  font-style: normal;
+}
+</style>

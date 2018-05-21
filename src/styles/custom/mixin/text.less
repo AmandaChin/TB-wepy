@@ -1,0 +1,79 @@
+
+.h1() {
+  font-size: 56rpx !important;
+}
+.h2() {
+  font-size: 40rpx !important;
+}
+.h3() {
+  font-size: 32rpx !important;
+}
+.h4() {
+  font-size: 28rpx !important;
+}
+.h5() {
+  font-size: 24rpx !important;
+}
+
+.text-ellipsis() {
+  display:block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.text-ellipsis-line(@line) {
+  display: -webkit-box;
+  -webkit-line-clamp: @line;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-all;
+  text-overflow: ellipsis;
+}
+
+.ellipsis(@w:auto) {
+
+  width: @w;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+
+  word-wrap: normal;
+
+}
+
+.ellipsisLn(@line) {
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  display: -webkit-box;
+
+  -webkit-box-orient: vertical;
+
+  -webkit-line-clamp: @line;
+
+}
+
+.text_wrap() {
+
+  word-wrap:break-word;
+
+  word-break:break-all;
+
+}
+
+.hyphens() {
+
+  word-wrap:break-word;
+
+  -webkit-hyphens:auto;
+
+  hyphens:auto;
+
+}
+
+

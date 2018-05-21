@@ -1,0 +1,204 @@
+<template>
+	<view class="wux-rater">
+		<block wx:for="{{ stars }}" wx:key="">
+			<view class="wux-rater__box {{ value > index ? 'wux-rater__box--active' : '' }}" @tap = "handlerClick({{index}})" data-index="{{ index }}" style="color: {{ colors && colors[index] ? colors[index]: '#ccc' }}; margin-right: {{ margin+'px' }}; font-size: {{ fontSize + 'px' }}; width: {{ fontSize + 'px' }}; height: {{ fontSize + 'px' }}; line-height: {{ fontSize + 'px' }}">
+				<view class="wux-rater__inner">
+					{{star}}
+					<view class="wux-rater__outer" style="color: {{ activeColor }}; width: {{ cutPercent + '%' }}" wx:if="{{ cutPercent > 0 && cutIndex === index }}">
+						{{star}}
+					</view>
+				</view>
+			</view>
+		</block>
+		<block wx:for="{{ text }}" wx:key="">
+			<view class="wux-rater__text {{ item.className }}" wx:if="{{ value === index + 1 }}" style="color: {{ item.color || defaultTextColor }}">
+				{{ item.text || item }}
+			</view>
+		</block>
+	</view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  export default class Rater extends wepy.component {
+    props = {
+        max: {
+            type: Number,
+            default: '5'
+        },
+        star: {
+            type: String,
+            default: '★'
+        },
+        activeColor: {
+            type: String,
+            default: '#fc6'
+        },
+        defaultTextColor: {
+            type: String,
+            default: `#999`
+        },
+        text:{
+            type: Object,
+            default: ['非常差', '很差', '一般', '很好', '非常好']
+        },
+        stars:{
+            type: Object,
+            default: [0,1,2,3,4]
+        },
+        value:{
+            type: Number,
+            default: 1
+        },
+        colors:{
+            type: Object,
+            default: []
+        },
+        id:{
+            type: String,
+            default:''
+        }
+    }
+
+    data = {
+		cutIndex: -1, 
+		cutPercent: 0
+    }
+    computed = {
+       
+    }
+    methods = {
+        /**
+    	 * 点击触发事件
+    	 */
+		handlerClick(e) {
+            console.log('handlerClick')
+			const value = this.value
+            const _val = value === e + 1 ? e : e + 1
+            this.value = _val < 0 ? 0 : _val > this.max ? this.max : _val
+            // 更新stars
+            const max = this.max
+            //console.log('value:'+ this.value)
+            const stars = []
+            for (let i = 0; i < max; i++) {
+                stars.push(i)
+            }
+            this.stars = stars
+            //更新style
+            //console.log("更新style")
+            const activeColor = this.activeColor
+            const colors = []
+            for (let j = 0; j < max; j++) {
+            if (j <= this.value - 1) {
+                colors.push(activeColor)
+                } else {
+                colors.push(`#ccc`)
+                }
+            this.colors = colors
+            }
+		}
+    }
+    
+    onLoad(){
+        this.init(this.id, {
+            star : '★',
+            text : ['一星', '二星', '三星', '四星', '五星'] 
+        })
+    }
+    
+    init(id, opts = {}) {
+        console.log("init")
+        console.log(this.id)
+        // 更新stars
+        const max = this.max
+        //console.log('value:'+ this.value)
+        const stars = []
+        for (let i = 0; i < max; i++) {
+            stars.push(i)
+        }
+        this.stars = stars
+        //更新style
+        //console.log("更新style")
+        const activeColor = this.activeColor
+        const colors = []
+        for (let j = 0; j < max; j++) {
+        if (j <= this.value - 1) {
+            colors.push(activeColor)
+            } else {
+            colors.push(`#ccc`)
+            }
+        this.colors = colors
+        }
+        this.$apply()
+	}
+  }
+</script>
+
+<style type="less">
+@import "../styles/custom/fn.less";
+
+.wux-rater {
+  display: block;
+  margin: 0;
+  padding: 0;
+  line-height: normal;
+  vertical-align: middle;
+  font-weight: 400;
+  font-style: normal;
+}
+.wux-rater:before,
+.wux-rater:after {
+  display: table;
+  content: " ";
+}
+.wux-rater:after {
+  clear: both;
+}
+.wux-rater:before,
+.wux-rater:after {
+  display: table;
+  content: " ";
+}
+.wux-rater:after {
+  clear: both;
+}
+.wux-rater__box {
+  position: relative;
+  display: block;
+  float: left;
+  font-size: 48rpx;
+  text-align: center;
+  width: 50rpx;
+  cursor: pointer;
+  color: #ccc;
+  -webkit-transition: color .3s ease;
+  transition: color .3s ease;
+}
+.wux-rater__box:last-child {
+  padding-right: 4rpx !important;
+  margin-right: 0 !important;
+}
+.wux-rater__box--disabled {
+  color: #ccc !important;
+  cursor: not-allowed;
+}
+.wux-rater__inner {
+  position: relative;
+  display: block;
+}
+.wux-rater__outer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: block;
+  overflow: hidden;
+}
+.wux-rater__text {
+  display: inline-block;
+  float: none;
+  text-align: right;
+  margin-left: 20rpx;
+  vertical-align: middle;
+  font-size: 30rpx;
+}
+</style>
