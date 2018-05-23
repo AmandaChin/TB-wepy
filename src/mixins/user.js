@@ -27,6 +27,21 @@ export default class userMixin extends wepy.mixin {
     })
   }
 
+  // 获取地址信息
+  $getAddress(callback) {
+    // 顶级容错
+    if (!this.$parent || !this.$parent.$updateGlobalData) return
+    // 取缓存信息
+    const res = this.$parent.$updateGlobalData('res')
+    // 不重复获取用户信息
+    if (res && res.address) {
+      this.isFunction(callback) && callback(res)
+      this.$apply()
+      return res
+    }
+    this._wxChooseAddress(callback)
+  }
+
   // 进行微信登陆
   $login(success = () => {}, noAutoLogin) {
     // 先登录
@@ -104,12 +119,34 @@ export default class userMixin extends wepy.mixin {
     })
   }
 
+  //
+  _wxChooseAddress(callback) {
+    wepy.chooseLocation({
+      success: (res) => {
+        console.log('wepy.chooseLocation.success:', res)
+        // 缓存用户信息
+        const address = this.$parent.$updateGlobalData('address', res.address)
+        this.isFunction(callback) && callback(address)
+        this.$apply()
+      },
+      fail: (res) => {
+        console.log('wepy.getUserInfo.fail:', res)
+        // 用户拒绝授权:填充默认数据
+        const address = this.$parent.$updateGlobalData('address', null)
+
+        // 串行回调
+        this.isFunction(callback) && callback(user)
+        this.$apply()
+      }
+    })
+  }
+
   // 提示用户开启授权
   _wxAuthModal(callback) {
     // 先判断是否支持开启授权页的API
     wx.openSetting && wx.showModal({
       title: '授权提示',
-      content: 'BookMall希望获得以下权限：\n · 获取您的公开信息（昵称、头像等）',
+      content: '时间银行希望获得以下权限：\n · 获取您的公开信息（昵称、头像等）',
       confirmText: '去授权',
       cancelText: '先不授权',
       success: (res) => {

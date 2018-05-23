@@ -1,4 +1,5 @@
 <template>
+<view class="page-publish">
   <view class="weui-panel">
     <view class="weui-media-box weui-media-box_text borrow-address">
       <view class="weui-media-box__title h4 color-666">发布成功</view>
@@ -22,6 +23,7 @@
    <button class="mini-btn">
         <navigator url="/pages/index"  hover-class="weui-cell_active">一键发布</navigator>
    </button>
+</view>
 </template>
 
 <script>
@@ -45,4 +47,5 @@ export default class v2c extends wepy.page {
 .page-index {
   // some style
 }
+
 </style>

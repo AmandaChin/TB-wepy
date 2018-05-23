@@ -17,10 +17,11 @@
         <text class="weui-cell__bd h4">{{grades}}</text>
        </view>
     </view>
+    <button class="mini-btn">
+        <navigator url="./publish">确认支付</navigator>
+    </button>
   </view>
-  <button class="mini-btn">
-        <navigator url="./publish">确定支付</navigator>
-  </button>
+  
 </template>
 
 <script>

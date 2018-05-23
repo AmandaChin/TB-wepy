@@ -34,12 +34,11 @@ export default class pageIndex extends wepy.page {
       { image: '/images/yigong.jpg', url: '/pages/index' }
     ],
     categorys: [
-      { title: '陪护', image: funImages[0] },
-      { title: '打扫', image: funImages[1] },
-      { title: '剪发', image: funImages[2] },
-      { title: '做饭', image: funImages[3] }
+      { title: '陪护', image: '/images/index_icon/幼儿.png' },
+      { title: '打扫', image: '/images/index_icon/扫把.png' },
+      { title: '剪发', image: '/images/index_icon/剪刀.png' },
+      { title: '做饭', image: '/images/index_icon/饮食.png' }
     ],
-
     noMoreList: false,
     loading: false,
     list: [],
@@ -57,18 +56,15 @@ export default class pageIndex extends wepy.page {
 
   onReachBottom() {
     setTimeout(() => {
-      this.updateBookList(this.page)
+      this.updateBookList()
       this.$apply()
     }, 200)
   }
 
   // 初始化页面数据
   initPageData() {
-    // 初始化参数
-    this.page = 0
-
     // 请求列表
-    this.updateBookList(this.page)
+    this.updateBookList()
 
     // 处理轮播图this.swipers.push({ image: "/images/swiper.png" })
     // 处理菜单栏
@@ -87,19 +83,17 @@ export default class pageIndex extends wepy.page {
     if (this.loading || this.noMoreList) return
     this.loading = true
     // 请求列表
-    this.$post(
+    this.$get(
       {
-        url: service.list,
-        data: {
-          // 默认从0开始为第一页
-          page: page,
-          size: this.size
-        }
+        url:'https://www.nkugame.com/api/getAllDemand',
+        //url: service.list,
       },
       {
-        success: ({ code, data }) => {
+        success: ({list}) => {
+          const data = list.rows
+          console.log(data.length)
           // 示例规则：最多20本
-          if (this.list.length >= 20) {
+          if (this.list.length >= data.length) {
             this.noMoreList = true
             return
           }
@@ -109,16 +103,10 @@ export default class pageIndex extends wepy.page {
             this.noMoreList = true
             return
           }
-          if (!this.page || +this.page === 0) {
-            this.list = this.getBooks(data)
-          } else {
-            // 添加到列表中
-            this.list = [...this.list, ...this.getBooks(data)]
-          }
-          // 成功了就增加一页
-          this.page += 1
+          this.list = this.getItems(data)
+          
         },
-        fail: ({ code, data }) => {
+        fail: ({list}) => {
           // 失败了什么也不做
         },
         complete: () => {
@@ -129,17 +117,17 @@ export default class pageIndex extends wepy.page {
   }
 
   // 处理图书列表
-  getBooks(data) {
+  getItems(data) {
     const len = this.list.length
-    return this.getArray(data).map((book, index) => {
+    return this.getArray(data).map((item, index) => {
       const xlen = len + index
       // 拼接示例数据
       return {
         id: xlen,
-        title: book.title,
-        content: `简介: ${book.title}；${book.title}。`,
+        title: item.Content,
+        content: `简介: 需求人${item.Name}，在${item.DemandStartTime}发布${item.Content}的需求 。`,
         image: funImages[(xlen + 4) % 8],
-        tags: ['tag1', 'tag2'],
+        tags: ['', ''],
         status: xlen % 2
       }
     })

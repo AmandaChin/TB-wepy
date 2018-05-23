@@ -1,7 +1,7 @@
 <template>
 	<view class="wux-rater">
 		<block wx:for="{{ stars }}" wx:key="">
-			<view class="wux-rater__box {{ value > index ? 'wux-rater__box--active' : '' }}" @tap = "handlerClick({{index}})" data-index="{{ index }}" style="color: {{ colors && colors[index] ? colors[index]: '#ccc' }}; margin-right: {{ margin+'px' }}; font-size: {{ fontSize + 'px' }}; width: {{ fontSize + 'px' }}; height: {{ fontSize + 'px' }}; line-height: {{ fontSize + 'px' }}">
+			<view class="wux-rater__box {{ value > index ? 'wux-rater__box--active' : '' }}" @tap = "handlerClick('{{index}}')" data-index="{{ index }}" style="color: {{ colors && colors[index] ? colors[index]: '#ccc' }}; margin-right: {{ margin+'px' }}; font-size: {{ fontSize + 'px' }}; width: {{ fontSize + 'px' }}; height: {{ fontSize + 'px' }}; line-height: {{ fontSize + 'px' }}">
 				<view class="wux-rater__inner">
 					{{star}}
 					<view class="wux-rater__outer" style="color: {{ activeColor }}; width: {{ cutPercent + '%' }}" wx:if="{{ cutPercent > 0 && cutIndex === index }}">
@@ -138,13 +138,13 @@
 @import "../styles/custom/fn.less";
 
 .wux-rater {
-  display: block;
+  position: relative;
+  display: flex;
   margin: 0;
   padding: 0;
-  line-height: normal;
-  vertical-align: middle;
-  font-weight: 400;
-  font-style: normal;
+  display:table-cell;
+  vertical-align:middle;
+  
 }
 .wux-rater:before,
 .wux-rater:after {
@@ -164,10 +164,10 @@
 }
 .wux-rater__box {
   position: relative;
-  display: block;
+  display: flex;
   float: left;
-  font-size: 48rpx;
-  text-align: center;
+  font-size: 50rpx;
+  padding: 5rpx;
   width: 50rpx;
   cursor: pointer;
   color: #ccc;
@@ -194,11 +194,10 @@
   overflow: hidden;
 }
 .wux-rater__text {
-  display: inline-block;
-  float: none;
-  text-align: right;
-  margin-left: 20rpx;
-  vertical-align: middle;
-  font-size: 30rpx;
+  display: flex;
+  padding-top : 5rpx;
+  margin: 14rpx;
+  justify-content:center;
+  font-size: 33rpx;
 }
 </style>

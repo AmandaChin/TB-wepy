@@ -1,28 +1,27 @@
 <template>
 <view class="page_v2c">
-    <view class="page__bd">
-        <view class="weui-cells weui-cells_after-title">
-             <view class="weui-media-box weui-media-box_text borrow-address">
-             <view class="weui-media-box__title h4 color-666">文字评价</view>
-                 <view class="weui-cell__bd h4" style="height: 200rpx;">
-                 <textarea bindinput="typing" class="weui-textarea" data-wpytyping-a="address" placeholder="你的评价能帮助小伙伴哟" value=""  style="height: 150rpx;">
-                 </textarea>
-              <view class="weui-cell">
-                <view class="weui-cell__bd">综合评价</view>
-                <view class="weui-cell__ft">
-                   <Rater :id="id2" :value="value2" :star="star2" :text="
-                    "></Rater>
-                </view>
-              </view>
-             </view>
-            </view>
-          </view> 
-        <button class="mini-btn">
-        <navigator url="./succeed">发表评价</navigator>
-        </button>
+  <view class="weui-panel">
+    <view class="weui-cells">
+      <view class="weui-media-box">
+        <view class="weui-media-box__title h4 color-666">文字评价</view>
+        <view class="weui-cell__bd h4" style="height: 200rpx;">
+          <textarea bindinput="typing" class="weui-textarea" data-wpytyping-a="address" placeholder="你的评价能帮助小伙伴哟" value=""  style="height: 150rpx;">
+          </textarea>
         </view>
+
+        <view class="weui-cell">
+          <view class="weui-cell__bd">综合评价</view>
+          <view class="weui-cell__ft">
+            <Rater :id="id2" :value="value2" :star="star2" :text="mytest2"></Rater>
+          </view>
+        </view>
+        
+      </view>
     </view>
+  </view>
+  <button @tap="v2cpublish"  class="weui-btn btn-primary" type="primary">发表评价</button>
 </view>
+
 </template>
 
 
@@ -38,10 +37,10 @@ export default class v2c extends wepy.page {
     Rater
   }
   data = {
-    id1: 'text1',
-    value1: 3,
-    star1: '✩',
-    mytest: [{
+    id2: 'loving',
+    value2: 0,
+    star2: '♡',
+    mytest2: [{
               text: '非常差',
               color: 'red',
             },
@@ -61,11 +60,12 @@ export default class v2c extends wepy.page {
                 text: '非常好',
                 color: 'orange',
             },
-      ],
-    id2: 'loving',
-    value2: 0,
-    star2: '♡',
-    mytest2: ['一星', '二星', '三星', '四星', '五星']
+      ]
+  }
+  methods={
+    v2cpublish() {
+        wx.navigateTo({url: './succeed'})
+    }
   }
   onLoad() {
   }
@@ -82,5 +82,8 @@ export default class v2c extends wepy.page {
   position: relative;
   width: 70%;
   text-align:right
+}
+.mini-btn{
+  margin-top: 15px;
 }
 </style>

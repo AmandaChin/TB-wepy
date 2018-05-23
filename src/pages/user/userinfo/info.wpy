@@ -1,65 +1,72 @@
 <template>
+  <view class="page-info">
     <view class="weui-panel">
-        <view class="weui-cell weui-cell_input">
-        <view class="weui-cell__hd">
-          <view class="weui-label reset-label-left h3">头像</view>
-          <image class="userinfo-avatar" src="{{ userInfo.avatarUrl }}" background-size="cover"/>
+      <view class="weui-cells weui-cells_after-title">
+        <view class="weui-cell">
+          <view class="weui-cell__bd userinfo">
+            <image class="userinfo-avatar" src="{{avatarUrl }}" background-size="cover"/>
+          </view>
         </view>
       </view>
-
+    </view>
+    <view class="weui-panel">
       <view class="weui-cell weui-cell_input">
-        <view class="weui-cell__hd">
+        <view class="weui-cell__bd">
           <view class="weui-label reset-label-left h3">昵称</view>
-        <view class="weui-cell__bd h3">
-          <input bindinput="typing" class="weui-input" value="{{receiver}}" placeholder="请填写昵称" data-wpytyping-a="receiver"/>
+        <view class="weui-cell__ft h3">
+          <input bindinput="typing" class="weui-input" value="{{receiver}}" placeholder="{{nickName}}" data-wpytyping-a="receiver"/>
         </view>
         </view>
        </view>
 
       <view class="weui-cell weui-cell_input">
-        <view class="weui-cell__hd">
+        <view class="weui-cell__bd">
           <view class="weui-label reset-label-left h3">真实姓名</view>
-          <view class="weui-cell__bd h3">
+          <view class="weui-cell__ft h3">
           <input bindinput="typing" class="weui-input" value="{{receiver}}" placeholder="请填写真实姓名" data-wpytyping-a="receiver"/>
         </view>
         </view>
          </view>
 
       <view class="weui-cell weui-cell_input">
-        <view class="weui-cell__hd">
+        <view class="weui-cell__bd">
           <view class="weui-label reset-label-left h3">性别</view>
-         <view class="weui-cell__bd">
-            <picker @change="bindCountryChange" value="{{countryIndex}}" range="{{countries}}">
-              <view class="weui-select weui-select_in-select-after h3">{{countries[countryIndex]}}</view>
+         <view class="weui-cell__ft">
+            <picker @change="bindGenderChange" value="{{genderIndex}}" range="{{genders}}">
+              <view class="weui-select weui-select_in-select-after h3">{{genders[genderIndex]}}</view>
               </picker>
             </view>
         </view>
      </view>
 
       <view class="weui-cell weui-cell_input">
-        <view class="weui-cell__hd">
+        <view class="weui-cell__bd">
           <view class="weui-label reset-label-left h3">地址</view>
-         <view class="weui-cell__bd h3">
+         <view class="weui-cell__ft h3">
           <input bindinput="typing" class="weui-input" value="{{receiver}}" placeholder="请填写地址" data-wpytyping-a="receiver"/>
         </view>
         </view>
          </view>
 
       <view class="weui-cell weui-cell_input">
-        <view class="weui-cell__hd">
+        <view class="weui-cell__bd">
           <view class="weui-label reset-label-left h3">个性签名</view>
-          <view class="weui-cell__bd h3">
-          <input bindinput="typing" class="weui-input" value="{{receiver}}" placeholder="编辑个性签名" data-wpytyping-a="receiver"/>
-        </view>
-        </view>
-        
-        </view>
-      <view class="weui-cell weui-cell_input">
-        <view class="weui-cell__hd">
-          <view class="weui-label reset-label-left h3">实名认证</view>
+          <view class="weui-cell__ft h3">
+            <input bindinput="typing" class="weui-input" value="{{receiver}}" placeholder="编辑个性签名" data-wpytyping-a="receiver"/>
+          </view>
         </view>
       </view>
-  </view>
+      <view class="weui-cells weui-cells_after-title">
+        <navigator url="/pages/user/userinfo/identity" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
+          <view class="weui-cell__bd">实名认证</view>
+          <view class="weui-cell__ft weui-cell__ft_in-access">
+            <text class="color-green" style="color:'{{authStatus.color}}'">{{authStatus.text}}</text>
+          </view>
+        </navigator>
+      </view>
+    </view>
+    <button @tap="saveInfo" class="weui-btn btn-primary" type="primary">完成</button>
+  </view> 
 </template>
 <script>
 import wepy from 'wepy'
@@ -74,15 +81,29 @@ export default class info extends wepy.page {
   }
   components = {}
   data = {
-    userInfo:{
-      avatarUrl: '../../../images/icon/icon-avatar@2x.png'
-    },
-    countries: ['男', '女'],
-    countryIndex: 0
+    nickName: '请填写昵称',
+    avatarUrl: '../../../images/icon/icon-avatar@2x.png',
+    genders: ['男', '女'],
+    genderIndex: 0,
+    authStatus:{
+      text: '已通过',
+      color: 'green'
+    }
   }
   computed = {
+    nickName() {
+      const info = this.getObject(this.userInfo)
+      return info.nickName 
+    },
+    avatarUrl() {
+      const info = this.getObject(this.userInfo)
+      return info.avatarUrl
+    }
   }
   methods = {
+    saveInfo(){
+        wx.switchTab({url: '/pages/user'})
+    },
     bindCountryChange (e) {
       this.countryIndex = e.detail.value
     }
@@ -112,16 +133,28 @@ export default class info extends wepy.page {
 
 <style lang="less">
 @import "../../../styles/custom/fn.less";
-@userinfoHeight: 100rpx;
+@userinfoHeight: 150rpx;
+@userinfoSpace: 8rpx;
+
+.userinfo {
+    padding: 20rpx 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
 .weui-select {
   position: relative;
-
-  padding-right: 30px;
 }
 .userinfo-avatar {
     margin-bottom: 24rpx;
     width: @userinfoHeight;
     height: @userinfoHeight;
     border-radius: 50%;
+    align-items: center;
 }
+.page-info .weui-cell__ft
+{
+  text-align:right;
+  color: #000000
+  }
 </style>

@@ -15,35 +15,25 @@
             <block wx:for="{{item.tags}}" wx:key="index" wx:for-item="tag">
               <view class="booklist-tag">{{tag}}</view>
             </block>
-            <view class="booklist-status">
-              <block wx:if="{{item.status == '1'}}">
-                <image src="{{icon_eye_active}}" class="imgicon" mode="aspectFit" />
-                <text class="booklist-text color-blue">可借阅</text>
-              </block>
-              <block wx:else>
-                <image src="{{icon_eye}}" class="imgicon" mode="aspectFit" />
-                <text class="booklist-text color-bbb">已借完</text>
-              </block>
-            </view>
           </view>
-  </view>
-  </navigator>
-  </block>
-  <block wx:if="{{loading}}">
-    <view class="weui-loadmore">
-      <view class="weui-loading"></view>
-      <view class="weui-loadmore__tips">正在加载</view>
-    </view>
-  </block>
-  <block wx:elif="{{noMore}}">
-    <view class="weui-loadmore weui-loadmore_line weui-loadmore_dot">
-      <view class="weui-loadmore__tips weui-loadmore__tips_in-line weui-loadmore__tips_in-dot"></view>
-    </view>
-  </block>
+        </navigator>
+      </block>
+    </block>
+    <block wx:if="{{loading}}">
+      <view class="weui-loadmore">
+        <view class="weui-loading"></view>
+        <view class="weui-loadmore__tips">正在加载</view>
+      </view>
+    </block>
+    <block wx:elif="{{noMore}}">
+      <view class="weui-loadmore weui-loadmore_line weui-loadmore_dot">
+        <view class="weui-loadmore__tips weui-loadmore__tips_in-line weui-loadmore__tips_in-dot"></view>
+      </view>
+    </block>
   </block>
   <block wx:else>
     <view class="weui-loadmore weui-loadmore_line">
-      <view class="weui-loadmore__tips weui-loadmore__tips_in-line">暂无需求</view>
+      <view class="weui-loadmore__tips weui-loadmore__tips_in-line">暂无数据</view>
     </view>
   </block>
   </view>

@@ -1,6 +1,6 @@
 <template>
   <view class="page-index">
-    <BookList :list.sync="list" title="义工市场"
+    <BookList :list.sync="list" title="勋章列表"
      :loading.sync="loading" :noMore.sync="noMoreList"></BookList>
   </view>
 </template>

@@ -5,11 +5,11 @@
         <view class="weui-cell">
           <view class="weui-cell__bd userinfo clearfix">
             <navigator url="/pages/user/userinfo/info">
-              <image class="userinfo-avatar" src="{{ userInfo.avatarUrl }}" background-size="cover"/>
+              <image class="userinfo-avatar" src="{{ avatarUrl }}" background-size="cover"/>
             </navigator>
             <view class="userinfo-nickname">{{ nickName }}</view>
-            <view class="userinfo-status">志愿时长：{{identity.type}}</view>
-            <view class="userinfo-status">服务次数：{{identity.type}}</view>
+            <view class="userinfo-status">志愿时长：0 hours</view>
+            <view class="userinfo-status">服务次数：0 times</view>
           </view>
         </view>
       </view>
@@ -20,20 +20,20 @@
           <view class="weui-cell__bd">我的勋章</view>
           <view class="weui-cell__ft weui-cell__ft_in-access">
             <text>余额：</text>
-            <text class="color-green">{{packages.times}}</text>
+            <text class="color-green">0</text>
             <text>VLT</text>
           </view>
         </navigator>
         <navigator url="/pages/user/demand/myDemand" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
           <view class="weui-cell__bd">我的需求</view>
           <view class="weui-cell__ft weui-cell__ft_in-access">
-            <text class="color-green">{{packages.status}}</text>
+            <text class="color-green">5</text>
           </view>
         </navigator>
         <navigator url="/pages/user/volunteer/myVolunteer" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
           <view class="weui-cell__bd">待完成</view>
           <view class="weui-cell__ft weui-cell__ft_in-access">
-            <text class="color-green">{{identity.collection || '0'}}</text>
+            <text class="color-green">20</text>
           </view>
         </navigator>
       </view>
@@ -55,19 +55,9 @@ export default class pageUser extends wepy.page {
     enablePullDownRefresh: false
   };
   data = {
-    userInfo: {
       nickName: '加载中...',
       // 头像占位图
-      avatarUrl: '../images/icon/icon-avatar@2x.png',
-      packages: {
-        times: 0,
-        status: '借阅状态'
-      },
-      identity: {
-        type: '订阅状态',
-        collection: 0
-      }
-    }
+      avatarUrl: '../images/icon/icon-avatar@2x.png'
   };
 
   computed = {
@@ -80,7 +70,12 @@ export default class pageUser extends wepy.page {
     nickName() {
       const info = this.getObject(this.userInfo)
       // 名称或头像不为空的，才认为是授权用户
-      return info.nickName || info.avatarUrl ? info.nickName : '未授权用户'
+      return info.nickName
+    },
+    avatarUrl() {
+      const info = this.getObject(this.userInfo)
+      console.log(info.avatarUrl)
+      return info.avatarUrl
     }
   };
 
