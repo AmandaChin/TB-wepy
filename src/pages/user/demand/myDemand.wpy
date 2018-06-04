@@ -1,7 +1,27 @@
 <template>
  <view>
-     <booklist :list.sync="list"
-     :loading.sync="loading" :noMore.sync="noMoreList"></booklist>
+   <view class="navbar page">
+        <view class="page__bd">
+            <view class="weui-tab">
+                <view class="weui-navbar">
+                    <view wx:for="{{tabs}}" wx:key="*this" id="{{index}}" class="weui-navbar__item {{activeIndex == index ? 'weui-bar__item_on' : ''}}" @tap="tabClick">
+                        <view class="weui-navbar__title">{{item}}</view>
+                    </view>
+                    <view class="weui-navbar__slider" style="left: {{sliderLeft}}px; transform: translateX({{sliderOffset}}px); -webkit-transform: translateX({{sliderOffset}}px);"></view>
+                </view>
+                <view class="weui-tab__panel">
+                    <view class="weui-tab__content" hidden="{{activeIndex != 0}}">
+                       <booklist :list.sync="list"
+                        :loading.sync="loading" :noMore.sync="noMoreList"></booklist>
+                    </view>
+                    <view class="weui-tab__content" hidden="{{activeIndex != 1}}">
+                      
+                    </view>
+                </view>
+            </view>
+        </view>
+    </view>
+    
  </view>
 </template>
 
@@ -11,17 +31,38 @@ import booklist from '../../../components/demandlist'
 import wepy from 'wepy'
 import { service } from '../../../config.js'
 import { funImages } from '../../../mixins/demo'
+const sliderWidth = 96; // 需要设置slider的宽度，用于计算中间位置
 export default class myDemand extends wepy.page {
   config = {
     navigationBarTitleText: '我的需求',
     enablePullDownRefresh: false
   }
-
-  onReady() {
-    this.initPageData()
+  data = {
+    tabs: ['待评价', '历史需求'],
+    activeIndex: 0,
+    sliderOffset: 0,
+    sliderLeft: 0,
+    list: [
+     {title: "扶老奶奶过马路",content:"这是示例demo", url:"./c2v",my_button:'立即评价'},
+     {title: "这是示例demo", url:"./c2v",my_button:'立即评价'},
+     {title: "这是示例demo", url:"./c2v",my_button:'立即评价'},
+     {title: "这是示例demo", url:"./c2v",my_button:'立即评价'},
+     {title: "这是示例demo", url:"./c2v",my_button:'立即评价'}
+     ]
   }
 
-  onPullDownRefresh() {
+  methods = {
+    tabClick (e) {
+      this.sliderOffset = e.currentTarget.offsetLeft;
+      this.activeIndex = e.currentTarget.id;
+    }
+  }
+
+  async onLoad () {
+    let res = await wepy.getSystemInfo();
+
+    this.sliderLeft = (res.windowWidth / this.tabs.length - sliderWidth) / 2;
+    this.sliderOffset = res.windowWidth / this.tabs.length * this.activeIndex;
     this.initPageData()
   }
 
@@ -36,20 +77,8 @@ export default class myDemand extends wepy.page {
   initPageData() {
     // 初始化参数
     this.page = 0
-
     // 请求列表
     this.updateBookList(this.page)
-
-    // 处理轮播图this.swipers.push({ image: "/images/swiper.png" })
-    // 处理菜单栏
-    this.categorys.map((cate, index) => {
-      const xnum = Math.min(Math.max(index, 1), 3)
-      cate.url = `/pages/main/list?params=${this.$json({
-        value: [xnum, 4 - xnum].map(item => this.getString(item)),
-        index: index + 1,
-        title: cate.title
-      })}`
-    })
   }
 
   // 更新图书列表
@@ -114,22 +143,27 @@ export default class myDemand extends wepy.page {
       }
     })
   }
-
+  
   components = {
     booklist
   }
-  data = {
-    list: [
-     {title: "这是一个不寻常的故事",content:"我就是在瞎诌；我就是在瞎诌。", url:"./c2v",my_button:'立即评价'},
-     {title: "这里突然出现了3句话", url:"./c2v",my_button:'立即评价'}, {title: "是的，没错", url:"./c2v",my_button:'立即评价'}, 
-     {title: "你可能猜到", url:"./c2v",my_button:'立即评价'}, {title: "我就是在瞎诌", url:"./c2v",my_button:'立即评价'}
-     ]
-  }
-  computed = {}
-}</script>
+ 
+}
+</script>
 
 <style lang="less">
-.page-index {
-  // some style
+@import "../../../styles/weui/widget/weui-tab/weui-navbar.wxss";
+.navbar {
+    .page,
+    .page__bd{
+        height: 100%;
+    }
+    .page__bd{
+        padding-bottom: 0;
+    }
+    .weui-tab__content{
+        padding-top: 60px;
+        text-align: center;
+    }
 }
 </style>

@@ -27,7 +27,7 @@
                                         </view>
                                     </block>
                                 </view>
-                                <view class="weui-uploader__input-box">
+                                <view hidden="{{files.length==2}}" class="weui-uploader__input-box">
                                     <view class="weui-uploader__input" @tap="chooseImage"></view>
                                 </view>
                             </view>
@@ -41,40 +41,47 @@
         <navigator url="./v2c">发表申请</navigator>
         </button>
         </view>
-    </view>
 </view>
 </template>
 
 <script>
 import wepy from 'wepy'
+//import 'wepy-async-function'
 export default class apply extends wepy.page {
   config = {
     navigationBarTitleText: '申请勋章',
     enablePullDownRefresh: false
   }
-  components = {}
   data = {
-    title:"帮习大大整理稿件",
+    title: '',
     files:[]
   }
-  computed = {
-  }
+  
   methods = {
-            async chooseImage (e) {
-                let res = await wepy.chooseImage({
-                    sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
-                    sourceType: ['album', 'camera'] // 可以指定来源是相册还是相机，默认二者都有
-                });
-                this.files = this.files.concat(res.tempFilePaths);
-                this.$apply();
-            },
-            previewImage (e) {
-                wepy.previewImage({
-                    current: e.currentTarget.id, // 当前显示图片的http链接
-                    urls: this.props.files // 需要预览的图片http链接列表
-                });
+      async chooseImage (e) {
+          let result = await wepy.chooseImage({
+              count:2,
+              sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+              sourceType: ['album', 'camera']// 可以指定来源是相册还是相机，默认二者都有
+          })
+          var tempFilePaths = result.tempFilePaths
+          this.files = this.files.concat(tempFilePaths)
+          this.$apply()
+        },
+        
+      previewImage (e) {
+          wepy.previewImage({
+              current: e.currentTarget.id, // 当前显示图片的http链接
+              urls: this.props.files // 需要预览的图片http链接列表
+              })
             }
-        }
+    }
+    
+    onLoad() {
+    }
+    onShow(){
+    }
+
 }
 </script>
 

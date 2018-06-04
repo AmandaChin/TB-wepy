@@ -12,7 +12,7 @@
   "license": "GPL-3.0",
   "dependencies": {
     "wepy": "^1.6.0",
-    "wepy-async-function": "^1.4.4",
+    "wepy-async-function": "^1.4.6",
     "wepy-cli": "^1.7.1",
     "wepy-com-toast": "^1.0.2"
   },

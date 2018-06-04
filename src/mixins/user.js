@@ -48,7 +48,6 @@ export default class userMixin extends wepy.mixin {
     wepy.login({
       success: (res) => {
         console.log('wepy.login.success:', res)
-
         // 如果不需要自动登录，就return
         if (noAutoLogin) {
           // 串行回调
@@ -67,17 +66,6 @@ export default class userMixin extends wepy.mixin {
         setTimeout(() => {
           this.$parent.$updateGlobalData('user', {
             session: Math.random().toString(36).substring(2),
-            packages: {
-              times: 0,
-              quantity: 0,
-              status: '未借阅'
-            },
-            identity: {
-              collection: 20,
-              type: '未订阅用户',
-              mobile: '1234567890',
-              address: '在那遥远的地方 有一位美丽的姑娘',
-            }
           })
           // 串行回调
           this.isFunction(success) && success(res)
@@ -93,6 +81,12 @@ export default class userMixin extends wepy.mixin {
   /* ========================= 其他方法 ========================= */
   // 获取用户公开信息（微信）
   _wxUserInfo(callback) {
+    // let info = await wepy.getUserInfo({})
+    // const user = this.$parent.$updateGlobalData('user', info.userInfo)
+    // console.log('_wxUserInfo'+info)
+    // this.isFunction(callback) && callback(user)
+    
+    this.$apply()
     wepy.getUserInfo({
       success: (res) => {
         console.log('wepy.getUserInfo.success:', res)
@@ -119,28 +113,7 @@ export default class userMixin extends wepy.mixin {
     })
   }
 
-  //
-  _wxChooseAddress(callback) {
-    wepy.chooseLocation({
-      success: (res) => {
-        console.log('wepy.chooseLocation.success:', res)
-        // 缓存用户信息
-        const address = this.$parent.$updateGlobalData('address', res.address)
-        this.isFunction(callback) && callback(address)
-        this.$apply()
-      },
-      fail: (res) => {
-        console.log('wepy.getUserInfo.fail:', res)
-        // 用户拒绝授权:填充默认数据
-        const address = this.$parent.$updateGlobalData('address', null)
-
-        // 串行回调
-        this.isFunction(callback) && callback(user)
-        this.$apply()
-      }
-    })
-  }
-
+ 
   // 提示用户开启授权
   _wxAuthModal(callback) {
     // 先判断是否支持开启授权页的API

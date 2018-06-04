@@ -1,0 +1,131 @@
+<template>
+  <view class="page-notice">
+    <notice :list.sync="list" title="通知列表"
+     :loading.sync="loading" :noMore.sync="noMoreList"></notice>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import { service } from '../../../config.js'
+import base from '../../../mixins/base'
+import http from '../../../mixins/http'
+import { funImages } from '../../../mixins/demo'
+import notice from '../../../components/notice'
+
+export default class Notice extends wepy.page {
+  mixins = [base, http]
+  config = {
+    navigationBarTitleText: '通知',
+    navigationBarTextStyle: 'white',
+    navigationBarBackgroundColor: '#049BFF'
+  }
+  data = {
+
+    noMoreList: false,
+    loading: false,
+    list: [
+     {title: "关于系统使用说明的通知",content:"这是示例demo"}
+     ],
+    page: 0,
+    size: 5
+  }
+
+  onReady() {
+    this.initPageData()
+  }
+
+  onPullDownRefresh() {
+    this.initPageData()
+  }
+
+  onReachBottom() {
+    setTimeout(() => {
+      this.updateBookList(this.page)
+      this.$apply()
+    }, 200)
+  }
+
+  // 初始化页面数据
+  initPageData() {
+    // 初始化参数
+    this.page = 0
+
+    // 请求列表
+    this.updateBookList(this.page)
+  }
+  // 更新图书列表
+  updateBookList(page) {
+    if (this.loading || this.noMoreList) return
+    this.loading = true
+    // 请求列表
+    this.$post(
+      {
+        url: service.list,
+        data: {
+          // 默认从0开始为第一页
+          page: page,
+          size: this.size
+        }
+      },
+      {
+        success: ({ code, data }) => {
+          // 示例规则：最多20本
+          if (this.list.length >= 20) {
+            this.noMoreList = true
+            return
+          }
+
+          // 请求到空列表后就认为没有更多了
+          if (this.isArray(data) && data.length === 0) {
+            this.noMoreList = true
+            return
+          }
+          if (!this.page || +this.page === 0) {
+            this.list = this.getBooks(data)
+          } else {
+            // 添加到列表中
+            this.list = [...this.list, ...this.getBooks(data)]
+          }
+          // 成功了就增加一页
+          this.page += 1
+        },
+        fail: ({ code, data }) => {
+          // 失败了什么也不做
+        },
+        complete: () => {
+          this.loading = false
+        }
+      }
+    )
+  }
+
+  // 处理图书列表
+  getBooks(data) {
+    const len = this.list.length
+    return this.getArray(data).map((book, index) => {
+      const xlen = len + index
+      // 拼接示例数据
+      return {
+        id: xlen,
+        title: book.title,
+        content: `简介: ${book.title}；${book.title}。`,
+        image: funImages[(xlen + 4) % 8],
+        tags: ['tag1', 'tag2'],
+        status: xlen % 2
+      }
+    })
+  }
+
+  methods = {}
+
+  components = {
+    notice
+  }
+}
+</script>
+
+<style lang="less">
+.page-notice {
+}
+</style>

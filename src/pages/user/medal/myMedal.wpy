@@ -1,7 +1,31 @@
 <template>
   <view class="page-index">
-    <BookList :list.sync="list" title="勋章列表"
-     :loading.sync="loading" :noMore.sync="noMoreList"></BookList>
+    <view class="navbar page">
+        <view class="page__bd">
+            <view class="weui-tab">
+                <view class="weui-navbar">
+                    <view wx:for="{{tabs}}" wx:key="*this" id="{{index}}" class="weui-navbar__item {{activeIndex == index ? 'weui-bar__item_on' : ''}}" @tap="tabClick">
+                        <view class="weui-navbar__title">{{item}}</view>
+                    </view>
+                    <view class="weui-navbar__slider" style="left: {{sliderLeft}}px; transform: translateX({{sliderOffset}}px); -webkit-transform: translateX({{sliderOffset}}px);"></view>
+                </view>
+                <view class="weui-tab__panel">
+                    <view class="weui-tab__content" hidden="{{activeIndex != 0}}">
+                      <BookList :list.sync="list" title=""
+                      :loading.sync="loading" :noMore.sync="noMoreList"></BookList>
+                    </view>
+                    <view class="weui-tab__content" hidden="{{activeIndex != 1}}">
+                      <BookList :list.sync="list" title=""
+                      :loading.sync="loading" :noMore.sync="noMoreList"></BookList>
+                    </view>
+                    <view class="weui-tab__content" hidden="{{activeIndex != 2}}">
+                      <BookList :list.sync="list" title=""
+                      :loading.sync="loading" :noMore.sync="noMoreList"></BookList>
+                    </view>
+                </view>
+            </view>
+        </view>
+    </view>
   </view>
 </template>
 
@@ -12,29 +36,37 @@ import base from '../../../mixins/base'
 import http from '../../../mixins/http'
 import { funImages } from '../../../mixins/demo'
 import BookList from '../../../components/bookList'
-
+const sliderWidth = 96; // 需要设置slider的宽度，用于计算中间位置
 export default class pageIndex extends wepy.page {
   mixins = [base, http]
   config = {
-    navigationBarTitleText: '首页',
+    navigationBarTitleText: '我的勋章',
     navigationBarTextStyle: 'white',
-    navigationBarBackgroundColor: '#049BFF'
+    navigationBarBackgroundColor: '#049BFF',
+    enablePullDownRefresh: false
   }
   data = {
-
+    tabs: ['已获得', '正在申请', '已转移'],
+    activeIndex: 0,
+    sliderOffset: 0,
+    sliderLeft: 0,
     noMoreList: false,
     loading: false,
     list: [],
     page: 0,
     size: 5
   }
-
-  onReady() {
-    this.initPageData()
+  methods = {
+    tabClick (e) {
+      this.sliderOffset = e.currentTarget.offsetLeft;
+      this.activeIndex = e.currentTarget.id;
+    }
   }
+  async onLoad () {
+    let res = await wepy.getSystemInfo();
 
-  onPullDownRefresh() {
-    this.initPageData()
+    this.sliderLeft = (res.windowWidth / this.tabs.length - sliderWidth) / 2;
+    this.sliderOffset = res.windowWidth / this.tabs.length * this.activeIndex;
   }
 
   onReachBottom() {
@@ -59,7 +91,7 @@ export default class pageIndex extends wepy.page {
     // 请求列表
     this.$post(
       {
-        url: service.list,
+        url: '',
         data: {
           // 默认从0开始为第一页
           page: page,
@@ -115,8 +147,6 @@ export default class pageIndex extends wepy.page {
     })
   }
 
-  methods = {}
-
   components = {
     BookList
   }
@@ -124,6 +154,18 @@ export default class pageIndex extends wepy.page {
 </script>
 
 <style lang="less">
-.page-index {
+@import "../../../styles/weui/widget/weui-tab/weui-navbar.wxss";
+.navbar {
+    .page,
+    .page__bd{
+        height: 100%;
+    }
+    .page__bd{
+        padding-bottom: 0;
+    }
+    .weui-tab__content{
+        padding-top: 60px;
+        text-align: center;
+    }
 }
 </style>

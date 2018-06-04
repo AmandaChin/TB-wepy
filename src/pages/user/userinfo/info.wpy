@@ -33,7 +33,9 @@
           <view class="weui-label reset-label-left h3">性别</view>
          <view class="weui-cell__ft">
             <picker @change="bindGenderChange" value="{{genderIndex}}" range="{{genders}}">
-              <view class="weui-select weui-select_in-select-after h3">{{genders[genderIndex]}}</view>
+              <text wx:if="{{genderisundefined}}" style="color:#999;font-size:30rpx;">请选择性别</text>
+              <text wx:elif="{{genderisdefined}}" style="color:#999;font-size:30rpx;">{{gender}}</text>
+              <view wx:else><text class="weui-input">{{genders[genderIndex]}}</text></view>
               </picker>
             </view>
         </view>
@@ -88,7 +90,11 @@ export default class info extends wepy.page {
     authStatus:{
       text: '已通过',
       color: 'green'
-    }
+    },
+    genderisundefined: false,
+    genderisdefined: true,
+    gender: ''
+
   }
   computed = {
     nickName() {
@@ -114,6 +120,11 @@ export default class info extends wepy.page {
       const uinfo = this.getObject(info)
       const userInfo = this.getObject(this.userInfo)
       this.userInfo = Object.assign({}, userInfo, uinfo)
+      if(this.userInfo.gender==1){
+        this.gender = '男'
+      }else{
+        this.gender = '女'
+      }
       this.initPageData()
     })
   }

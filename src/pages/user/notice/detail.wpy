@@ -1,0 +1,86 @@
+<template>
+  <view class="page-detail">
+            <view class="weui-article">
+                <view class="weui-article__h1">关于系统使用说明的通知</view>
+                <view class="page__desc">作者：佚名</view>
+                <view class="page__desc">发布日期：2018/06/01</view>
+                <view class="weui-article__section">
+                    <view class="weui-article__section">
+                        <view class="weui-article__h3">欢迎来到时间银行志愿服务系统</view>
+                        <view class="weui-article__p">
+                            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+                            tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+                            quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+                            consequat.
+                        </view>
+                        <view class="weui-article__p">
+                            <image class="weui-article__img" src="../../../images/yigong.jpg" mode="aspectFit" style="height: 180px" />
+                        </view>
+                    </view>
+                </view>
+            </view>
+    <Screen class="fixed-bottom">
+      <button slot="placeholder" class="weui-btn btn-block" type="primary">返回</button>
+    </Screen>
+  </view>
+
+</template>
+
+<script>
+import wepy from 'wepy'
+export default class noticeDetail extends wepy.page {
+  config = {
+    navigationBarTitleText: '详情',
+    navigationBarTextStyle: 'white',
+    navigationBarBackgroundColor: '#049BFF'
+  }
+}
+</script>
+
+<style lang="less">
+@import "../../../styles/custom/fn.less";
+.page-detail {
+  background-color: #FFFFFF;
+}
+image{
+    margin: 4px 0;
+}
+
+.weui-article {
+  padding: 20px 15px;
+  font-size: 15px;
+}
+.weui-article__section {
+  margin-bottom: 1.5em;
+}
+.weui-article__h1 {
+  font-size: 18px;
+  font-weight: 400;
+  margin-bottom: .9em;
+}
+.weui-article__h2 {
+  font-size: 16px;
+  font-weight: 400;
+  margin-bottom: .34em;
+}
+.weui-article__h3 {
+  font-weight: 400;
+  font-size: 15px;
+  margin-bottom: .34em;
+}
+.weui-article__p {
+  margin: 0 0 .8em;
+}
+.page__title {
+  text-align: left;
+  font-size: 20px;
+  font-weight: 400;
+}
+.page__desc {
+  margin-top: 5px;
+  color: #888888;
+  text-align: left;
+  font-size: 14px;
+}
+
+</style>

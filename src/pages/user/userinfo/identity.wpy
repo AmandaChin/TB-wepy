@@ -6,25 +6,86 @@
         <view class="h3 color-666">{{user}}的身份认证信息{{authStatus.text}}</view>
       </view>
     </view>
-    <view class="weui-panel">
+   
+    <block wx:if="{{authStatus.state}}">
+       <view class="weui-panel">
       <view class="weui-cell__bd">
         <view class="weui-label reset-label-left h3">身份证正面：</view>
       </view>
       <view class="weui-cell__hd">
         <image src="/images/back-indentity.jpg" style="margin-left: 20px;margin-top: 10px;margin-bottom: 10px;vertical-align: middle;width:320px; height: 240px" />
       </view>
+      <view class="weui-panel">
+        <view class="weui-cell__bd">
+          <view class="weui-label reset-label-left h3">身份证反面：</view>
+        </view>
+        <view class="weui-cell__hd">
+          <image src="/images/back-indentity.jpg" style="margin-left: 20px;margin-top: 10px;margin-bottom: 10px;vertical-align: middle;width:320px; height: 240px" />
+        </view>
+      </view>
+      </view> 
+    </block>    
+    <block wx:else>
+      <view class="weui-panel">
+      <view class="weui-cells">
+        <view class="weui-cell">
+          <view class="weui-cell__bd">
+            <view class="weui-uploader">
+              <view class="weui-uploader__hd">
+                <view class="weui-uploader__title">上传身份证正面</view>
+                <view class="weui-uploader__info">{{files.length}}/1</view>
+              </view>
+                <view class="weui-uploader__bd">
+                <view class="weui-uploader__files" id="uploaderFiles">
+                <block wx:for="{{files}}" wx:key="*this">
+                    <view class="weui-uploader__file" @tap="previewImage" id="{{item}}">
+                      <image class="weui-uploader__img" src="{{item}}" mode="aspectFill" />
+                    </view>
+                </block>
+              </view>
+              <view hidden="{{files.length==2}}" class="weui-uploader__input-box">
+                <view class="weui-uploader__input" @tap="chooseImage"></view>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+        <view class="weui-cell">
+          <view class="weui-cell__bd">
+            <view class="weui-uploader">
+              <view class="weui-uploader__hd">
+                <view class="weui-uploader__title">上传身份证反面</view>
+                <view class="weui-uploader__info">{{files.length}}/1</view>
+              </view>
+                <view class="weui-uploader__bd">
+                <view class="weui-uploader__files" id="uploaderFiles">
+                <block wx:for="{{files}}" wx:key="*this">
+                    <view class="weui-uploader__file" @tap="previewImage" id="{{item}}">
+                      <image class="weui-uploader__img" src="{{item}}" mode="aspectFill" />
+                    </view>
+                </block>
+              </view>
+              <view hidden="{{files.length==2}}" class="weui-uploader__input-box">
+                <view class="weui-uploader__input" @tap="chooseImage"></view>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
     </view>
-      
-    <view class="weui-panel">
-      <view class="weui-cell__bd">
-        <view class="weui-label reset-label-left h3">身份证反面：</view>
-      </view>
-      <view class="weui-cell__hd">
-        <image src="/images/back-indentity.jpg" style="margin-left: 20px;margin-top: 10px;margin-bottom: 10px;vertical-align: middle;width:320px; height: 240px" />
-      </view>
+    </view>
+    <view class="weui-cells__tips">
+      <view class="color-666">说明</view>
+      <view class="color-999">1. 请分别上传身份证正、反面照</view>
+      <view class="color-999">2. 请仔细检查图片信息，一旦审核成功将无法更改！</view>
+    </view>
+    <button class="mini-btn">
+        <navigator url="">保存信息</navigator>
+        </button>
+    </block>
     </view>
     
-  </view> 
+  
 </template>
 <script>
 import wepy from 'wepy'
@@ -41,18 +102,36 @@ export default class info extends wepy.page {
   data = {
     user: '',
     authStatus:{
-      text: '已通过',
-      color: 'green'
-    }
+      text: '未通过',
+      color: 'green',
+      state:false
+    },
+    files:[]    
   }
   computed = {
     
   }
   methods = {
-   
-  }
+    async chooseImage (e) {
+      let res = await wepy.chooseImage({
+        sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+        sourceType: ['album', 'camera'] // 可以指定来源是相册还是相机，默认二者都有
+        
+      })
+      this.files = this.files.concat(res.tempFilePaths)
+      this.$apply()
+    },
+    previewImage (e) {
+      wepy.previewImage({
+        current: e.currentTarget.id, // 当前显示图片的http链接
+        urls: this.data.files // 需要预览的图片http链接列表
+      })
+    }
+}
+
   onShow() {
     this.initPageData()
+    console.log('show:'+this.res)
   }
   // 初始化页面数据
     initPageData() {
@@ -75,5 +154,8 @@ export default class info extends wepy.page {
 
 <style lang="less">
 @import "../../../styles/custom/fn.less";
-
+@import "../../../styles/weui/widget/weui-cell/weui-uploader.wxss";
+.mini-btn{
+  margin-top: 20px;
+}
 </style>

@@ -1,6 +1,5 @@
 @import "../../base/fn.wxss";
 
-@weuiNavBarColor: #1AAD19;
 .weui-navbar {
     display: flex;
     position: absolute;
@@ -19,7 +18,7 @@
     font-size: 0;
 
     &.weui-bar__item_on {
-        color: @weuiNavBarColor;
+        color: @weuiColorPrimary;
     }
 }
 .weui-navbar__slider {
@@ -29,7 +28,7 @@
     bottom: 0;
     width: 6em;
     height: 3px;
-    background-color: @weuiNavBarColor;
+    background-color: @weuiColorPrimary;
     transition: transform .3s;
 }
 .weui-navbar__title{

@@ -26,7 +26,9 @@ export default class extends wepy.app {
       'pages/user/volunteer/myVolunteer',
       'pages/user/volunteer/v2c',
       'pages/user/volunteer/succeed',
-      'pages/user/userinfo/identity'
+      'pages/user/userinfo/identity',
+      'pages/user/notice/notice',
+      'pages/user/notice/detail'
     ],
     window: {
       navigationBarTitleText: '时间银行志愿服务系统',
@@ -66,12 +68,12 @@ export default class extends wepy.app {
   }
 
   globalData = {
-    user: null,
-    cart: null
+    user: null
   }
 
   constructor () {
     super()
+    //this.use('promisify')
     this.use('requestfix')
   }
 

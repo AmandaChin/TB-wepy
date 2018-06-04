@@ -56,11 +56,9 @@ export default class myDemand extends wepy.page {
   }
   data = {
     list: [
-     {title: "这是一个不寻常的故事",content:"我就是在瞎诌；我就是在瞎诌。", url:"./apply", my_button:'立即申请'},
-     {title: "这里突然出现了3句话", url:"./v2c", my_button:'立即申请'}, 
-     {title: "是的，没错", url:"./apply", my_button:'立即申请'}, 
-     {title: "你可能猜到", url:"./v2c", my_button:'立即申请'}, 
-     {title: "我就是在瞎诌", url:"./apply", my_button:'立即申请'}
+     {title: "扶老奶奶过马路",content:"我是示例demo。", url:"./apply", my_button:'立即申请'},
+     {title: "我是示例demo", url:"./v2c", my_button:'立即申请'}, 
+     {title: "我是示例demo", url:"./apply", my_button:'立即申请'}
      ]
   }
   computed = {}
