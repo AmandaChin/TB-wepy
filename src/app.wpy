@@ -68,13 +68,15 @@ export default class extends wepy.app {
   }
 
   globalData = {
-    user: null
+    user: null,
+    oppenid: null,
+    session: null
   }
 
   constructor () {
     super()
-    //this.use('promisify')
-    this.use('requestfix')
+    //this.use('requestfix')
+    this.use('promisify')
   }
 
   onLaunch() {

@@ -35,7 +35,7 @@ export default class httpMixin extends wepy.mixin {
     {success = () => {}, fail = () => {}, complete = () => {} }
   ) {
     // 增强体验：加载中
-    wx.showNavigationBarLoading()
+    wepy.showNavigationBarLoading()
 
     // 构造请求体
     const request = {

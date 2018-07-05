@@ -147,7 +147,7 @@
     computed = {
       showChooseAddress() {
         if(!wepy.chooseLocation){
-        wx.showModal({
+        wepy.showModal({
             title: '提示',
             content: '您当前的版本不支持地图插件，请更新微信或者手动输入地址！',
             success: function (res) {
@@ -156,7 +156,7 @@
             }
             })
       }
-      return !!wx.chooseLocation
+      return !!wepy.chooseLocation
       }
     }
     methods = {
@@ -209,6 +209,7 @@
     onPullDownRefresh() {
       this.initPageData()
     }
+    
     // 初始化页面数据
     initPageData() {
       // 异步获取数据
@@ -227,8 +228,6 @@
       var day = myDate.getDate()
       this.today = year+'-'+month+'-'+day
       this.endday = year+'-'+(month+3)+'-'+day
-      console.log(this.today)
-      console.log(this.endday)
     }
     updateLocation(){
       this.$getAddress((data)=>{

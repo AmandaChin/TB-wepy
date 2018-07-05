@@ -46,7 +46,6 @@
 
 <script>
 import wepy from 'wepy'
-//import 'wepy-async-function'
 export default class apply extends wepy.page {
   config = {
     navigationBarTitleText: '申请勋章',
@@ -76,7 +75,7 @@ export default class apply extends wepy.page {
               })
             }
     }
-    
+   
     onLoad() {
     }
     onShow(){

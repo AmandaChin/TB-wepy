@@ -64,37 +64,35 @@ export default class pageUser extends wepy.page {
     enablePullDownRefresh: false
   };
   data = {
-      nickName: '加载中...',
+      nickName: '未授权用户',
       // 头像占位图
       avatarUrl: '../images/icon/icon-avatar@2x.png'
   };
 
   computed = {
-    packages() {
-      return this.getObject(this.getObject(this.userInfo).packages)
-    },
-    identity() {
-      return this.getObject(this.getObject(this.userInfo).identity)
-    },
     nickName() {
-      const info = this.getObject(this.userInfo)
-      // 名称或头像不为空的，才认为是授权用户
-      return info.nickName
+      const info = this.$parent.globalData.user
+      if(info){
+        // 名称或头像不为空的，才认为是授权用户
+        return info.nickName
+      }
+      else{
+        return '未授权用户'
+      }
     },
     avatarUrl() {
-      const info = this.getObject(this.userInfo)
-      return info.avatarUrl
+      const info = this.$parent.globalData.user
+      if(info){
+        return info.avatarUrl
+      }
+      else{
+        return '../images/icon/icon-avatar@2x.png'
+      }
     }
   };
 
   onShow() {
-    // 初始化页面数据
-    this.$getUserInfo(info => {
-      const uinfo = this.getObject(info)
-      const userInfo = this.getObject(this.userInfo)
-      this.userInfo = Object.assign({}, userInfo, uinfo)
-      this.initPageData()
-    })
+     this.initPageData()
   }
 
   onPullDownRefresh() {
@@ -103,11 +101,32 @@ export default class pageUser extends wepy.page {
 
   // 初始化页面数据
   initPageData() {
-    // 根据业务接口处理:获取最新个人信息并更新
-    // this.$get({url: service.user}, {
-    //   success: ({code, data}) => {},
-    //   fail: ({code, data}) => {}
-    // })
+    this.getInfo()
+    this.$apply()
+    console.log('[global]'+this.$parent.globalData.user)
+  }
+  //获取用户信息
+  async getInfo() {
+    // 取缓存信息
+    const user = this.$parent.globalData.user
+    // 不重复获取用户信息
+    if (user && user.nickName) {
+      console.log('no')
+      return 
+    }
+    // 首次获取用户信息
+    var auth = 0
+    let res = await wepy.showModal({
+      title: '授权提醒',
+      content: '时间银行想获取您的个人信息',
+    })
+    if (res.confirm) {
+      await wepy.login()
+      let res = await wepy.getUserInfo()
+      this.$parent.globalData.user = res.userInfo
+      this.$apply()
+    } 
+    return 
   }
 
   methods = {}

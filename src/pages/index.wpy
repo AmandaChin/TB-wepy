@@ -34,10 +34,10 @@ export default class pageIndex extends wepy.page {
       { image: '/images/yigong.jpg', url: '/pages/index' }
     ],
     categorys: [
-      { title: '陪护', image: '/images/index_icon/幼儿.png' },
-      { title: '打扫', image: '/images/index_icon/扫把.png' },
-      { title: '剪发', image: '/images/index_icon/剪刀.png' },
-      { title: '做饭', image: '/images/index_icon/饮食.png' }
+      // { title: '陪护', image: '/images/index_icon/幼儿.png' },
+      // { title: '打扫', image: '/images/index_icon/扫把.png' },
+      // { title: '剪发', image: '/images/index_icon/剪刀.png' },
+      // { title: '做饭', image: '/images/index_icon/饮食.png' }
     ],
     noMoreList: false,
     loading: false,
@@ -83,9 +83,10 @@ export default class pageIndex extends wepy.page {
     if (this.loading || this.noMoreList) return
     this.loading = true
     // 请求列表
-    this.$get(
+    wepy.request(
       {
-        url:'https://www.nkugame.com/api/getAllDemand',
+        url:'http://localhost:3000/api/getAllDemand',
+        method: 'GET'
         //url: service.list,
       },
       {

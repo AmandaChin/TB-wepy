@@ -27,10 +27,9 @@ export default class userMixin extends wepy.mixin {
     })
   }
 
+
   // 获取地址信息
   $getAddress(callback) {
-    // 顶级容错
-    if (!this.$parent || !this.$parent.$updateGlobalData) return
     // 取缓存信息
     const res = this.$parent.$updateGlobalData('res')
     // 不重复获取用户信息
