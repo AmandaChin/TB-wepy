@@ -111,7 +111,6 @@ export default class pageUser extends wepy.page {
     const user = this.$parent.globalData.user
     // 不重复获取用户信息
     if (user && user.nickName) {
-      console.log('no')
       return 
     }
     // 首次获取用户信息

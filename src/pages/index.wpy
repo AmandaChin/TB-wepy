@@ -79,42 +79,59 @@ export default class pageIndex extends wepy.page {
   }
 
   // 更新图书列表
-  updateBookList(page) {
+  async updateBookList(page) {
     if (this.loading || this.noMoreList) return
-    this.loading = true
+    //this.loading = true
     // 请求列表
-    wepy.request(
-      {
-        url:'http://localhost:3000/api/getAllDemand',
-        method: 'GET'
-        //url: service.list,
-      },
-      {
-        success: ({list}) => {
-          const data = list.rows
-          console.log(data.length)
-          // 示例规则：最多20本
-          if (this.list.length >= data.length) {
-            this.noMoreList = true
-            return
-          }
+    // wepy.request(
+    //   {
+    //     url:'http://localhost:3000/api/getAllDemand',
+    //     method: 'GET'
+    //   },
+    //   {
+    //     success: ({list}) => {
+    //       const data = list.rows
+    //       console.log('[haha]'+data.length)
+    //       // 示例规则：最多20本
+    //       if (this.list.length >= data.length) {
+    //         this.noMoreList = true
+    //         return
+    //       }
 
-          // 请求到空列表后就认为没有更多了
-          if (this.isArray(data) && data.length === 0) {
-            this.noMoreList = true
-            return
-          }
-          this.list = this.getItems(data)
+    //       // 请求到空列表后就认为没有更多了
+    //       if (this.isArray(data) && data.length === 0) {
+    //         this.noMoreList = true
+    //         return
+    //       }
+    //       this.list = this.getItems(data)
           
-        },
-        fail: ({list}) => {
-          // 失败了什么也不做
-        },
-        complete: () => {
-          this.loading = false
-        }
-      }
-    )
+    //     },
+    //     fail: ({list}) => {
+    //       // 失败了什么也不做
+    //     },
+    //     complete: () => {
+    //       this.loading = false
+    //     }
+    //   }
+    // )
+    let res = await wepy.request({
+         url:'http://localhost:3000/api/getAllDemand',
+         method: 'GET'
+    })
+    const list = res.data.list
+    const data = list.rows
+    if (this.list.length >= data.length) {
+      this.noMoreList = true
+      return
+    }
+    // 请求到空列表后就认为没有更多了
+    if (this.isArray(data) && data.length === 0) {
+      this.noMoreList = true
+      return
+       }
+       this.list = this.getItems(data)
+    this.$apply()
+
   }
 
   // 处理图书列表
