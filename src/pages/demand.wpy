@@ -3,7 +3,7 @@
     <view class="weui-panel">
       <view class="weui-media-box ">
         <image src="/images/icon/help.png" style="margin-right: 15px;margin-top: 5px;vertical-align: middle;width:30px; height: 30px;float:left"/>
-        <view class="h1 color-666">{{user}}发布需求</view>
+        <view class="h1 color-666">{{nickName}}发布需求</view>
       </view>
     </view>
     <view class="weui-panel">
@@ -109,7 +109,7 @@
 
 <script>
   import wepy from 'wepy'
-  // import { service } from '../config.js'
+  import { service } from '../config.js'
   import http from '../mixins/http'
   import base from '../mixins/base'
   import user from '../mixins/user'
@@ -123,7 +123,7 @@
     }
     components = {}
     data = {
-      user: '',
+      nickName: '',
       time: '',
       date: '',
       location: '',
@@ -145,6 +145,16 @@
       timeIndex: 0
     }
     computed = {
+      nickName() {
+      const info = this.$parent.globalData.user
+      if(info){
+        // 名称或头像不为空的，才认为是授权用户
+        return info.nickName
+      }
+      else{
+        return ''
+      }
+    },
       showChooseAddress() {
         if(!wepy.chooseLocation){
         wepy.showModal({
@@ -190,10 +200,6 @@
       goMain() {
         wx.switchTab({url: '/pages/index'})
       },
-      typeAddress(){
-        console.log('choose')
-        this.updateLocation()
-      },
       typing (type, e) {
         if (this.isDefined(this[type])) {
           this[type] = e.detail.value
@@ -209,36 +215,13 @@
     onPullDownRefresh() {
       this.initPageData()
     }
-    
-    // 初始化页面数据
+     // 初始化页面数据
     initPageData() {
-      // 异步获取数据
-      this.loading = true
-      this.$getUserInfo((data) => {
-        console.log('getUserInfo'+this.getString(data))
-        this.loaded = true
-        // 初始化收件人信息
-        const { nickName } = data
-        this.user = this.getString(this.receiver || nickName, '用户')
-        this.loading = false
-      })
-      var myDate = new Date()
-      var year = myDate.getFullYear()
-      var month = myDate.getMonth()+1
-      var day = myDate.getDate()
-      this.today = year+'-'+month+'-'+day
-      this.endday = year+'-'+(month+3)+'-'+day
+      this.getInfo()
+      this.$apply()
+      console.log(this.$parent.globalData.user)
     }
-    updateLocation(){
-      this.$getAddress((data)=>{
-        console.log('getAddress'+data)
-        setTimeout(() => {
-            this.location = data
-            this.locationisnull = false
-            this.$apply()
-        })
-      })
-    }
+  
   }
 </script>
 

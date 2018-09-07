@@ -69,7 +69,8 @@ export default class extends wepy.app {
 
   globalData = {
     user: null,
-    oppenid: null,
+    openid: null,
+    id:null,
     session: null
   }
 

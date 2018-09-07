@@ -1,5 +1,5 @@
 import wepy from 'wepy'
-// import { service } from '../config.js'
+import { service } from '../config.js'
 
 export default class userMixin extends wepy.mixin {
   /* ============= 工具方法（mixins没法复写，就再写一遍了） ============= */
@@ -8,110 +8,70 @@ export default class userMixin extends wepy.mixin {
   }
 
   /* ========================== 用户方法 ========================== */
-  // 获取用户信息
-  $getUserInfo(callback) {
-    // 顶级容错
-    if (!this.$parent || !this.$parent.$updateGlobalData) return
+  
+
+  //获取用户信息
+  async getInfo() {
+    console.log('test')
     // 取缓存信息
-    const user = this.$parent.$updateGlobalData('user')
+    const user = this.$parent.globalData.user
     // 不重复获取用户信息
     if (user && user.nickName) {
-      this.isFunction(callback) && callback(user)
-      this.$apply()
-      return user
+      return 
     }
     // 首次获取用户信息
-    this.$login(() => {
-      // 再获取用户信息
-      this._wxUserInfo(callback)
+    var auth = 0
+    let res = await wepy.showModal({
+      title: '授权提醒',
+      content: '时间银行想获取您的个人信息',
     })
-  }
-
-  // 获取地址信息
-  $getAddress(callback) {
-    // 顶级容错
-    if (!this.$parent || !this.$parent.$updateGlobalData) return
-    // 取缓存信息
-    const res = this.$parent.$updateGlobalData('res')
-    // 不重复获取用户信息
-    if (res && res.address) {
-      this.isFunction(callback) && callback(res)
-      this.$apply()
-      return res
-    }
-    this._wxChooseAddress(callback)
-  }
-
-  // 进行微信登陆
-  $login(success = () => {}, noAutoLogin) {
-    // 先登录
-    wepy.login({
-      success: (res) => {
-        console.log('wepy.login.success:', res)
-        // 如果不需要自动登录，就return
-        if (noAutoLogin) {
-          // 串行回调
-          this.isFunction(success) && success(res)
-          this.$apply()
-          return
-        }
-
-        // 根据业务接口处理:业务登陆:异步
-        // this.$post({ url: service.login, data: {code: res.code} }, {
-        //   success: ({code, data}) => {},
-        //   fail: ({code, data}) => {}
-        // })
-
-        // ===== 以下随机示例 =====
-        setTimeout(() => {
-          this.$parent.$updateGlobalData('user', {
-            session: Math.random().toString(36).substring(2),
-          })
-          // 串行回调
-          this.isFunction(success) && success(res)
-          this.$apply()
-        }, 100)
-      },
-      fail: (res) => {
-        console.log('wepy.login.fail:', res)
-      }
-    })
-  }
-
-  /* ========================= 其他方法 ========================= */
-  // 获取用户公开信息（微信）
-  _wxUserInfo(callback) {
-    // let info = await wepy.getUserInfo({})
-    // const user = this.$parent.$updateGlobalData('user', info.userInfo)
-    // console.log('_wxUserInfo'+info)
-    // this.isFunction(callback) && callback(user)
-    
-    this.$apply()
-    wepy.getUserInfo({
-      success: (res) => {
-        console.log('wepy.getUserInfo.success:', res)
-        // 缓存用户信息
-        const user = this.$parent.$updateGlobalData('user', res.userInfo)
-        this.isFunction(callback) && callback(user)
-        this.$apply()
-      },
-      fail: (res) => {
-        console.log('wepy.getUserInfo.fail:', res)
-        // 用户拒绝授权:填充默认数据
-        const user = this.$parent.$updateGlobalData('user', {
-          nickName: '未授权',
-          avatarUrl: '/images/icon/icon-avatar@2x.png'
+    if (res.confirm) {
+      let code = await wepy.login()
+      let res = await wepy.getUserInfo()
+      let openid = await wepy.request({
+       url:'https://api.weixin.qq.com/sns/jscode2session?appid=wx01aca083ef813dd0&secret=9c86a02eb57bb9a4db4f920036556c10&js_code='+code.code+'&grant_type=authorization_code',
+       method: 'POST'
+      })
+      this.userlogin(openid.data.openid)
+      let id = await wepy.request({
+          url: service.getUserID, //开发者服务器接口地址",
+          data: {
+            "Account": openid.data.openid
+          }, //请求的参数",
+          method: 'POST'
         })
-
-        // 串行回调
-        this.isFunction(callback) && callback(user)
-        this.$apply()
-
-        // 尝试授权
-        this._wxAuthModal(callback)
-      }
-    })
+      this.$parent.globalData.user = res.userInfo
+      this.$parent.globalData.openid = openid.data.openid
+      this.$parent.globalData.id = id.data.UserID
+      this.$apply()
+    } 
+    return 
   }
+  async userlogin(account){
+    let password = '123456'
+    let res = await wepy.request({
+       url:service.log,
+       data:{
+         "Account":account,
+         "Password": password
+       },
+       method: 'POST'
+      })
+    if(res!=3){
+      let num = await wepy.request({
+        url: service.register, //开发者服务器接口地址",
+        data: {
+         "account":account,
+         "username":this.$parent.globalData.user.nickName,
+         "password": password
+       }, //请求的参数",
+        method: 'POST'
+      })
+  }
+  return
+  }
+ 
+  
 
   //
   _wxChooseAddress(callback) {

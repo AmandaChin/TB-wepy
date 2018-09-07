@@ -116,8 +116,9 @@ export default class pageIndex extends wepy.page {
     // )
     let res = await wepy.request({
          url:'http://localhost:3000/api/getAllDemand',
-         method: 'GET'
+         method: 'POST'
     })
+    console.log(res.data.list)
     const list = res.data.list
     const data = list.rows
     if (this.list.length >= data.length) {

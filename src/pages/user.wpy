@@ -105,28 +105,6 @@ export default class pageUser extends wepy.page {
     this.$apply()
     console.log('[global]'+this.$parent.globalData.user)
   }
-  //获取用户信息
-  async getInfo() {
-    // 取缓存信息
-    const user = this.$parent.globalData.user
-    // 不重复获取用户信息
-    if (user && user.nickName) {
-      return 
-    }
-    // 首次获取用户信息
-    var auth = 0
-    let res = await wepy.showModal({
-      title: '授权提醒',
-      content: '时间银行想获取您的个人信息',
-    })
-    if (res.confirm) {
-      await wepy.login()
-      let res = await wepy.getUserInfo()
-      this.$parent.globalData.user = res.userInfo
-      this.$apply()
-    } 
-    return 
-  }
 
   methods = {}
 
