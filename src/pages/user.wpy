@@ -92,15 +92,15 @@ export default class pageUser extends wepy.page {
   };
 
   onShow() {
-     this.initPageData()
+     this.initUserData()
   }
 
   onPullDownRefresh() {
-    this.initPageData()
+    this.initUserData()
   }
 
   // 初始化页面数据
-  initPageData() {
+  initUserData() {
     this.getInfo()
     this.$apply()
     console.log('[global]'+this.$parent.globalData.user)

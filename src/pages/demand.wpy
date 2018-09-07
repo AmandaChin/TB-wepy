@@ -209,14 +209,14 @@
 
     onShow() {
       // 初始化页面数据
-      this.initPageData()
+      this.initUserData()
     }
 
     onPullDownRefresh() {
-      this.initPageData()
+      this.initUserData()
     }
      // 初始化页面数据
-    initPageData() {
+    initUserData() {
       this.getInfo()
       this.$apply()
       console.log(this.$parent.globalData.user)

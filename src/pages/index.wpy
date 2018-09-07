@@ -13,6 +13,7 @@ import wepy from 'wepy'
 import { service } from '../config.js'
 import base from '../mixins/base'
 import http from '../mixins/http'
+import user from '../mixins/user'
 import { funImages } from '../mixins/demo'
 import Swiper from '../components/swiper'
 import SearchBar from '../components/searchbar'
@@ -20,7 +21,7 @@ import Category from '../components/category'
 import BookList from '../components/bookList'
 
 export default class pageIndex extends wepy.page {
-  mixins = [base, http]
+  mixins = [base, user, http]
   config = {
     navigationBarTitleText: '首页',
     navigationBarTextStyle: 'white',
@@ -47,10 +48,16 @@ export default class pageIndex extends wepy.page {
   }
 
   onReady() {
+    //this.initUserData()
+    this.initPageData()
+  }
+  onShow() {
+    //this.initUserData()
     this.initPageData()
   }
 
   onPullDownRefresh() {
+    //this.initUserData()
     this.initPageData()
   }
 
@@ -60,7 +67,12 @@ export default class pageIndex extends wepy.page {
       this.$apply()
     }, 200)
   }
-
+   // 初始化用户数据
+    initUserData() {
+      this.getInfo()
+      this.$apply()
+      console.log(this.$parent.globalData.user)
+    }
   // 初始化页面数据
   initPageData() {
     // 请求列表
@@ -81,41 +93,12 @@ export default class pageIndex extends wepy.page {
   // 更新图书列表
   async updateBookList(page) {
     if (this.loading || this.noMoreList) return
-    //this.loading = true
-    // 请求列表
-    // wepy.request(
-    //   {
-    //     url:'http://localhost:3000/api/getAllDemand',
-    //     method: 'GET'
-    //   },
-    //   {
-    //     success: ({list}) => {
-    //       const data = list.rows
-    //       console.log('[haha]'+data.length)
-    //       // 示例规则：最多20本
-    //       if (this.list.length >= data.length) {
-    //         this.noMoreList = true
-    //         return
-    //       }
-
-    //       // 请求到空列表后就认为没有更多了
-    //       if (this.isArray(data) && data.length === 0) {
-    //         this.noMoreList = true
-    //         return
-    //       }
-    //       this.list = this.getItems(data)
-          
-    //     },
-    //     fail: ({list}) => {
-    //       // 失败了什么也不做
-    //     },
-    //     complete: () => {
-    //       this.loading = false
-    //     }
-    //   }
-    // )
+    console.log('id:'+this.$parent.globalData.id)
     let res = await wepy.request({
          url:'http://localhost:3000/api/getAllDemand',
+         data:{
+           "UserID": this.$parent.globalData.id
+         },
          method: 'POST'
     })
     console.log(res.data.list)

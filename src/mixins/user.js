@@ -12,7 +12,6 @@ export default class userMixin extends wepy.mixin {
 
   //获取用户信息
   async getInfo() {
-    console.log('test')
     // 取缓存信息
     const user = this.$parent.globalData.user
     // 不重复获取用户信息
