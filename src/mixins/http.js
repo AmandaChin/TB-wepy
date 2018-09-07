@@ -57,9 +57,9 @@ export default class httpMixin extends wepy.mixin {
       success: ({ statusCode, data }) => {
         // 控制台调试日志
         console.log('[SUCCESS]', statusCode, typeof data === 'object' ? data : data.toString().substring(0, 100))
-
         // 状态码正常 & 确认有数据
-        if (0 === +data.code && data.data) {
+        if (200 === statusCode && data) {
+          console.log('正常')
           // 成功回调
           return setTimeout(() => {
             this.isFunction(success) && success({statusCode, ...data})
@@ -69,6 +69,7 @@ export default class httpMixin extends wepy.mixin {
 
         // 失败回调：其他情况
         return setTimeout(() => {
+          console.log('失败')
           this.isFunction(fail) && fail({statusCode, ...data})
           this.$apply()
         })

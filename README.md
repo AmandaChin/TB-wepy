@@ -1,28 +1,9 @@
-# wepy-demo-bookmall
+# 时间银行小程序端
 
-Demo codes for [🐼满熊阅读📖](https://img003.qufenqi.com/products/b4/54/b4543ad35eb9486354397bf33af8f8b5.jpg) which used in a very early version.
+框架： wepy+weui
 
-> [`new` 支付宝小程序示例（ **alipay-mini-app got in branch: alipay**）](https://github.com/Thunf/wepy-demo-bookmall/tree/alipay)
+Demo: [🐼满熊阅读📖](https://img003.qufenqi.com/products/b4/54/b4543ad35eb9486354397bf33af8f8b5.jpg) which used in a very early version.
 
-
-## Features
-<div>
-<img src="https://github.com/Thunf/wepy-demo-bookmall/blob/gif/gif/1.gif" width="200"/>
-<img src="https://github.com/Thunf/wepy-demo-bookmall/blob/gif/gif/2.gif" width="200"/>
-<img src="https://github.com/Thunf/wepy-demo-bookmall/blob/gif/gif/3.gif" width="200"/>
-<img src="https://github.com/Thunf/wepy-demo-bookmall/blob/gif/gif/4.gif" width="200"/>
-</div>
-
-
-## Related miniApp
-<div>
-<img src="https://img003.qufenqi.com/products/b4/54/b4543ad35eb9486354397bf33af8f8b5.jpg" width="200" alt="满熊阅读"/>
-<img src="https://img003.qufenqi.com/products/b0/11/b0110e4cfdfe7c8ce5f9dabf5ee34be2.jpg" width="200" alt="大白车"/>
-<img src="https://img002.qufenqi.com/products/5d/a2/5da2bb5a6b5b149e8e841b133fc7c657.jpg" width="200" alt="趣店招聘"/>
-</div>
-
-
-## Usage
 
 ### Start
 
@@ -34,12 +15,6 @@ cd wepy-demo-bookmall
 npm install wepy-cli -g
 npm install
 
-npm run dev
-```
-
-### For Alipay
-```
-git checkout alipay
 npm run dev
 ```
 
@@ -82,21 +57,5 @@ This repository relies on the [wepy](https://github.com/wepyjs/wepy), thanks to 
 For detailed explanation & more functions, checkout the [微信官方小程序文档](https://mp.weixin.qq.com/debug/wxadoc/dev/api/) and [小程序框架wepy文档](https://wepyjs.github.io/wepy/).
 
 
-
-## Fork It And Make Your Own
-
-You can fork this repo to create your own demo, and run it.
-
-
-
-## LICENSE
-
-[LICENSE](https://github.com/Thunf/wepy-demo-bookmall/blob/master/LICENSE)
-
-Please note that the open source protocol for this repository is **GPL**. This means that you have the freedom to run, copy, modify and distribute the software. However, this software your modified itself is bound by GPL.
-
-**You must open the source code**
-
-Copyright (c) 2017 - Present, Thunf
 
 

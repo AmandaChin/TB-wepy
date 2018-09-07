@@ -1,8 +1,9 @@
 {
-  "name": "wepy-demo-bookmall",
+  "name": "TimeBank",
   "version": "1.0.0",
   "description": "",
   "main": "dist/app.js",
+  "appid": "wx01aca083ef813dd0",
   "scripts": {
     "dev": "wepy build --watch",
     "build": "cross-env NODE_ENV=production wepy build --no-cache",
