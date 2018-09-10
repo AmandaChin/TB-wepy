@@ -1,8 +1,21 @@
 <template>
   <view class="page-index">
-    <SearchBar :placeholder="searchText"></SearchBar>
+    <!-- <SearchBar :placeholder="searchText"></SearchBar> -->
+    <navigator url="/pages/main/search" redirect="false" hover-class="navigator-hover" open-type="navigate|redirect|switchTab">
+    <view class="weui-search-bar">
+      <view class="weui-search-bar__form">
+        <view class="weui-search-bar__box">
+          <icon class="weui-icon-search_in-box" type="search" size="14"></icon>
+          <view class="weui-search-bar__text">搜索感兴趣的义工需求</view>
+        </view>
+        <label class="weui-search-bar__label" hidden="{{inputShowed}}">
+          <icon class="weui-icon-search" type="search" size="14"></icon>
+          <view class="weui-search-bar__text">搜索感兴趣的义工需求</view>
+        </label>
+      </view>
+    </view>
+    </navigator>
     <Swiper :list.sync="swipers" height="280"></Swiper>
-    <Category :list.sync="categorys" col="4"></Category>
     <BookList :list.sync="list" title="义工市场"
      :loading.sync="loading" :noMore.sync="noMoreList"></BookList>
   </view>
@@ -14,10 +27,8 @@ import { service } from '../config.js'
 import base from '../mixins/base'
 import http from '../mixins/http'
 import user from '../mixins/user'
-import { funImages } from '../mixins/demo'
 import Swiper from '../components/swiper'
 import SearchBar from '../components/searchbar'
-import Category from '../components/category'
 import BookList from '../components/bookList'
 
 export default class pageIndex extends wepy.page {
@@ -28,18 +39,13 @@ export default class pageIndex extends wepy.page {
     navigationBarBackgroundColor: '#049BFF'
   }
   data = {
-    searchText: '搜索感兴趣的义工需求',
+    inputShowed: false,
     swipers: [
       // 占位图，防止请求错误无图显示
       { image: '/images/timg.gif', url: '/pages/index' },
       { image: '/images/yigong.jpg', url: '/pages/index' }
     ],
-    categorys: [
-      // { title: '陪护', image: '/images/index_icon/幼儿.png' },
-      // { title: '打扫', image: '/images/index_icon/扫把.png' },
-      // { title: '剪发', image: '/images/index_icon/剪刀.png' },
-      // { title: '做饭', image: '/images/index_icon/饮食.png' }
-    ],
+   
     noMoreList: false,
     loading: false,
     list: [],
@@ -75,27 +81,19 @@ export default class pageIndex extends wepy.page {
     }
   // 初始化页面数据
   initPageData() {
+    var id = this.$parent.globalData.id
     // 请求列表
-    this.updateBookList()
+    this.updateBookList(id)
 
     // 处理轮播图this.swipers.push({ image: "/images/swiper.png" })
-    // 处理菜单栏
-    this.categorys.map((cate, index) => {
-      const xnum = Math.min(Math.max(index, 1), 3)
-      cate.url = `/pages/main/list?params=${this.$json({
-        value: [xnum, 4 - xnum].map(item => this.getString(item)),
-        index: index + 1,
-        title: cate.title
-      })}`
-    })
+   
   }
 
   // 更新图书列表
-  async updateBookList(page) {
+  async updateBookList(id) {
     if (this.loading || this.noMoreList) return
-    console.log('id:'+this.$parent.globalData.id)
     let res = await wepy.request({
-         url:'http://localhost:3000/api/getAllDemand',
+         url: service.getAllDemand,
          data:{
            "UserID": this.$parent.globalData.id
          },
@@ -127,9 +125,9 @@ export default class pageIndex extends wepy.page {
       return {
         id: xlen,
         title: item.Content,
-        content: `简介: 需求人${item.Name}，在${item.DemandStartTime}发布${item.Content}的需求 。`,
-        image: funImages[(xlen + 4) % 8],
-        tags: ['', ''],
+        name: `需求人:${item.Name}`,
+        time: `发布时间: ${item.DemandStartTime.substr(0,10)}`,
+        content: `需求简介:${item.Content}`,
         status: xlen % 2
       }
     })
@@ -139,7 +137,6 @@ export default class pageIndex extends wepy.page {
 
   components = {
     SearchBar,
-    Category,
     BookList,
     Swiper
   }
@@ -147,6 +144,7 @@ export default class pageIndex extends wepy.page {
 </script>
 
 <style lang="less">
+@import "../styles/custom/fn.less";
 .page-index {
   // some style
 }

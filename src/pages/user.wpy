@@ -8,8 +8,8 @@
               <image class="userinfo-avatar" src="{{ avatarUrl }}" background-size="cover"/>
             </navigator>
             <view class="userinfo-nickname">{{ nickName }}</view>
-            <view class="userinfo-status">志愿时长：0 hours</view>
-            <view class="userinfo-status">服务次数：0 times</view>
+            <!-- <view class="userinfo-status">志愿时长：0 hours</view>
+            <view class="userinfo-status">服务次数：0 times</view> -->
           </view>
         </view>
       </view>

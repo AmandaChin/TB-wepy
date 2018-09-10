@@ -9,12 +9,9 @@
           </view>
           <view class="booklist-content-wrapper">
             <view class="booklist-title">{{item.title}}</view>
+            <view class="booklist-abstract">{{item.name}}</view>
+            <view class="booklist-abstract">{{item.time}}</view>
             <view class="booklist-abstract">{{item.content}}</view>
-          </view>
-          <view class="booklist-tags">
-            <block wx:for="{{item.tags}}" wx:key="index" wx:for-item="tag">
-              <view class="booklist-tag">{{tag}}</view>
-            </block>
           </view>
         </navigator>
       </block>
@@ -131,7 +128,7 @@
     }
   }
   .booklist-cover-wrapper {
-    width: @bookListImageWidth;
+    width: 0;
     height: 0;
     padding-bottom: @bookListImageWidth / 0.75;
     overflow: hidden;
@@ -141,10 +138,10 @@
   .booklist-content-wrapper {
     position: absolute;
     top: 0;
-    left: @bookListImageWidth;
+    left: 50rpx;
     bottom: @bookListSpace;
-    width: 100% - @bookListImageWidth;
-    padding-left: @bookListSpace;
+    width: 100% ;
+    padding-left: 0;
     box-sizing: border-box;
   }
   .booklist-cover {

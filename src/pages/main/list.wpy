@@ -18,7 +18,6 @@
   import { service } from '../../config.js'
   import base from '../../mixins/base'
   import http from '../../mixins/http'
-  import { funImages } from '../../mixins/demo'
   import BookList from '../../components/bookList'
 
   export default class mainList extends wepy.page {
@@ -82,51 +81,40 @@
     // 初始化页面数据
     initPageData() {
       // 初始化参数
-      this.page = 0
       this.loading = false
       this.noMoreList = false
-
-      // 请求推荐列表
-      this.updateBookList(this.page)
+      var id = this.$parent.globalData.id
+      // 请求列表
+      this.updateBookList(id)
     }
 
-    // 更新图书列表
-  updateBookList(page) {
-    if (this.loading || this.noMoreList) return
-    this.loading = true
-    // 请求列表
-    this.$get(
-      {
-        url:'https://www.nkugame.com/api/getAllDemand',
-        //url: service.list,
-      },
-      {
-        success: ({list}) => {
-          const data = list.rows
-          console.log(data.length)
-          // 示例规则：最多20本
-          if (this.list.length >= data.length) {
-            this.noMoreList = true
-            return
-          }
-
-          // 请求到空列表后就认为没有更多了
-          if (this.isArray(data) && data.length === 0) {
-            this.noMoreList = true
-            return
-          }
-          this.list = this.getItems(data)
-          
-        },
-        fail: ({list}) => {
-          // 失败了什么也不做
-        },
-        complete: () => {
-          this.loading = false
-        }
+    // 更新列表
+    async updateBookList(id) {
+      if (this.loading || this.noMoreList) return
+      let res = await wepy.request({
+          url: service.host.getDemandByCondition,
+          data:{
+            "UserID": this.$parent.globalData.id
+          },
+          method: 'POST'
+      })
+      console.log(res.data.list)
+      const list = res.data.list
+      const data = list.rows
+      if (this.list.length >= data.length) {
+        this.noMoreList = true
+        return
       }
-    )
-  }
+      // 请求到空列表后就认为没有更多了
+      if (this.isArray(data) && data.length === 0) {
+        this.noMoreList = true
+        return
+        }
+        this.list = this.getItems(data)
+      this.$apply()
+
+    }
+  
 
   // 处理图书列表
   getItems(data) {
@@ -137,9 +125,9 @@
       return {
         id: xlen,
         title: item.Content,
-        content: `简介: 需求人${item.Name}，在${item.DemandStartTime}发布${item.Content}的需求 。`,
-        image: funImages[(xlen + 4) % 8],
-        tags: ['', ''],
+        name: `需求人:${item.Name}`,
+        time: `发布时间: ${item.DemandStartTime}`,
+        content: `需求简介:${item.Content}`,
         status: xlen % 2
       }
     })

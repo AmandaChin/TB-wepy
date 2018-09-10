@@ -10,13 +10,13 @@ var host = 'http://localhost:3000/api';
 // 下面的地址配合云端 Demo 工作
 export const service = {
   // 列表接口 GET
-  list: `${host}/bookmall/list`,
+  list: `https://wxapp.thunf.cn/bookmall/list`,
 
   // 筛选页接口 GET 
-  tags: `${host}/bookmall/tags`,
+  tags: `https://wxapp.thunf.cn/bookmall/tags`,
 
   // 假装有收藏接口 POST
-  collect: `${host}/bookmall/list`,
+  collect: `https://wxapp.thunf.cn/bookmall/list`,
   
   //登录
   log: `${host}/allUserLogin`,
@@ -26,6 +26,10 @@ export const service = {
   
   //获取用户id
   getUserID: `${host}/getUserIDbyAccount`,
+
+  //获取全部需求信息
+  getAllDemand: `${host}/getAllDemand`,
+
 
   // 主域
   host

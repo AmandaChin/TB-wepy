@@ -1,0 +1,337 @@
+<template>
+  <view class="page-demand"> 
+    <view class="weui-panel">
+      <view class="weui-media-box ">
+        <image src="/images/icon/help.png" style="margin-right: 15px;margin-top: 5px;vertical-align: middle;width:30px; height: 30px;float:left"/>
+        <view class="h1 color-666">{{nickName}}发布服务</view>
+      </view>
+    </view>
+    <view class="weui-panel">
+      <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__hd">
+          <view class="weui-label reset-label-left h3">项目类型</view>
+        </view>
+        <view class="weui-cell__bd">
+            <picker @change="bindtypeChange" value="{{typeIndex}}" range="{{types}}">
+              <text wx:if="{{typeisnull}}" style="color:#999;font-size:30rpx;">请选择项目类型</text>
+              <view wx:else>
+                <text class="weui-select weui-select_in-select-after h3">{{types[typeIndex]}}</text>
+              </view>
+              </picker>
+            </view>
+      </view>
+
+      <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__hd">
+          <view class="weui-label reset-label-left h3">服务日期</view>
+        </view>
+        <view class="weui-cell__bd h3">
+          <picker mode="date" value="{{date}}" start="{{today}}" end="{{endday}}" @change="bindDateChange">
+            <text wx:if="{{dateisnull}}" style="color:#999;font-size:30rpx;">请选择服务日期</text>
+            <view wx:else><text class="weui-input">{{date}}</text></view>
+          </picker>
+        </view>
+      </view>
+
+      <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__hd">
+          <view class="weui-label reset-label-left h3">服务时间</view>
+        </view>
+        <view class="weui-cell__bd h3">
+          <picker mode="time" value="{{time}}" start="09:01" end="21:01" @change="bindTimeChange">
+            <text wx:if="{{timeisnull}}" style="color:#999;font-size:30rpx;">请选择服务时间</text>
+            <view wx:else><text class="weui-input">{{time}}</text></view>
+          </picker>
+        </view>
+      </view>
+
+      <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__hd">
+          <view class="weui-label reset-label-left h3">服务时长</view>
+        </view>
+        <view class="weui-cell__bd">
+            <picker @change="bindDurationChange" value="{{timeIndex}}" range="{{times}}">
+              <text wx:if="{{durationisnull}}" style="color:#999;font-size:30rpx;">请选择服务时长</text>
+              <view wx:else>
+                <text class="weui-select weui-select_in-select-after h3">{{times[timeIndex]}}</text>
+              </view>
+              </picker>
+            </view>
+      </view>
+
+      <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__hd">
+          <view class="weui-label reset-label-left h3">服务位置</view>
+        </view>
+        <view class="weui-cell__bd h3">
+          <view wx:if="{{showChooseAddress}}">
+            <view @tap="typeAddress" placeholder="请选择地址">
+              <text wx:if="{{locationisnull}}" style="color:#999;font-size:30rpx;">请选择地址</text>{{location}}
+            </view>
+          </view>
+          <view wx:else>
+            <input class="weui-input"  placeholder="请填写地址" data-wpytyping-a="receiver"/>
+          </view>
+          
+        </view>
+      </view>
+     
+      <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__hd">
+          <view class="weui-label reset-label-left h3">勋章支付</view>
+        </view>
+        <view class="weui-cell__bd">
+            <picker @change="bindpaytypeChange" value="{{paytypeIndex}}" range="{{paytypes}}">
+              <text wx:if="{{paytypeisnull}}" style="color:#999;font-size:30rpx;">请选择支付方式</text>
+              <view wx:else>
+                <text class="weui-select weui-select_in-select-after h3">{{paytypes[paytypeIndex]}}</text>
+              </view>
+              </picker>
+        </view>
+      </view>
+    <view class="weui-cell weui-cell_input">
+      <view class="weui-cell__hd">
+        <view class="weui-label reset-label-left h3">详细描述</view>
+      </view>
+    </view>
+    <view class="weui-cells weui-cells_after-title">
+      <view class="weui-cell">
+        <view class="weui-cell__bd">
+          <textarea class="weui-textarea h3" placeholder="请输入详细描述" style="height: 3.3em" />
+        </view>
+      </view>
+    </view>
+    
+   </view>
+    <button @tap="pushdemand" class="weui-btn btn-primary" type="primary">发布需求</button>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import { service } from '../../config.js'
+  import http from '../../mixins/http'
+  import base from '../../mixins/base'
+  import user from '../../mixins/user'
+  import cart from '../../mixins/cart'
+
+  export default class pageBorrow extends wepy.page {
+    mixins = [base, http, user, cart]
+    config = {
+      navigationBarTitleText: '需求发布',
+      enablePullDownRefresh: false
+    }
+    components = {}
+    data = {
+      nickName: '',
+      time: '',
+      date: '',
+      location: '',
+      typeisnull:true,
+      locationisnull: true,
+      durationisnull:true,
+      timeisnull:true,
+      dateisnull:true,
+      paytypeisnull:true,
+      today: '',
+      endday:'',
+      loaded: false,
+      loading: false,
+      types: ['陪护', '打扫', '剪发', '做饭'],
+      typeIndex: 0,
+      paytypes: ['平台代付', '自行支付'],
+      paytypeIndex: 0,
+      times: ['0.5h','1h','1.5h','2h','3h','4h','5h','6h'],
+      timeIndex: 0
+    }
+    computed = {
+      nickName() {
+      const info = this.$parent.globalData.user
+      if(info){
+        // 名称或头像不为空的，才认为是授权用户
+        return info.nickName
+      }
+      else{
+        return ''
+      }
+    },
+      showChooseAddress() {
+        if(!wepy.chooseLocation){
+        wepy.showModal({
+            title: '提示',
+            content: '您当前的版本不支持地图插件，请更新微信或者手动输入地址！',
+            success: function (res) {
+                if (res.confirm) {}
+                else{}
+            }
+            })
+      }
+      return !!wepy.chooseLocation
+      }
+    }
+    methods = {
+      bindtypeChange (e) {
+        this.typeIndex = e.detail.value
+        this.typeisnull = false
+      },
+      bindpaytypeChange (e) {
+        this.paytypeIndex = e.detail.value
+        this.paytypeisnull = false
+      },
+      bindDurationChange (e){
+        this.timeIndex = e.detail.value
+        this.durationisnull = false
+      },
+      bindDateChange (e) {
+        console.log("datechange"+this.today)
+        this.date = e.detail.value
+        this.dateisnull = false
+      },
+      bindTimeChange (e) {
+        this.time = e.detail.value
+        this.timeisnull = false
+      },
+      pushdemand(){
+        wx.switchTab({url: '/pages/index'})
+      },
+      toSubscribe() {
+        wx.navigateTo({url: '/pages/borrow/subscribe'})
+      },
+      goMain() {
+        wx.switchTab({url: '/pages/index'})
+      },
+      typing (type, e) {
+        if (this.isDefined(this[type])) {
+          this[type] = e.detail.value
+        }
+      }
+    }
+
+    onShow() {
+      // 初始化页面数据
+      this.initUserData()
+    }
+    
+    onReady(){
+      this.initUserData()
+    }
+
+    onPullDownRefresh() {
+      this.initUserData()
+    }
+     // 初始化页面数据
+    initUserData() {
+      this.getInfo()
+      this.$apply()
+      console.log(this.$parent.globalData.user)
+      console.log(this.$parent.globalData.id)
+    }
+  
+  }
+</script>
+
+<style lang="less">
+  @import "../../styles/custom/fn.less";
+
+  @icon-font-size: 34rpx;
+
+  .page-demand{
+      .weui-textarea{
+        width: 600rpx;
+      }
+      .weui-media-box{
+        padding-bottom: 1em;
+        display: flex;
+      }
+
+      .category-icon{
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 100%;
+      }
+      .reset-pull-right{
+        .h4();
+        top: 15px;
+        bottom: auto;
+        margin-top: -0.5em;
+      }
+      .reset-pull-middle{
+        top: 1em;
+      }
+      .icon-location{
+        width: 1.5em;
+        height: 1.5em;
+      }
+    
+    .reset-pull-right,
+    .reset-pull-middle{
+      position: absolute;
+      right: 15px;
+      top: 0;
+      bottom: 0;
+      height: 2em;
+      line-height: 2;
+      padding: 0 1em;
+      margin: auto -1em auto 0;
+    }
+    .reset-label-left{
+      color: #999;
+      margin-right:1em;
+      padding-right: 1em;
+      border-right: 1rpx solid @uiBorderColor;
+    }
+    .icon-order-circle,
+    .icon-order-empty{
+      display: inline-block;
+      width: @icon-font-size;
+      height: @icon-font-size;
+      font-size: 90%;
+      line-height: @icon-font-size;
+      border: 1rpx solid transparent;
+      border-radius: 50%;
+      text-align: center;
+    }
+    .icon-order-circle{
+      color: #fff;
+      background: @weuiColorPrimary;
+      border-color: @weuiColorPrimary;
+    }
+    .icon-order-empty{
+      color: #ddd;
+      background: transparent;
+      border-color: #ddd;
+    }
+    .icon-delete{
+      display: inline-block;
+      width: @icon-font-size;
+      height: @icon-font-size;
+      &:before,
+      &:after{
+        content: '';
+        display: inline-block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 2rpx;
+        height: 100%;
+        margin: auto;
+        background: #999;
+        transform: rotate(45deg);
+      }
+      &:after{
+        transform: rotate(-45deg);
+      }
+      
+    }
+    .weui-input {
+      height: 32px;
+      min-height: 32px;
+      line-height: 32px;
+    }
+  }
+
+</style>

@@ -11,6 +11,7 @@ export default class extends wepy.app {
       'pages/user',
       'pages/main/list',
       'pages/main/detail',
+      'pages/main/search',
       'pages/login/login',
       'pages/login/register',
       'pages/borrow/subscribe',
@@ -28,7 +29,9 @@ export default class extends wepy.app {
       'pages/user/volunteer/succeed',
       'pages/user/userinfo/identity',
       'pages/user/notice/notice',
-      'pages/user/notice/detail'
+      'pages/user/notice/detail',
+      'pages/demand/oldmanDemand',
+      'pages/demand/volunteerDemand'
     ],
     window: {
       navigationBarTitleText: '时间银行志愿服务系统',
