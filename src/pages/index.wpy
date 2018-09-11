@@ -83,14 +83,14 @@ export default class pageIndex extends wepy.page {
   initPageData() {
     var id = this.$parent.globalData.id
     // 请求列表
-    this.updateBookList(id)
+    this.updateDemandList(id)
 
     // 处理轮播图this.swipers.push({ image: "/images/swiper.png" })
    
   }
 
   // 更新图书列表
-  async updateBookList(id) {
+  async updateDemandList(id) {
     if (this.loading || this.noMoreList) return
     let res = await wepy.request({
          url: service.getAllDemand,
@@ -125,7 +125,7 @@ export default class pageIndex extends wepy.page {
       return {
         id: xlen,
         title: item.Content,
-        name: `需求人:${item.Name}`,
+        name: `发布者:${item.Name}`,
         time: `发布时间: ${item.DemandStartTime.substr(0,10)}`,
         content: `需求简介:${item.Content}`,
         status: xlen % 2

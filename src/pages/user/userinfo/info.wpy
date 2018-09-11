@@ -4,17 +4,18 @@
       <view class="weui-cells weui-cells_after-title">
         <view class="weui-cell">
           <view class="weui-cell__bd userinfo">
-            <image class="userinfo-avatar" src="{{avatarUrl }}" background-size="cover"/>
+            <image class="userinfo-avatar" src="{{avatarUrl}}" background-size="cover"/>
           </view>
         </view>
       </view>
     </view>
     <view class="weui-panel">
+      <form bindsubmit='searchBox'>
       <view class="weui-cell weui-cell_input">
         <view class="weui-cell__bd">
           <view class="weui-label reset-label-left h3">昵称</view>
         <view class="weui-cell__ft h3">
-          <input bindinput="typing" class="weui-input" value="{{receiver}}" placeholder="{{nickName}}" data-wpytyping-a="receiver"/>
+          <input bindblur="nickname" class="weui-input"  placeholder="{{nickName}}" placeholder-style="color:#999;font-size:30rpx;" data-wpytyping-a="receiver"/>
         </view>
         </view>
        </view>
@@ -23,10 +24,10 @@
         <view class="weui-cell__bd">
           <view class="weui-label reset-label-left h3">真实姓名</view>
           <view class="weui-cell__ft h3">
-          <input bindinput="typing" class="weui-input" value="{{receiver}}" placeholder="请填写真实姓名" data-wpytyping-a="receiver"/>
+          <input bindblur="name" class="weui-input"  placeholder="{{name}}" placeholder-style="color:#999;font-size:30rpx;" data-wpytyping-a="receiver"/>
         </view>
         </view>
-         </view>
+      </view>
 
       <view class="weui-cell weui-cell_input">
         <view class="weui-cell__bd">
@@ -34,44 +35,66 @@
          <view class="weui-cell__ft">
             <picker @change="bindGenderChange" value="{{genderIndex}}" range="{{genders}}">
               <text wx:if="{{genderisundefined}}" style="color:#999;font-size:30rpx;">请选择性别</text>
-              <text wx:elif="{{genderisdefined}}" style="color:#999;font-size:30rpx;">{{gender}}</text>
+              <text wx:elif="{{genderisdefined}}" style="color:#999;font-size:30rpx;">{{sex}}</text>
               <view wx:else><text class="weui-input">{{genders[genderIndex]}}</text></view>
               </picker>
             </view>
         </view>
      </view>
 
-      <view class="weui-cell weui-cell_input">
+     <view class="weui-cell weui-cell_input">
         <view class="weui-cell__bd">
-          <view class="weui-label reset-label-left h3">地址</view>
-         <view class="weui-cell__ft h3">
-          <input bindinput="typing" class="weui-input" value="{{receiver}}" placeholder="请填写地址" data-wpytyping-a="receiver"/>
+          <view class="weui-label reset-label-left h3">手机号</view>
+          <view class="weui-cell__ft h3">
+          <input bindblur="phone" class="weui-input" placeholder="{{phone}}" placeholder-style="color:#999;font-size:30rpx;" data-wpytyping-a="receiver"/>
         </view>
         </view>
-         </view>
+      </view>
 
       <view class="weui-cell weui-cell_input">
         <view class="weui-cell__bd">
-          <view class="weui-label reset-label-left h3">个性签名</view>
+          <view class="weui-label reset-label-left h3">注册邮箱</view>
           <view class="weui-cell__ft h3">
-            <input bindinput="typing" class="weui-input" value="{{receiver}}" placeholder="编辑个性签名" data-wpytyping-a="receiver"/>
-          </view>
+          <input bindblur="email" class="weui-input" placeholder="{{email}}" placeholder-style="color:#999;font-size:30rpx;" data-wpytyping-a="receiver"/>
+        </view>
         </view>
       </view>
-      <view class="weui-cells weui-cells_after-title">
+
+
+      <!-- <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__bd">
+          <view class="weui-label reset-label-left h3">地址</view>
+         <view class="weui-cell__ft h3">
+          <input bindinput="typing" class="weui-input" value="{{receiver}}" placeholder="请填写地址" placeholder-style="color:#999;font-size:30rpx;" data-wpytyping-a="receiver"/>
+        </view>
+        </view>
+         </view> -->
+
+      <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__bd">
+          <view class="weui-label reset-label-left h3">身份证号</view>
+          <view class="weui-cell__ft h3">
+          <input bindblur="identityNum" class="weui-input" placeholder="{{identitynum}}" placeholder-style="color:#999;font-size:30rpx;" data-wpytyping-a="receiver"/>
+        </view>
+        </view>
+      </view>
+
+      <!-- <view class="weui-cells weui-cells_after-title">
         <navigator url="/pages/user/userinfo/identity" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
           <view class="weui-cell__bd">实名认证</view>
           <view class="weui-cell__ft weui-cell__ft_in-access">
             <text class="color-green" style="color:'{{authStatus.color}}'">{{authStatus.text}}</text>
           </view>
         </navigator>
-      </view>
+      </view> -->
+      </form>
     </view>
     <button @tap="saveInfo" class="weui-btn btn-primary" type="primary">完成</button>
   </view> 
 </template>
 <script>
 import wepy from 'wepy'
+import { service } from '../../../config.js'
 import http from '../../../mixins/http'
 import base from '../../../mixins/base'
 import user from '../../../mixins/user'
@@ -91,51 +114,152 @@ export default class info extends wepy.page {
       text: '已通过',
       color: 'green'
     },
-    genderisundefined: false,
-    genderisdefined: true,
-    gender: ''
-
+    genderisundefined: true,
+    genderisdefined: false,
+    sex: '',
+    name:'请填写真实姓名',
+    phone:'请填写有效手机号',
+    identitynum:'请填写您本人的身份证号',
+    email:'请填写有效邮箱地址'
   }
   computed = {
     nickName() {
-      const info = this.getObject(this.userInfo)
-      return info.nickName 
+      const info = this.$parent.globalData.user
+      if(info){
+        return info.nickName
+      }
+      else{
+        return '请填写昵称'
+      } 
     },
     avatarUrl() {
-      const info = this.getObject(this.userInfo)
-      return info.avatarUrl
+      const info = this.$parent.globalData.user
+      if(info){
+        return info.avatarUrl
+      }
+      else{
+        return '../../../images/icon/icon-avatar@2x.png'
+      }
     }
   }
   methods = {
     saveInfo(){
-        wx.switchTab({url: '/pages/user'})
+      this.submit()
+      this.$apply()
+        //wx.switchTab({url: '/pages/user'})
     },
-    bindCountryChange (e) {
-      this.countryIndex = e.detail.value
+    nickname(e){
+      this.nickName = e.detail.value
+    },
+    name(e){
+      this.name = e.detail.value
+    },
+    bindGenderChange(e) {
+      this.genderisdefined = false
+      this.genderisundefined = false
+      this.genderIndex = e.detail.value
+    },
+    phone(e){
+      this.phone = e.detail.value
+    },
+    email(e){
+      this.email = e.detail.value
+    },
+    identityNum(e){
+      this.identitynum = e.detail.value
     }
   }
   onShow() {
     // 初始化页面数据
-    this.$getUserInfo(info => {
-      const uinfo = this.getObject(info)
-      const userInfo = this.getObject(this.userInfo)
-      this.userInfo = Object.assign({}, userInfo, uinfo)
-      if(this.userInfo.gender==1){
-        this.gender = '男'
-      }else{
-        this.gender = '女'
-      }
-      this.initPageData()
-    })
+    this.initUserData()
+    this.$apply()
   }
+  async submit(){
+    if (this.nickName =='请填写昵称'){
+      this.nickName = ''
+    }
+    if (this.name =='请填写真实姓名'){
+      this.nickName = ''
+    }
+    if (this.identitynum =='请填写您本人的身份证号'){
+      this.nickName = ''
+    }
+    if (this.email =='请填写有效邮箱地址'){
+      this.nickName = ''
+    }
+    if (this.phone =='请填写有效手机号'){
+      this.nickName = ''
+    }
+    let res = await wepy.request({
+      url: service.host + '/changeUserInformation', //开发者服务器接口地址",
+      data: {
+        'UserID' :  parseInt(this.$parent.globalData.id),
+        'Gender' : this.sex,
+        'UserName' : this.nickName,
+        'Name': this.name,
+        'IDNumber': this.identitynum,
+        'Email': this.email,
+        'Phone': this.phone
+      }, //请求的参数
+      method: 'POST',
+    });
+    //console.log(res)
+    if(res.data.num==1){
+      wx.showToast({
+        title: '修改成功',
+        icon: 'success',
+        duration: 800
+      });
+    }else{
+      wx.showToast({
+        title: '修改失败',
+        icon: 'loading',
+        duration: 800
+      });
+    }
+    this.$apply()
+    
+  }
+
   // 初始化页面数据
-  initPageData() {
-    // 根据业务接口处理:获取最新个人信息并更新
-    // this.$get({url: service.user}, {
-    //   success: ({code, data}) => {},
-    //   fail: ({code, data}) => {}
-    // })
+  async initUserData() {
+    await this.getInfo()
+    await this.getInfoInDB(this.$parent.globalData.id)
+    var userinfo = this.$parent.globalData.userinfo
+    //console.log(userinfo)
+    //数据预处理
+    if(userinfo.UserName!=null){
+      this.nickName = userinfo.UserName
+    }
+    if(userinfo.Name!=null){
+      this.name = userinfo.Name
+    }
+    if(userinfo.Gender!=null){
+      this.sex = userinfo.Gender
+    }
+    if(userinfo.Phone!=null){
+      this.phone = userinfo.Phone
+    }
+    if(userinfo.Email!=null){
+      this.email = userinfo.Email
+    }
+    if(userinfo.IDNumber!=null){
+      this.identitynum = userinfo.IDNumber
+    }
+    var info = this.$parent.globalData.user
+    if(info.gender!=null){
+      this.genderisdefined = true
+      this.genderisundefined = false
+      if(parseInt(info.gender) == 1){
+        this.sex = '男'
+      }else{
+        this.sex = '女'
+      }
+    }
+    this.$apply()
+    
   }
+  
 }
 </script>
 

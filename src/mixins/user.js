@@ -16,6 +16,7 @@ export default class userMixin extends wepy.mixin {
     const user = this.$parent.globalData.user
     // 不重复获取用户信息
     if (user && user.nickName) {
+      console.log(user)
       return 
     }
     // 首次获取用户信息
@@ -40,12 +41,15 @@ export default class userMixin extends wepy.mixin {
           method: 'POST'
         })
       this.$parent.globalData.user = res.userInfo
+      console.log(this.$parent.globalData.user)
       this.$parent.globalData.openid = openid.data.openid
       this.$parent.globalData.id = id.data.UserID
+      console.log('[globalID]:'+this.$parent.globalData.id)
       this.$apply()
     } 
     return 
   }
+  //用户登录
   async userlogin(account){
     let password = '123456'
     let res = await wepy.request({
@@ -68,6 +72,23 @@ export default class userMixin extends wepy.mixin {
       })
   }
   return
+  }
+  //获取用户在数据库中的信息
+  async getInfoInDB(id){
+    const userinfo = this.$parent.globalData.userinfo
+    // 不重复获取用户存在数据库中的信息
+    if (userinfo) {
+      console.log(userinfo)
+      return 
+    }
+    let res = await wepy.request({
+      url: service.host+'/getUserInfo',
+      data:{
+        'UserId':id
+      },
+      method:'POST'
+    })
+    this.$parent.globalData.userinfo = res.data
   }
  
   

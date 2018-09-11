@@ -46,7 +46,7 @@ export default class pageIndex extends wepy.page {
     enablePullDownRefresh: false
   }
   data = {
-    tabs: ['已获得', '正在申请', '已转移'],
+    tabs: ['已获得', '已转移'],
     activeIndex: 0,
     sliderOffset: 0,
     sliderLeft: 0,

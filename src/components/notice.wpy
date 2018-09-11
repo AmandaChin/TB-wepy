@@ -9,6 +9,8 @@
           </view>
           <view class="notice-content-wrapper">
            <view class="notice-title">{{item.title}}</view>
+           <view class="notice-abstract">{{item.name}}</view>
+           <view class="notice-abstract">{{item.time}}</view>
            <view class="notice-abstract">{{item.content}}</view>
           </view>
         </navigator>
