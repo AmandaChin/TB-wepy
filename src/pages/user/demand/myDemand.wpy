@@ -1,25 +1,8 @@
 <template>
  <view>
    <view class="navbar page">
-        <view class="page__bd">
-            <view class="weui-tab">
-                <view class="weui-navbar">
-                    <view wx:for="{{tabs}}" wx:key="*this" id="{{index}}" class="weui-navbar__item {{activeIndex == index ? 'weui-bar__item_on' : ''}}" @tap="tabClick">
-                        <view class="weui-navbar__title">{{item}}</view>
-                    </view>
-                    <view class="weui-navbar__slider" style="left: {{sliderLeft}}px; transform: translateX({{sliderOffset}}px); -webkit-transform: translateX({{sliderOffset}}px);"></view>
-                </view>
-                <view class="weui-tab__panel">
-                    <view class="weui-tab__content" hidden="{{activeIndex != 0}}">
-                       <booklist :list.sync="list"
-                        :loading.sync="loading" :noMore.sync="noMoreList"></booklist>
-                    </view>
-                    <view class="weui-tab__content" hidden="{{activeIndex != 1}}">
-                      
-                    </view>
-                </view>
-            </view>
-        </view>
+      <booklist :list.sync="list"
+                :loading.sync="loading" :noMore.sync="noMoreList"></booklist>
     </view>
     
  </view>
@@ -38,10 +21,7 @@ export default class myDemand extends wepy.page {
     enablePullDownRefresh: false
   }
   data = {
-    tabs: ['待评价', '历史需求'],
-    activeIndex: 0,
-    sliderOffset: 0,
-    sliderLeft: 0,
+    
     list: [
      {title: "扶老奶奶过马路",content:"这是示例demo", url:"./c2v",my_button:'立即评价'},
      {title: "这是示例demo", url:"./c2v",my_button:'立即评价'},
@@ -52,17 +32,10 @@ export default class myDemand extends wepy.page {
   }
 
   methods = {
-    tabClick (e) {
-      this.sliderOffset = e.currentTarget.offsetLeft;
-      this.activeIndex = e.currentTarget.id;
-    }
+   
   }
 
   async onLoad () {
-    let res = await wepy.getSystemInfo();
-
-    this.sliderLeft = (res.windowWidth / this.tabs.length - sliderWidth) / 2;
-    this.sliderOffset = res.windowWidth / this.tabs.length * this.activeIndex;
     this.initPageData()
   }
 

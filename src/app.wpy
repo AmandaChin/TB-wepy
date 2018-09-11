@@ -10,7 +10,7 @@ export default class extends wepy.app {
       'pages/demand',
       'pages/user',
       'pages/main/list',
-      'pages/main/detail',
+      'pages/main/demandDetail',
       'pages/main/search',
       'pages/login/login',
       'pages/login/register',

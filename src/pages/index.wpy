@@ -17,7 +17,8 @@
     </navigator>
     <Swiper :list.sync="swipers" height="280"></Swiper>
     <BookList :list.sync="list" title="义工市场"
-     :loading.sync="loading" :noMore.sync="noMoreList"></BookList>
+     :loading.sync="loading" :noMore.sync="noMoreList"
+     :page.sync="pagetype" ></BookList>
   </view>
 </template>
 
@@ -27,12 +28,13 @@ import { service } from '../config.js'
 import base from '../mixins/base'
 import http from '../mixins/http'
 import user from '../mixins/user'
+import publicProcess from '../mixins/publicProcess'
 import Swiper from '../components/swiper'
 import SearchBar from '../components/searchbar'
 import BookList from '../components/bookList'
 
 export default class pageIndex extends wepy.page {
-  mixins = [base, user, http]
+  mixins = [base, user, http,publicProcess]
   config = {
     navigationBarTitleText: '首页',
     navigationBarTextStyle: 'white',
@@ -48,6 +50,7 @@ export default class pageIndex extends wepy.page {
    
     noMoreList: false,
     loading: false,
+    pagetype:'demandDetail',
     list: [],
     page: 0,
     size: 5
@@ -69,9 +72,9 @@ export default class pageIndex extends wepy.page {
 
   onReachBottom() {
     setTimeout(() => {
-      this.updateBookList()
+      this.updateDemandList()
       this.$apply()
-    }, 200)
+    }, 200);
   }
    // 初始化用户数据
     initUserData() {
@@ -80,38 +83,38 @@ export default class pageIndex extends wepy.page {
       console.log(this.$parent.globalData.user)
     }
   // 初始化页面数据
-  initPageData() {
+  async initPageData() {
     var id = this.$parent.globalData.id
+    console.log('id'+ id)
     // 请求列表
     this.updateDemandList(id)
-
-    // 处理轮播图this.swipers.push({ image: "/images/swiper.png" })
-   
+    this.$apply()
   }
 
   // 更新图书列表
   async updateDemandList(id) {
-    if (this.loading || this.noMoreList) return
+    console.log('updateDemandList')
+    //if (this.loading || this.noMoreList) return
     let res = await wepy.request({
-         url: service.getAllDemand,
+         url: service.host + '/getAllDemand',
          data:{
-           "UserID": this.$parent.globalData.id
+           'UserID': id
          },
          method: 'POST'
     })
     console.log(res.data.list)
     const list = res.data.list
     const data = list.rows
-    if (this.list.length >= data.length) {
-      this.noMoreList = true
-      return
-    }
+    // if (this.list.length >= data.length) {
+    //   this.noMoreList = true
+    //   return
+    // }
     // 请求到空列表后就认为没有更多了
     if (this.isArray(data) && data.length === 0) {
       this.noMoreList = true
       return
        }
-       this.list = this.getItems(data)
+    this.list = this.getItems(data)
     this.$apply()
 
   }
@@ -120,18 +123,23 @@ export default class pageIndex extends wepy.page {
   getItems(data) {
     const len = this.list.length
     return this.getArray(data).map((item, index) => {
-      const xlen = len + index
       // 拼接示例数据
       return {
-        id: xlen,
+        id: item.ServiceID,
         title: item.Content,
-        name: `发布者:${item.Name}`,
-        time: `发布时间: ${item.DemandStartTime.substr(0,10)}`,
-        content: `需求简介:${item.Content}`,
-        status: xlen % 2
+        name: item.Name,
+        date: item.DemandStartTime.substring(0,10),
+        time: item.DemandStartTime.substring(11,19),
+        content: this.convertHtmlToText(item.Remark),
+        status: item.Status,
+        duration: item.Duration,
+        phone:item.Phone
       }
     })
+    this.$apply()
   }
+
+   
 
   methods = {}
 

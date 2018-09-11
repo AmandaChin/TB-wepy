@@ -1,0 +1,235 @@
+<template>
+  <view class="main-detail">
+    <view class="weui-panel">
+      <view class="page__hd">
+            <view class="page__title" style="text-align:center;">{{demand.title}}</view>
+        </view>
+      <!-- <view class="weui-media-box weui-media-box_text weui-cells_in-small-appmsg">
+        <view class="h2 color-333">{{demand.title}}</view>
+        <view class="detail-tags">
+          <text wx:for="{{tags}}" wx:key="index" wx:for-item="tag" class="tag">{{tag}}</text>
+        </view>
+      </view> -->
+    
+      <view class="page__bd">
+        <view class="weui-cells__title">详情：</view>
+        <view class="weui-cells weui-cells_after-title">
+          <view class="weui-cell">
+              <view class="weui-cell__bd">服务日期：</view>
+              <view class="weui-cell__ft">{{demand.mydate}}</view>
+          </view>
+          <view class="weui-cell">
+              <view class="weui-cell__bd">服务时间：</view>
+              <view class="weui-cell__ft">{{demand.mytime}}</view>
+          </view>
+          <view class="weui-cell">
+              <view class="weui-cell__bd">服务对象：</view>
+              <view class="weui-cell__ft">{{demand.author}}</view>
+          </view>
+          <view class="weui-cell">
+              <view class="weui-cell__bd">服务内容：</view>
+              <view class="weui-cell__ft">{{demand.title}}</view>
+          </view>
+          <view class="weui-cell">
+              <view class="weui-cell__bd">具体事宜：</view>
+              <view class="weui-cell__ft">{{demand.content}}</view>
+          </view>
+          <view class="weui-cell">
+              <view class="weui-cell__bd">服务时长：</view>
+              <view class="weui-cell__ft">{{demand.duration}}</view>
+          </view>
+          <view class="weui-cell">
+              <view class="weui-cell__bd">联系方式：</view>
+              <view class="weui-cell__ft">{{demand.phone}}</view>
+          </view>
+        </view>
+          <!-- <view class="weui-cell">
+            <view>服务日期：{{demand.mydate}}</view>
+            <view>服务时间：{{demand.mytime}}</view>
+            <view>服务对象：{{demand.author}}</view>
+            <view>服务内容：{{demand.title}}</view>
+            <view>具体事宜：{{demand.content}}</view>
+            <view>服务时长：{{demand.duration}}小时</view>
+            <view>联系方式：{{demand.phone}}</view>
+          </view> -->
+      </view>
+    </view>
+
+    <Screen class="fixed-bottom">
+      <view style="display: flex;">
+        <button @tap="toAdd()" disabled="{{!isEnabled}}" class="weui-btn btn-block btn-flex-full" type="primary">
+          <text wx:if="{{!isEnabled}}">已被申请</text>
+          <text wx:else>申请</text>
+        </button>
+      </view>
+      <button slot="placeholder" class="weui-btn btn-block" type="primary">申请</button>
+    </Screen>
+
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import { service } from '../../config.js'
+  import http from '../../mixins/http'
+  import base from '../../mixins/base'
+  import cart from '../../mixins/cart'
+  import user from '../../mixins/user'
+  import { funImages } from '../../mixins/demo'
+  import Swiper from '../../components/swiper'
+  import Screen from '../../components/screen'
+
+  export default class mainDetail extends wepy.page {
+    mixins = [base, http, cart, user]
+    config = {
+      navigationBarTitleText: '需求详情'
+    }
+    data = {
+      tags: [],
+      navigate: false,
+      demand: {
+        Serviceid: '',
+        mytime:'',
+        mydate:'',
+        title:'',
+        author:'',
+        pubtime:'',
+        pubcompany:'',
+        status:'',
+        exist: 0
+      }
+    }
+
+    computed = {
+      isEnabled() {
+        return Boolean(this.demand && +this.demand.status == '0')
+      }
+    }
+
+    async onLoad(query) {
+      console.log(query)
+      const Serviceid = query && +query.id
+      const title = query && query.title
+      const author = query && query.name
+      const status = query && query.status
+      const mytime = query && query.time
+      const mydate = query && query.date
+      const content = query && query.content
+      const duration = query && query.duration
+      const phone = query && query.phone
+      console.log('time')
+      console.log(mytime)
+      console.log(query.time)
+      setTimeout(() => {
+        this.demand = Object.assign({}, this.demand, {
+          Serviceid: Serviceid,
+          title: title,
+          author: author,
+          status: status,
+          mytime: mytime,
+          mydate: mydate,
+          content: content,
+          duration: duration,
+          phone: phone,
+          stock: 1
+        })
+        this.$apply()
+      }, 300)
+    }
+
+    onShow() {
+      // 初始化页面数据
+      this.initPageData()
+      this.initUserData()
+    }
+
+    onPullDownRefresh() {
+      this.initPageData()
+      this.initUserData()
+    }
+
+     // 初始化页面数据
+    initUserData() {
+      this.getInfo()
+      console.log('[global]'+this.$parent.globalData.user)
+      
+      this.$apply()
+    }
+
+    // 初始化页面数据
+    initPageData() {
+      wx.stopPullDownRefresh()
+     
+    }
+
+    methods = {
+      async toAdd() {
+         let res = await wepy.request({
+           url: service.host + '/applicateInSearch', //开发者服务器接口地址",
+           data: {
+             'UserID' : this.$parent.globalData.id,
+             'ServiceID' : this.demand.Serviceid
+           },
+           method: 'POST'
+         });
+         console.log(res)
+         if(res.data.num=='1'){
+            wx.showToast({
+              title: '申请成功',
+              icon: 'success',
+              duration: 800
+            });
+            setTimeout(() => {
+              this.$switch({url:'/pages/index'});
+            }, 800);
+          }else{
+            wx.showToast({
+              title: '申请失败',
+              icon: 'loading',
+              duration: 800
+            });
+          }
+         this.$apply()
+      }
+    }
+
+    components = {
+      Swiper,
+      Screen
+    }
+  }
+</script>
+
+<style lang="less">
+@import "../../styles/custom/fn.less";
+
+.main-detail{
+  .weui-cell__ft{
+    color: black;
+  }
+  .weui-cell{
+    margin:10rpx;
+  }
+  .detail-tags{
+    .h4();
+    padding: 0.4em 0;
+  }
+
+  
+  .btn-flex-1{
+    padding: 0;
+    width: 3.5em;
+    line-height: 1.6;
+    overflow: hidden;
+  }
+  .btn-flex-full{
+    flex: 1 1 auto;
+  }
+  .btn-text-bottom{
+    .h5();
+    line-height: 1;
+    color: #777;
+  }
+
+}
+</style>
