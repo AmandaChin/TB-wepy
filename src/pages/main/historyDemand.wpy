@@ -70,7 +70,7 @@
           <view class="btn-text-bottom">编辑</view>
         </button>
       <view style="display: flex;">
-        <button @tap="toAdd()" disabled="{{demand.status==0}}" class="weui-btn btn-block btn-flex-full" type="primary">
+        <button @tap="toSee()" disabled="{{demand.status==0}}" class="weui-btn btn-block btn-flex-full" type="primary">
           <text wx:if="{{demand.status==0}}">暂无响应者</text>
           <text wx:else>查看响应者</text>
         </button>
@@ -211,28 +211,28 @@
               }
             }
       },
-      async toAdd() {
+      async toSee() {
          let res = await wepy.request({
-           url: service.host + '/applicateInSearch', //开发者服务器接口地址",
+           url: service.host + '/getUserByService', //开发者服务器接口地址",
            data: {
-             'UserID' : this.$parent.globalData.id,
              'ServiceID' : this.demand.Serviceid
            },
            method: 'POST'
          });
          console.log(res)
-         if(res.data.num=='1'){
-            wx.showToast({
-              title: '申请成功',
-              icon: 'success',
-              duration: 800
-            });
-            setTimeout(() => {
-              this.$switch({url:'/pages/index'});
-            }, 800);
+         var volunteer = res.data.list
+         if(res.data.list!=null){
+           wepy.showModal({
+             title: '志愿者信息', //提示的标题,
+             content: '志愿者用户名：'+volunteer.UserName+'\r\n志愿者性别:'+volunteer.Gender+'\r\n志愿者姓名:'+volunteer.Name+'\r\n志愿者身份证号'+volunteer.IDNumber
+             +'\r\n邮箱地址'+volunteer.Email+'\r\n联系方式'+volunteer.Phone, //提示的内容,
+             showCancel: false, 
+             confirmColor: '#049BFF'
+           });
+           
           }else{
-            wx.showToast({
-              title: '申请失败',
+            wepy.showToast({
+              title: '请重试',
               icon: 'loading',
               duration: 800
             });
