@@ -34,6 +34,10 @@ export default class userMixin extends wepy.mixin {
         returnText = returnText.replace(/"/gi, '"');
         returnText = returnText.replace(/</gi, '<');
         returnText = returnText.replace(/>/gi, '>');
+
+        //去掉回车换行        
+        returnText = returnText.replace(/[\r\n]/g,"");        
+        
         return returnText;
       }
 }

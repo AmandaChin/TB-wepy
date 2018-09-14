@@ -1,8 +1,8 @@
 <template>
  <view>
    <view class="navbar page">
-      <booklist :list.sync="list"
-                :loading.sync="loading" :noMore.sync="noMoreList"></booklist>
+      <booklist :list.sync="list"  title="历史需求"
+                :loading.sync="loading" :noMore.sync="noMoreList" :isCollectList.sync="isCollectList" :page.sync="pagetype"></booklist>
     </view>
     
  </view>
@@ -10,25 +10,27 @@
 
 
 <script>
-import booklist from '../../../components/demandlist'
+import booklist from '../../../components/bookList'
 import wepy from 'wepy'
 import { service } from '../../../config.js'
 import { funImages } from '../../../mixins/demo'
+import base from '../../../mixins/base'
+import http from '../../../mixins/http'
+import user from '../../../mixins/user'
+import publicProcess from '../../../mixins/publicProcess'
 const sliderWidth = 96; // 需要设置slider的宽度，用于计算中间位置
 export default class myDemand extends wepy.page {
+   mixins = [base, user, http ,publicProcess]
   config = {
     navigationBarTitleText: '我的需求',
     enablePullDownRefresh: false
   }
   data = {
-    
-    list: [
-     {title: "扶老奶奶过马路",content:"这是示例demo", url:"./c2v",my_button:'立即评价'},
-     {title: "这是示例demo", url:"./c2v",my_button:'立即评价'},
-     {title: "这是示例demo", url:"./c2v",my_button:'立即评价'},
-     {title: "这是示例demo", url:"./c2v",my_button:'立即评价'},
-     {title: "这是示例demo", url:"./c2v",my_button:'立即评价'}
-     ]
+    list: [],
+    noMoreList: false,
+    loading: false,
+    isCollectList: true,
+    pagetype: 'historyDemand'
   }
 
   methods = {
@@ -41,7 +43,7 @@ export default class myDemand extends wepy.page {
 
   onReachBottom() {
     setTimeout(() => {
-      this.updateBookList(this.page)
+      this.updateDemandList()
       this.$apply()
     }, 200)
   }
@@ -51,70 +53,51 @@ export default class myDemand extends wepy.page {
     // 初始化参数
     this.page = 0
     // 请求列表
-    this.updateBookList(this.page)
+    this.updateDemandList()
   }
 
-  // 更新图书列表
-  updateBookList(page) {
-    if (this.loading || this.noMoreList) return
-    this.loading = true
-    // 请求列表
-    this.$post(
-      {
-        url: service.list,
-        data: {
-          // 默认从0开始为第一页
-          page: page,
-          size: this.size
-        }
-      },
-      {
-        success: ({ code, data }) => {
-          // 示例规则：最多20本
-          if (this.list.length >= 20) {
-            this.noMoreList = true
-            return
-          }
+  async updateDemandList() {
+    //if (this.loading || this.noMoreList) return
+    let res = await wepy.request({
+         url: service.host + '/getDemandByUserID',
+         data:{
+           //'UserID': 2
+           'UserID': parseInt(this.$parent.globalData.id)
+         },
+         method: 'POST'
+    })
+    console.log('update')
+    console.log(res)
+    const list = res.data.list
+    // 请求到空列表后就认为没有更多了
+    if (this.isArray(list) && list.length === 0) {
+      this.noMoreList = true
+      return
+       }
+    this.list = this.getItems(list)
+    this.$apply()
 
-          // 请求到空列表后就认为没有更多了
-          if (this.isArray(data) && data.length === 0) {
-            this.noMoreList = true
-            return
-          }
-          if (!this.page || +this.page === 0) {
-            this.list = this.getBooks(data)
-          } else {
-            // 添加到列表中
-            this.list = [...this.list, ...this.getBooks(data)]
-          }
-          // 成功了就增加一页
-          this.page += 1
-        },
-        fail: ({ code, data }) => {
-          // 失败了什么也不做
-        },
-        complete: () => {
-          this.loading = false
-        }
-      }
-    )
   }
 
-  // 处理图书列表
-  getBooks(data) {
-    const len = this.list.length
-    return this.getArray(data).map((book, index) => {
-      const xlen = len + index
+  // 处理列表
+  getItems(data) {
+    //const len = this.list.length
+    return this.getArray(data).map((item, index) => {
       // 拼接示例数据
       return {
-        id: xlen,
-        title: book.title,
-        content: `详情: ${book.title}；${book.title}。`,
-        image: funImages[(xlen + 4) % 8],
-        tags: ['tag1', 'tag2'],
-        status: xlen % 2
+        id: item.ServiceID,
+        title: item.Content,
+        name: item.Name,
+        date: item.DemandStartTime.substring(0,10),
+        time: item.DemandStartTime.substring(11,19),
+        content: this.convertHtmlToText(item.Remark),
+        status: item.Status,
+        duration: item.Duration,
+        phone:item.Phone,
+        mutualtype:item.mutualtype
       }
     })
+    this.$apply()
   }
   
   components = {

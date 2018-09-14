@@ -36,6 +36,15 @@
             <!-- <text class="color-green">20</text> -->
           </view>
         </navigator>
+        <navigator url="/pages/user/check/mycheck" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
+          <view class="weui-cell__bd">
+            <view style="display: inline-block; vertical-align: middle">我的审核</view>
+            <view class="weui-badge" style="margin-left: 5px;">New</view> 
+          </view>
+          <view class="weui-cell__ft weui-cell__ft_in-access">
+            <!-- <text class="color-green">1</text> -->
+          </view>
+        </navigator>
         <navigator url="/pages/user/notice/notice" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
           <view class="weui-cell__bd">
             <view style="display: inline-block; vertical-align: middle">我的通知</view>

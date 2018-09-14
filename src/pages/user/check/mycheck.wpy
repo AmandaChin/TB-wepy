@@ -37,13 +37,13 @@ const sliderWidth = 96; // 需要设置slider的宽度，用于计算中间位�
 export default class pageIndex extends wepy.page {
   mixins = [base, http,publicProcess]
   config = {
-    navigationBarTitleText: '我的勋章',
+    navigationBarTitleText: '我的审核',
     navigationBarTextStyle: 'white',
     navigationBarBackgroundColor: '#049BFF',
     enablePullDownRefresh: false
   }
   data = {
-    tabs: ['已获得', '已转移'],
+    tabs: ['已审核', '待审核'],
     activeIndex: 0,
     sliderOffset: 0,
     sliderLeft: 0,

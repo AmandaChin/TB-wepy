@@ -11,6 +11,7 @@ export default class extends wepy.app {
       'pages/user',
       'pages/main/list',
       'pages/main/demandDetail',
+      'pages/main/historyDemand',
       'pages/main/search',
       'pages/login/login',
       'pages/login/register',
@@ -18,7 +19,7 @@ export default class extends wepy.app {
       'pages/borrow/result',
       'pages/user/demand/c2v',
       'pages/user/demand/myDemand',
-      'pages/user/demand/payMedal',
+      'pages/user/demand/editMedal',
       'pages/user/demand/publish',
       'pages/user/medal/detail',
       'pages/user/medal/myMedal',
@@ -31,7 +32,8 @@ export default class extends wepy.app {
       'pages/user/notice/notice',
       'pages/user/notice/detail',
       'pages/demand/oldmanDemand',
-      'pages/demand/volunteerDemand'
+      'pages/demand/volunteerDemand',
+      'pages/user/check/mycheck'
     ],
     window: {
       navigationBarTitleText: '时间银行志愿服务系统',

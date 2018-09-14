@@ -24,6 +24,7 @@ export default class userMixin extends wepy.mixin {
     let res = await wepy.showModal({
       title: '授权提醒',
       content: '时间银行想获取您的个人信息',
+      confirmColor: '#049BFF'
     })
     if (res.confirm) {
       let code = await wepy.login()

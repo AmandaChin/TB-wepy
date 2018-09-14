@@ -1,0 +1,395 @@
+<template>
+  <view class="page-editdemand"> 
+    <view class="weui-panel">
+      <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__hd">
+          <view class="weui-label reset-label-left h3">项目类型</view>
+        </view>
+        <view class="weui-cell__bd">
+            <picker @change="bindtypeChange" value="{{typeIndex}}" range="{{types}}">
+              <text wx:if="{{typeisnull}}" style="color:#999;font-size:30rpx;">{{demand.title}}</text>
+              <view wx:else>
+                <text class="weui-select weui-select_in-select-after h3">{{types[typeIndex]}}</text>
+              </view>
+              </picker>
+            </view>
+      </view>
+
+      <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__hd">
+          <view class="weui-label reset-label-left h3">服务日期</view>
+        </view>
+        <view class="weui-cell__bd h3">
+          <picker mode="date" value="{{date}}" start="{{today}}" end="{{endday}}" @change="bindDateChange">
+            <text wx:if="{{dateisnull}}" style="color:#999;font-size:30rpx;">{{demand.mydate}}</text>
+            <view wx:else><text class="weui-input">{{date}}</text></view>
+          </picker>
+        </view>
+      </view>
+
+      <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__hd">
+          <view class="weui-label reset-label-left h3">服务时间</view>
+        </view>
+        <view class="weui-cell__bd h3">
+          <picker mode="time" value="{{time}}" start="09:01" end="21:01" @change="bindTimeChange">
+            <text wx:if="{{timeisnull}}" style="color:#999;font-size:30rpx;">{{demand.mytime}}</text>
+            <view wx:else><text class="weui-input">{{time}}</text></view>
+          </picker>
+        </view>
+      </view>
+
+      <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__hd">
+          <view class="weui-label reset-label-left h3">服务时长</view>
+        </view>
+        <view class="weui-cell__bd">
+            <picker @change="bindDurationChange" value="{{timeIndex}}" range="{{times}}">
+              <text wx:if="{{durationisnull}}" style="color:#999;font-size:30rpx;">{{demand.duration}}小时</text>
+              <view wx:else>
+                <text class="weui-select weui-select_in-select-after h3">{{times[timeIndex]}}小时</text>
+              </view>
+              </picker>
+            </view>
+      </view>
+    <view class="weui-cell weui-cell_input">
+      <view class="weui-cell__hd">
+        <view class="weui-label reset-label-left h3">详细描述</view>
+      </view>
+    </view>
+    <view class="weui-cells weui-cells_after-title">
+      <view class="weui-cell">
+        <view class="weui-cell__bd">
+          <textarea bindblur="bindTextAreaBlur" class="weui-textarea h3" value="{{remark}}" placeholder="{{demand.content}}" style="height: 3.3em" />
+        </view>
+      </view>
+    </view>
+    
+   </view>
+    <button @tap="editdemand" class="weui-btn btn-primary" type="primary">确认修改</button>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import { service } from '../../../config.js'
+  import http from '../../../mixins/http'
+  import base from '../../../mixins/base'
+  import user from '../../../mixins/user'
+  import cart from '../../../mixins/cart'
+
+  export default class pageBorrow extends wepy.page {
+    mixins = [base, http, user, cart]
+    config = {
+      navigationBarTitleText: '需求发布',
+      enablePullDownRefresh: false
+    }
+    components = {}
+    data = {
+      time: '',
+      date: '',
+      location: '',
+      typeisnull:true,
+      locationisnull: true,
+      durationisnull:true,
+      timeisnull:true,
+      dateisnull:true,
+      paytypeisnull:true,
+      today: '',
+      endday:'',
+      loaded: false,
+      loading: false,
+      types: [],
+      typesid:[],
+      typeIndex: -1,
+      paytypes: ['自行支付'],
+      paytypeIndex: -1,
+      times: ['1','1.5','2','2.5','3','3.5','4'],
+      timeIndex: -1,
+      remark:'',
+      demand: {}
+    }
+    computed = {
+     
+    }
+    
+    methods = {
+      bindTextAreaBlur: function(e) {
+          this.remark = e.detail.value
+      },
+      bindtypeChange (e) {
+        this.typeIndex = e.detail.value
+        this.typeisnull = false
+      },
+      bindpaytypeChange (e) {
+        this.paytypeIndex = e.detail.value
+        this.paytypeisnull = false
+      },
+      bindDurationChange (e){
+        this.timeIndex = e.detail.value
+        this.durationisnull = false
+        //console.log(this.times[this.timeIndex])
+      },
+      bindDateChange (e) {
+        this.date = e.detail.value
+        this.dateisnull = false
+      },
+      bindTimeChange (e) {
+        this.time = e.detail.value
+        this.timeisnull = false
+      },
+      editdemand(){
+        console.log('pushDemand!!')
+        this.submitDemand()
+        this.$apply()
+      }
+    }
+    async onLoad(query) {
+      this.initTypes()
+      console.log(query)
+      const Serviceid = query && +query.Serviceid
+      const title = query && query.title
+      const mytime = query && query.time
+      const mydate = query && query.date
+      const content = query && query.content
+      const duration = query && query.duration
+      setTimeout(() => {
+      this.demand = Object.assign({}, this.demand, {
+          Serviceid: Serviceid,
+          title: title,
+          mytime: mytime,
+          mydate: mydate,
+          content: content,
+          duration: duration
+         })
+         this.$apply()
+       }, 300)
+    }
+    
+    onPullDownRefresh() {
+      this.initTypes()
+    }
+    //提交需求单
+    async submitDemand(){
+      //判断是否修改
+      var content 
+      if(this.typeisnull){
+        var contentid = -1
+        for(var i=0;i<this.typesid.length;i++){
+          if(this.typesid[i].type == this.demand.title){
+            contentid = this.typesid[i].ID
+            break
+          }
+        }
+        content = contentid
+      }else{
+        content = this.typesid[this.typeIndex].ID
+      }
+      var date 
+      if(this.dateisnull){
+        date = this.demand.mydate
+      }else{
+        date = this.date
+      }
+      var time 
+      if(this.timeisnull){
+        time = this.demand.mytime
+      }else{
+        time = this.time
+      }
+      var duration 
+      if(this.durationisnull){
+        duration = this.demand.duration
+      }else{
+        duration = this.times[this.timeIndex]
+      }
+      var remark
+      if(this.remark==null){
+        remark = this.demand.content
+      }else{
+        remark = this.remark
+      }
+      //拼接时间
+        var StartTimestamp = new Date(String(date) + ' ' + time)
+        var EndTimestamp = StartTimestamp.getTime() + duration * 60 * 60 * 1000
+        var finalbegin = this.formatDateTime(StartTimestamp.getTime())
+        var finalend = this.formatDateTime(EndTimestamp)
+        var id = parseInt(this.$parent.globalData.id)
+        let res = await wepy.request({
+          url:service.host+'/editDemand',
+          data:{
+            'UserId': parseInt(this.$parent.globalData.id),
+            //'UserId': 2,
+            'serviceId':parseInt(this.demand.Serviceid),
+            'Content': parseInt(content),
+            'DemandStartTime': finalbegin,
+            'DemandEndTime': finalend,
+            'Duration':parseInt(duration),
+            'Remark':remark
+          },
+          method:'POST'
+        })
+        console.log('res')
+        console.log(res)
+        if(res.data.num == 1){
+          wx.showToast({
+            title: '已修改',
+            icon: 'success',
+            duration: 800
+          });
+          setTimeout(() => {
+              wx.navigateTo({url:'/pages/user/demand/myDemand'});
+            }, 800);
+          
+        }else{
+          wx.showToast({
+            title: '请重试',
+            icon: 'loading',
+            duration: 800
+          });
+        }
+    }
+    //时间戳换时间
+    formatDateTime(inputTime) {
+        var date = new Date(inputTime)
+        var y = date.getFullYear()
+        var m = date.getMonth() + 1
+        m = m < 10 ? ('0' + m) : m
+        var d = date.getDate()
+        d = d < 10 ? ('0' + d) : d
+        var h = date.getHours()
+        h = h < 10 ? ('0' + h) : h
+        var minute = date.getMinutes()
+        var second = date.getSeconds()
+        minute = minute < 10 ? ('0' + minute) : minute
+        second = second < 10 ? ('0' + second) : second
+        return y + '-' + m + '-' + d + ' ' + h + ':' + minute + ':' + second
+      }
+    //初始化服务类型
+     async initTypes() {
+      let res = await wepy.request({
+        url: service.host+'/itemOperation', //开发者服务器接口地址",
+        method: 'GET'});
+      this.typesid = res.data.list.rows;
+      await this.getlist(res.data.list.rows);
+      
+    }
+    async getlist(list){
+      var item = []
+      for(var i=0;i<list.length;i++){
+        item.push(list[i].type)
+      }
+      if(item.length==list.length){
+        this.types = item
+        return
+      }
+    }
+  
+  }
+</script>
+
+<style lang="less">
+  @import "../../../styles/custom/fn.less";
+
+  @icon-font-size: 34rpx;
+
+  .page-editdemand{
+      .weui-textarea{
+        width: 600rpx;
+      }
+      .weui-media-box{
+        padding-bottom: 1em;
+        display: flex;
+      }
+
+      .category-icon{
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 100%;
+      }
+      .reset-pull-right{
+        .h4();
+        top: 15px;
+        bottom: auto;
+        margin-top: -0.5em;
+      }
+      .reset-pull-middle{
+        top: 1em;
+      }
+      .icon-location{
+        width: 1.5em;
+        height: 1.5em;
+      }
+    
+    .reset-pull-right,
+    .reset-pull-middle{
+      position: absolute;
+      right: 15px;
+      top: 0;
+      bottom: 0;
+      height: 2em;
+      line-height: 2;
+      padding: 0 1em;
+      margin: auto -1em auto 0;
+    }
+    .reset-label-left{
+      color: #999;
+      margin-right:1em;
+      padding-right: 1em;
+      border-right: 1rpx solid @uiBorderColor;
+    }
+    .icon-order-circle,
+    .icon-order-empty{
+      display: inline-block;
+      width: @icon-font-size;
+      height: @icon-font-size;
+      font-size: 90%;
+      line-height: @icon-font-size;
+      border: 1rpx solid transparent;
+      border-radius: 50%;
+      text-align: center;
+    }
+    .icon-order-circle{
+      color: #fff;
+      background: @weuiColorPrimary;
+      border-color: @weuiColorPrimary;
+    }
+    .icon-order-empty{
+      color: #ddd;
+      background: transparent;
+      border-color: #ddd;
+    }
+    .icon-delete{
+      display: inline-block;
+      width: @icon-font-size;
+      height: @icon-font-size;
+      &:before,
+      &:after{
+        content: '';
+        display: inline-block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 2rpx;
+        height: 100%;
+        margin: auto;
+        background: #999;
+        transform: rotate(45deg);
+      }
+      &:after{
+        transform: rotate(-45deg);
+      }
+      
+    }
+    .weui-input {
+      height: 32px;
+      min-height: 32px;
+      line-height: 32px;
+    }
+  }
+
+</style>

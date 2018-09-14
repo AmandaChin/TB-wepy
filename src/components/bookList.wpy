@@ -3,7 +3,7 @@
     <view wx:if="{{title}}" class="booklist-name">{{title}}</view>
     <block wx:if="{{list.length > 0}}">
       <block wx:for="{{list}}" wx:key="index">
-        <navigator url="/pages/main/{{page}}?id={{item.id}}&title={{item.title}}&status={{item.status}}&time={{item.time}}&date={{item.date}}&name={{item.name}}&content={{item.content}}&duration={{item.duration}}&phone={{item.phone}}" 
+        <navigator url="/pages/main/{{page}}?id={{item.id}}&title={{item.title}}&status={{item.status}}&time={{item.time}}&date={{item.date}}&name={{item.name}}&content={{item.content}}&duration={{item.duration}}&phone={{item.phone}}&mutualtype={{item.mutualtype}}" 
         class="booklist-item clearfix">
           <view class="booklist-cover-wrapper">
             <image src="{{item.image}}" mode="widthFix" style="width:100%;" />
@@ -13,6 +13,28 @@
             <view class="booklist-abstract">发布者:{{item.name}}</view>
             <view class="booklist-abstract">发布时间:{{item.date}}</view>
             <view class="booklist-abstract">详情:{{item.content}}</view>
+            <view wx:if="{{isCollectList}}" >
+              <view >
+                <block wx:if="{{item.mutualtype == '0'}}">
+                   <view class="booklist-abstract color-green">订单属性: 我发布的</view>
+                </block>
+                <block wx:else>
+                   <view class="booklist-abstract color-green">订单属性: 我响应的</view>
+                </block>
+              </view>
+              <view class="booklist-tags">
+                <view class=" booklist-status">
+                <block wx:if="{{item.status != 0}}">
+                  <image class="imgicon" src="{{icon_star_active}}" mode="aspectFit"/>
+                  <text class="booklist-text reset-text-star color-999">已被响应</text>
+                </block>
+                <block wx:else>
+                  <image class="imgicon" src="{{icon_star}}" mode="aspectFit"/>
+                  <text class="booklist-text reset-text-star color-blue">未被响应</text>
+                </block>
+                </view>
+              </view>
+            </view>
           </view>
         </navigator>
       </block>
@@ -74,9 +96,15 @@
       type: {
         type: String,
         default: 'list'
+      },
+      //是否需要加属性logo
+      isCollectList: {
+        type: Boolean,
+        default: false
       }
     }
     data = {
+      
       icon_eye: '/images/icon/icon-eye@2x.png',
       icon_eye_active: '/images/icon/icon-eye-active@2x.png',
       icon_star: '/images/icon/icon-star@2x.png',
@@ -169,7 +197,8 @@
     position: absolute;
     left: @bookListSpace;
     bottom: 0;
-    right: 0;
+    right: 30rpx;
+    top: 20rpx;
   }
   .booklist-tag {
     display: inline-block;
