@@ -5,7 +5,7 @@
 // 域名
 // var host = 'http://127.0.0.1:3000';
 //var host = 'https://wxapp.thunf.cn';
-var host = 'http://localhost:3000/api';
+var host = 'http://www.opengle.com:3000/api';
 
 // 下面的地址配合云端 Demo 工作
 export const service = {

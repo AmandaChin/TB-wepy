@@ -1,6 +1,6 @@
 // 示例:图片组
 const funImages = [
-  '/images/category/cate-da@2x.png',
+  'http://timebank-icon.oss-cn-beijing.aliyuncs.com/finish.png',
   '/images/category/cate-ji@2x.png',
   '/images/category/cate-da@2x.png',
   '/images/category/cate-li@2x.png',

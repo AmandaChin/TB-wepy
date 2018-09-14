@@ -34,7 +34,7 @@ import SearchBar from '../components/searchbar'
 import BookList from '../components/bookList'
 
 export default class pageIndex extends wepy.page {
-  mixins = [base, user, http,publicProcess]
+  mixins = [base, user, http ,publicProcess]
   config = {
     navigationBarTitleText: '首页',
     navigationBarTextStyle: 'white',

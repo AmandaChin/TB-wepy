@@ -74,7 +74,8 @@ export default class extends wepy.app {
     user: null,
     openid: null,
     id:-1,
-    userinfo:null
+    userinfo:null,
+    accountNum:0
   }
 
   constructor () {

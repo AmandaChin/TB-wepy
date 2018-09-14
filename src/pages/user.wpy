@@ -20,20 +20,20 @@
           <view class="weui-cell__bd">我的勋章</view>
           <view class="weui-cell__ft weui-cell__ft_in-access">
             <text>余额：</text>
-            <text class="color-green">0</text>
+            <text class="color-green">{{myAccount}}</text>
             <text>VLT</text>
           </view>
         </navigator>
         <navigator url="/pages/user/demand/myDemand" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
           <view class="weui-cell__bd">我的需求</view>
           <view class="weui-cell__ft weui-cell__ft_in-access">
-            <text class="color-green">5</text>
+            <!-- <text class="color-green">5</text> -->
           </view>
         </navigator>
         <navigator url="/pages/user/volunteer/myVolunteer" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
           <view class="weui-cell__bd">我的服务</view>
           <view class="weui-cell__ft weui-cell__ft_in-access">
-            <text class="color-green">20</text>
+            <!-- <text class="color-green">20</text> -->
           </view>
         </navigator>
         <navigator url="/pages/user/notice/notice" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
@@ -42,7 +42,7 @@
             <view class="weui-badge" style="margin-left: 5px;">New</view> 
           </view>
           <view class="weui-cell__ft weui-cell__ft_in-access">
-            <text class="color-green">1</text>
+            <!-- <text class="color-green">1</text> -->
           </view>
         </navigator>
       </view>
@@ -52,7 +52,7 @@
 
 <script>
 import wepy from 'wepy'
-// import { service } from '../config.js'
+import { service } from '../config.js'
 import http from '../mixins/http'
 import base from '../mixins/base'
 import user from '../mixins/user'
@@ -66,7 +66,9 @@ export default class pageUser extends wepy.page {
   data = {
       nickName: '未授权用户',
       // 头像占位图
-      avatarUrl: '../images/icon/icon-avatar@2x.png'
+      avatarUrl: '../images/icon/icon-avatar@2x.png',
+      myAccount: 0
+      
   };
 
   computed = {
@@ -83,10 +85,20 @@ export default class pageUser extends wepy.page {
     avatarUrl() {
       const info = this.$parent.globalData.user
       if(info){
+        
         return info.avatarUrl
       }
       else{
         return '../images/icon/icon-avatar@2x.png'
+      }
+    },
+    myAccount() {
+     const num = this.$parent.globalData.accountNum
+      if(num){
+        return parseFloat(num).toFixed(2)
+      }
+      else{
+        return 0
       }
     }
   };
@@ -98,12 +110,25 @@ export default class pageUser extends wepy.page {
   onPullDownRefresh() {
     this.initUserData()
   }
-
+  
   // 初始化页面数据
   initUserData() {
     this.getInfo()
-    this.$apply()
     console.log('[global]'+this.$parent.globalData.user)
+    this.getUserAccount()
+    this.$apply()
+  }
+  async getUserAccount(){
+    console.log('get account!')
+    let res = await wepy.request({
+          url: service.host + '/getUserAccount', //开发者服务器接口地址",
+          data: {
+            'UserId': 19
+          }, //请求的参数",
+          method: 'POST'
+        });
+    this.$parent.globalData.accountNum = res.data.list
+    this.$apply()
   }
 
   methods = {}

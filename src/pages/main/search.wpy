@@ -1,24 +1,24 @@
 <template>
   <view class="main-search">
     <block wx:if="{{items1}}">
-      <checkboxButton1 :title.sync="title1" :list.sync="items1" :value.sync="value1"></checkboxButton1>
+      <radioButton1 :title.sync="title1" :list.sync="items1" :value.sync="value1"></radioButton1>
     </block>
     <block wx:if="{{items2}}">
-      <checkboxButton2 :title.sync="title2" :list.sync="items2" :value.sync="value2"></checkboxButton2>
+      <radioButton2 :title.sync="title2" :list.sync="items2" :value.sync="value2"></radioButton2>
     </block>
     <block>
       <view class="checkbox-title">服务日期</view>
       <view class="weui-cell weui-cell_input">
         <view class="weui-cell__bd h3">
-          <picker mode="date" value="{{date}}" start="{{today}}" end="{{endday}}" @change="bindDateChange" style="border:10rpx;">
-            <text wx:if="{{dateisnull}}" style="color:#999;font-size:30rpx;">请选择服务日期</text>
-            <view wx:else><text class="weui-input">{{date}}</text></view>
+          <picker class="dateoption" mode="date" value="{{date}}" start="{{today}}" end="{{endday}}" @change="bindDateChange">
+            <text  wx:if="{{dateisnull}}" style="color:#999;font-size:30rpx;">请选择服务日期</text>
+            <view wx:else ><text class="weui-input">{{date}}</text></view>
           </picker>
         </view>
       </view>
     </block>
     <block wx:if="{{items4}}">
-      <checkboxButton4 :title.sync="title4" :list.sync="items4" :value.sync="value4"></checkboxButton4>
+      <radioButton4 :title.sync="title4" :list.sync="items4" :value.sync="value4"></radioButton4>
     </block>
     <button @tap="search" class="weui-btn" type="primary">搜索</button>
   </view>
@@ -29,7 +29,7 @@
   import { service } from '../../config.js'
   import base from '../../mixins/base'
   import http from '../../mixins/http'
-  import checkboxButton from '../../components/checkboxButton'
+  import radioButton from '../../components/radioButton'
 
   export default class mainSearch extends wepy.page {
     mixins = [base, http]
@@ -49,18 +49,21 @@
       value2: '',
       value3: '',
       value4: '',
-      items1: [{value:'0',name:'志愿信息',checked:false},{value:'1',name:'需求信息',checked:false}],
+      items1: [{value:'志愿信息',name:'志愿信息',checked:false},{value:'需求信息',name:'需求信息',checked:false}],
       items2: undefined,
       items3: undefined,
       items4: [{value:'0',name:'全国不限',checked:true},{value:'1',name:'同区选择',checked:false},{value:'2',name:'同市选择',checked:false},{value:'3',name:'同省选择',checked:false}],
-      lists: []
+      lists: [],
+      dateisnull : true,
+      date:''
     }
 
     onLoad(query) {
       const {index, value} = this.$parse(query && query.params)
       if (index && value) {
+        console.log('index'+index)
         // 多选时，预置对应value为对应数组
-        this[`value${index}`] = [...this.getArray(value, [this.getString(value, '1')])]
+        this[`value${index}`] = ''
       }
     }
 
@@ -81,52 +84,64 @@
         method: 'GET'});
       var list = res.data.list
       //console.log(res.data.count)
+      let itemlist = await this.handleItem(list)
+      this.items2 = itemlist
+      
+      this.$apply();
+    }
+    async handleItem(list){
       var item2 = []
-      for(var i=0; i<res.data.count; i++){
+      for(var i=0; i<list.count; i++){
         var item = {}
-        item.name = list[i].type
-        item.value = list[i].ID
+        item.name = list.rows[i].type
+        item.value = list.rows[i].ID
         item.checked = false
         item2.push(item)
       }
-      console.log(item2)
-      console.log(res);
+      this.$apply()
+      return item2
     }
-
     methods = {
+      bindDateChange (e) {
+        this.date = e.detail.value
+        this.dateisnull = false
+      },
       search() {
-        const params = {title: []}
-        ;[1, 2, 3, 4].map((i) => {
-          const items = `items${i}`
-          const value = `value${i}`
-          const key = `key${i}`
-          if (this[value] && this[key]) {
-            params[`${this[key]}`] = this.isArray(this[value]) ? this[value] : [this[value]]
-          }
-          // 整理条件对应的文案信息
-          if (this[items]) {
-            const titleArr = this.getArray(this[items]).filter((item) => {
-              return this.getArray(params[`${this[key]}`]).indexOf(this.getString(item.value)) > -1
-            }).map((item) => {
-              return item.name
-            })
-            if (titleArr && titleArr.length) {
-              params.title = [...params.title, ...titleArr]
-            }
-          }
-        })
-        params.title = params.title.join(' ')
-        wx.redirectTo({
-          url: `/pages/main/list?params=${JSON.stringify(params)}`
-        })
+        console.log(this.value1)
+        console.log(this.value2)
+        console.log(this.value4)
+        // const params = {title: []}
+        // ;[1, 2, 3, 4].map((i) => {
+        //   const items = `items${i}`
+        //   const value = `value${i}`
+        //   const key = `key${i}`
+        //   if (this[value] && this[key]) {
+        //     params[`${this[key]}`] = this.isArray(this[value]) ? this[value] : [this[value]]
+        //   }
+        //   // 整理条件对应的文案信息
+        //   if (this[items]) {
+        //     const titleArr = this.getArray(this[items]).filter((item) => {
+        //       return this.getArray(params[`${this[key]}`]).indexOf(this.getString(item.value)) > -1
+        //     }).map((item) => {
+        //       return item.name
+        //     })
+        //     if (titleArr && titleArr.length) {
+        //       params.title = [...params.title, ...titleArr]
+        //     }
+        //   }
+        // })
+        // params.title = params.title.join(' ')
+        // wx.redirectTo({
+        //   url: `/pages/main/list?params=${JSON.stringify(params)}`
+        // })
       }
     }
 
     components = {
-      checkboxButton1: checkboxButton,
-      checkboxButton2: checkboxButton,
-      checkboxButton3: checkboxButton,
-      checkboxButton4: checkboxButton
+      radioButton1 : radioButton,
+      radioButton2 : radioButton,
+      radioButton3 : radioButton,
+      radioButton4 : radioButton
     }
   }
 </script>
@@ -145,5 +160,22 @@ page{
 .main-search{
   position:relative;
   padding: 14px 15px 10px;
+}
+.dateoption{
+   display: block;
+    width: 100%;
+    padding: 0.5em 0;
+    line-height: 1;
+    .h4();
+    color: #999;
+    background: transparent;
+    border: 1rpx solid #ddd;
+    border-radius: 1em;
+    text-align: center;
+}
+.dateoption-value{
+  color: #fff;
+    background: @weuiColorPrimary;
+    border-color: @weuiColorPrimary;
 }
 </style>

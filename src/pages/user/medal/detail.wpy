@@ -1,26 +1,38 @@
 <template>
   <view class="page-hash">
-      <view class="weui-cell weui-cell_input">
-        <view class="weui-cell__hd">
-          <view class="weui-label reset-label-left h4">交易区块编号</view>
+      <view class="weui-cell weui-cell_input" style="margin-top:20%">
+        <view class="weui-cell__bd">
+          <view class="weui-label reset-label-left h3">交易区块编号</view>
+          <view class="weui-cell__ft h3">
+          <view style=" word-break: break-all">{{ temp.blockNumber }}</view>
+        </view>
         </view>
       </view>
 
       <view class="weui-cell weui-cell_input">
-        <view class="weui-cell__hd">
-          <view class="weui-label reset-label-left h4">交易区块哈希</view>
+        <view class="weui-cell__bd">
+          <view class="weui-label reset-label-left h3">交易区块哈希</view>
+          <view class="weui-cell__ft h3">
+          <view style=" word-break: break-all">{{temp.blockHash}}</view>
+        </view>
         </view>
       </view>
 
       <view class="weui-cell weui-cell_input">
-        <view class="weui-cell__hd">
-          <view class="weui-label reset-label-left h4">交易哈希</view>
-        </view> 
+        <view class="weui-cell__bd">
+          <view class="weui-label reset-label-left h3">交易哈希</view>
+          <view class="weui-cell__ft h3">
+          <view style=" word-break: break-all">{{temp.transactionHash }}</view>
+        </view>
+        </view>
       </view>
 
       <view class="weui-cell weui-cell_input">
-        <view class="weui-cell__hd">
-          <view class="weui-label reset-label-left h4">勋章去向</view>
+        <view class="weui-cell__bd">
+          <view class="weui-label reset-label-left h3">勋章去向</view>
+          <view class="weui-cell__ft h3">
+          <view style=" word-break: break-all">{{temp.to}}</view>
+        </view>
         </view>
       </view>
   </view>
@@ -28,19 +40,86 @@
 
 <script>
 import wepy from 'wepy'
+import base from '../../../mixins/base'
+import http from '../../../mixins/http'
+import { service } from '../../../config.js'
+
 export default class v2c extends wepy.page {
+  mixins = [base, http]
   config = {
     navigationBarTitleText: '勋章详情',
     enablePullDownRefresh: false
   }
   components = {}
-  data = {}
+  data = {
+    info:{
+      id:'',
+      transferHASH:''
+    },
+    temp: {
+        blockNumber:"加载中",
+        blockHash: "加载中",
+        transactionHash:"加载中",
+        to:"加载中",
+         }
+  }
   computed = {}
+  async onLoad(query) {
+      console.log(query)
+      const id = query && +query.id
+      const transferHASH = query && query.transferHASH
+      setTimeout(() => {
+        this.info = Object.assign({}, this.info, {
+          id: id,
+          transferHASH: transferHASH
+        })
+        this.initPageData()
+        this.$apply()
+      }, 300)
+    }
+
+  onShow() {
+    //this.initPageData()
+  }
+
+  onPullDownRefresh() {
+    this.initPageData()
+  }
+
+  onReachBottom() {
+    setTimeout(() => {
+      this.initPageData()
+      this.$apply()
+    }, 200);
+  }
+
+  // 初始化页面数据
+  async initPageData(){
+    console.log('updateDetail'+this.info.id)
+    console.log(this.info.transferHASH)
+    //if (this.loading || this.noMoreList) return
+    let res = await wepy.request({
+         url: service.host + '/getTransactionInfo',
+         data:{
+           'UserId': this.info.id,
+           'transactionHash': this.info.transferHASH
+         },
+         method: 'POST'
+    })
+    console.log(res)
+    const data = res.data.list
+    this.temp.blockNumber = data.blockNumber
+    this.temp.blockHash = data.blockHash
+    this.temp.transactionHash = data.transactionHash
+    this.temp.to = data.to
+    this.$apply()
+
+  }
 }
 </script>
 
 <style lang="less">
  .page-hash{
-   
+   background-color:white;
  }
 </style>

@@ -16,7 +16,7 @@
   import wepy from 'wepy'
   import base from '../mixins/base.js'
 
-  export default class radioButton2 extends wepy.component {
+  export default class radioButton extends wepy.component {
     mixins = [base]
     props = {
       list: {
