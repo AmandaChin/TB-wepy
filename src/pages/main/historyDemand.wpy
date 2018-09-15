@@ -69,12 +69,12 @@
           </block>
           <view class="btn-text-bottom">编辑</view>
         </button>
-      <view style="display: flex;">
+      <!-- <view style="display: flex;"> -->
         <button @tap="toSee()" disabled="{{demand.status==0}}" class="weui-btn btn-block btn-flex-full" type="primary">
           <text wx:if="{{demand.status==0}}">暂无响应者</text>
           <text wx:else>查看响应者</text>
         </button>
-      </view>
+      <!-- </view> -->
       </view>
       <!-- <button slot="placeholder" class="weui-btn btn-block" type="primary">借阅</button> -->
     </Screen>
@@ -266,7 +266,7 @@
   }
   .btn-flex-1{
     padding: 0;
-    width: 4em;
+    width: 3.5em;
     line-height: 1.6;
     overflow: hidden;
   }

@@ -2,7 +2,7 @@
  <view>
    <view class="navbar page">
       <booklist :list.sync="list"  title="历史需求"
-                :loading.sync="loading" :noMore.sync="noMoreList" :isCollectList.sync="isCollectList" :page.sync="pagetype"></booklist>
+                :loading.sync="loading" :noMore.sync="noMoreList" :OrderType.sync="OrderType"  :OrderStatus.sync="OrderStatus" :page.sync="pagetype"></booklist>
     </view>
     
  </view>
@@ -29,7 +29,8 @@ export default class myDemand extends wepy.page {
     list: [],
     noMoreList: false,
     loading: false,
-    isCollectList: true,
+    OrderType: true,
+    OrderStatus:true,
     pagetype: 'historyDemand'
   }
 

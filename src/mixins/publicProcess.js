@@ -3,7 +3,7 @@ import { service } from '../config.js'
 
 export default class userMixin extends wepy.mixin {
     //富文本转普通文本
- convertHtmlToText(inputText) {
+    convertHtmlToText(inputText) {
          var returnText = "" + inputText;
          returnText = returnText.replace(/<\/div>/ig, '\r\n');
          returnText = returnText.replace(/<\/li>/ig, '\r\n');
@@ -39,5 +39,84 @@ export default class userMixin extends wepy.mixin {
         returnText = returnText.replace(/[\r\n]/g,"");        
         
         return returnText;
+      }
+
+
+      //FormatDate 把时间延后8小时
+      formatDate(date, fmt) {
+        if (/(y+)/.test(fmt)) {
+          fmt = fmt.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length))
+        }
+        const o = {
+          'M+': date.getMonth() + 1,
+          'd+': date.getDate(),
+          'h+': date.getHours(),
+          'm+': date.getMinutes(),
+          's+': date.getSeconds()
+        }
+        for (const k in o) {
+          if (new RegExp(`(${k})`).test(fmt)) {
+            const str = o[k] + ''
+            fmt = fmt.replace(RegExp.$1, (RegExp.$1.length === 1) ? str : this.padLeftZero(str))
+          }
+        }
+        return fmt
+      }
+      
+      padLeftZero(str) {
+        return ('00' + str).substr(str.length)
+      }
+
+      //FormatDateX 
+      formatDatex(date, fmt) {
+        if (/(y+)/.test(fmt)) {
+          fmt = fmt.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length))
+        }
+      
+        var hours = date.getHours()
+        var days = date.getDate()
+        var month = date.getMonth() + 1
+        var year = date.getFullYear()
+        if (hours - 8 < '0') {
+          hours = hours + 16
+          days = days - 1
+        } else {
+          hours = hours - 8
+        }
+      
+        if (days == ' ') {
+          if (month === '2' || month === '4' || month === '6' || month == '8' || month == '9' || month == '11' || month == '1') {
+            days = '31'
+            month = month - 1
+          } else if (month === '3') {
+            if ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0) {
+              days = '29'
+              month = month - 1
+            } else {
+              days = '28'
+              month = month - 1
+            }
+          } else {
+            days = '30'
+            month = month - 1
+          }
+        }
+      
+        const o = {
+          'M+': month,
+          'd+': days,
+          // 'd+': date.getDate(),
+          'h+': hours,
+          // 'h+': date.getHours() -8,
+          'm+': date.getMinutes(),
+          's+': date.getSeconds()
+        }
+        for (const k in o) {
+          if (new RegExp(`(${k})`).test(fmt)) {
+            const str = o[k] + ''
+            fmt = fmt.replace(RegExp.$1, (RegExp.$1.length === 1) ? str : this.padLeftZero(str))
+          }
+        }
+        return fmt
       }
 }

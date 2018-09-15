@@ -1,23 +1,87 @@
 <template>
-<view class="page_c2v">
-    <view class="page__bd">
+<view class="page_apply">
+    <view class="weui-panel">
+         <view class="page__hd">
+            <view class="page__title color-green h3" style="text-align:center;">服务信息</view>
+        </view> 
         <view class="weui-cells weui-cells_after-title">
-             <view class="weui-media-box weui-media-box_text borrow-address">
-             <view class="weui-media-box__title h4 color-666">{{title}}</view>
-                 <view class="weui-cell__bd h4" style="height: 200rpx;">
-                 <textarea bindinput="typing" class="weui-textarea" data-wpytyping-a="address" placeholder="请输入描述信息" value=""  style="height: 150rpx;">
-                 </textarea>
-             </view>
+          <view class="weui-cell">
+              <view class="weui-cell__bd">服务用户：</view>
+              <view class="weui-cell__ft">{{serviceList.Name}}</view>
+          </view>
+          <view class="weui-cell">
+              <view class="weui-cell__bd">服务内容：</view>
+              <view class="weui-cell__ft">{{serviceList.Content}}</view>
+          </view>
+          <view class="weui-cell">
+              <view class="weui-cell__bd">服务日期：</view>
+              <view class="weui-cell__ft">{{startdate}}</view>
+          </view>
+          <view class="weui-cell">
+              <view class="weui-cell__bd">服务时段</view>
+              <view class="weui-cell__ft">{{starttime}} - {{endtime}}</view>
+          </view>
+          <view class="weui-cell">
+              <view class="weui-cell__bd">服务时长：</view>
+              <view class="weui-cell__ft">{{serviceList.Duration}}小时</view>
+          </view>
+        </view>
+    </view>
+    <view class="weui-panel">
+         <view class="page__hd">
+            <view class="page__title color-green h3" style="text-align:center;">请填写申请信息</view>
+        </view> 
+      <view class="weui-cell ">
+        <view class="weui-cell__bd">
+          <view class="weui-label reset-label-left h3">真实服务日期</view>
+        </view>
+        <view class="weui-cell__ft">
+          <picker mode="date" value="{{realdate}}" start="{{today}}" end="{{endday}}" @change="bindDateChange">
+            <!-- <text wx:if="{{dateisnull}}" style="color:#999;font-size:30rpx;"> {{}}</text> -->
+            <view ><text class="weui-input">{{realdate}}</text></view>
+          </picker>
+        </view>
+      </view>
+
+      <view class="weui-cell">
+        <view class="weui-cell__bd">
+          <view class="weui-label reset-label-left h3">真实开始时间</view>
+        </view>
+        <view class="weui-cell__ft">
+          <picker mode="time" value="{{realstarttime}}" start="09:01" end="21:01" @change="bindTimeChange">
+            <!-- <text wx:if="{{starttimeisnull}}" style="color:#999;font-size:30rpx;"> {{}}</text> -->
+            <view ><text class="weui-input">{{realstarttime}}</text></view>
+          </picker>
+        </view>
+      </view>
+      <view class="weui-cell">
+        <view class="weui-cell__bd">
+          <view class="weui-label reset-label-left h3">真实结束时间</view>
+        </view>
+        <view class="weui-cell__ft">
+          <picker mode="time" value="{{realendtime}}" start="09:01" end="21:01" @change="bindTimeChange">
+            <!-- <text wx:if="{{endtimeisnull}}" style="color:#999;font-size:30rpx;"> {{}}</text> -->
+            <view ><text class="weui-input">{{realendtime}}</text></view>
+          </picker>
+        </view>
+      </view>
+        <view class="weui-cells weui-cells_after-title">
+            <view class="weui-media-box weui-media-box_text borrow-address">
+                <view class="weui-media-box__title h3 color-666">{{title}}</view>
+                    <view class="weui-cell__bd h3" style="height: 200rpx;">
+                    <textarea bindinput="typing" class="weui-textarea" data-wpytyping-a="address" placeholder="请输入描述信息" value=""  style="height: 150rpx;">
+                    </textarea>
+                </view>
             </view>
-        
-              <view class="page__bd">
+        </view> 
+        <view class="page__bd">
             <view class="weui-cells">
                 <view class="weui-cell">
                     <view class="weui-cell__bd">
                         <view class="weui-uploader">
                             <view class="weui-uploader__hd">
                                 <view class="weui-uploader__title">上传凭证</view>
-                                <view class="weui-uploader__info">{{files.length}}/2</view>
+                                <view class="weui-uploader__info">{{files.length}}/4</view>
                             </view>
                             <view class="weui-uploader__bd">
                                 <view class="weui-uploader__files" id="uploaderFiles">
@@ -27,44 +91,67 @@
                                         </view>
                                     </block>
                                 </view>
-                                <view hidden="{{files.length==2}}" class="weui-uploader__input-box">
+                                <view hidden="{{files.length==4}}" class="weui-uploader__input-box">
                                     <view class="weui-uploader__input" @tap="chooseImage"></view>
                                 </view>
                             </view>
                         </view>
                 </view>
             </view>
-             </view>
-             </view>
-          </view> 
-        <button class="mini-btn">
-        <navigator url="./v2c">发表申请</navigator>
-        </button>
         </view>
+        </view>
+     <button @tap="handle()"  class="weui-btn btn-block btn-flex-full" type="primary">申请</button>
+    </view>
 </view>
 </template>
 
 <script>
 import wepy from 'wepy'
+  import { service } from '../../../config.js'
+  import http from '../../../mixins/http'
+  import base from '../../../mixins/base'
+  import user from '../../../mixins/user'
+  import publicProcess from '../../../mixins/publicProcess'
 export default class apply extends wepy.page {
+    mixins = [base, http, user,publicProcess]
   config = {
     navigationBarTitleText: '申请勋章',
     enablePullDownRefresh: false
   }
   data = {
-    title: '',
-    files:[]
+    startdate:'',
+    starttime:'',
+    endtime:'',
+    createtime:'',
+    DemandStartTime:'',
+    DemandEndTime:'',
+    serviceList:[],
+    title: '详细信息',
+    files:[],
+    dateisnull: true,
+    starttimeisnull : true,
+    endtimeisnull: true,
+    realdate:'',
+    realendtime:'',
+    realstarttime:''
   }
   
   methods = {
       async chooseImage (e) {
           let result = await wepy.chooseImage({
-              count:2,
-              sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
-              sourceType: ['album', 'camera']// 可以指定来源是相册还是相机，默认二者都有
+              count: 1
           })
-          var tempFilePaths = result.tempFilePaths
+          console.log(result)
+          var tempFilePaths = result.tempFilePaths[0]
           this.files = this.files.concat(tempFilePaths)
+          let res = await wepy.uploadFile({
+              url: service + '/uploadFile',
+              filePath: tempFilePaths,
+              name:'wxtest',
+              // header: {}, // 设置请求的 header
+              // formData: {}, // HTTP 请求中其他额外的 form data
+          })
+          console.log(res)
           this.$apply()
         },
         
@@ -76,7 +163,29 @@ export default class apply extends wepy.page {
             }
     }
    
-    onLoad() {
+    async onLoad(query) {
+      console.log(query)
+      const Serviceid = query && +query.Serviceid
+      this.getList(Serviceid)
+      this.$apply()
+    }
+    async getList(Serviceid){
+      let res = await wepy.request({
+         url: service.host + '/FindServiceByServiceID',
+         data:{
+           'serviceID': parseInt(Serviceid)
+         },
+         method: 'POST'
+        })
+        console.log(res)
+        this.serviceList = res.data.list.rows[0]
+        this.startdate = this.serviceList.DemandStartTime.substring(0,10)
+        this.starttime = this.serviceList.DemandStartTime.substring(11,19)
+        this.endtime = this.serviceList.DemandEndTime.substring(11,19)
+        this.realdate = this.startdate
+        this.realstarttime = this.starttime
+        this.realendtime = this.endtime
+        this.$apply()
     }
     onShow(){
     }
@@ -86,7 +195,13 @@ export default class apply extends wepy.page {
 
 <style lang="less">
 @import "../../../styles/weui/widget/weui-cell/weui-uploader.wxss";
-.page-index {
-  // some style
+.page-apply {
+  .weui-cell__ft{
+      color: black;
+  }
+  .weui-input{
+      color:gray;
+  }
+ 
 }
 </style>

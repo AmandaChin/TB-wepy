@@ -1,0 +1,222 @@
+<template>
+  <view class="main-detail">
+    <view class="weui-panel">
+      <view class="page__hd">
+            <view class="page__title" style="text-align:center;">服务信息</view>
+        </view>
+    
+      <view class="page__bd">
+        <view class="weui-cells__title">详情：</view>
+        <view class="weui-cells weui-cells_after-title">
+          <view class="weui-cell">
+              <view class="weui-cell__bd">发布时间：</view>
+              <view class="weui-cell__ft">{{createtime}}</view>
+          </view>
+          <view class="weui-cell">
+              <view class="weui-cell__bd">订单属性：</view>
+              <view class="weui-cell__ft">
+                <view wx:if="{{serviceList.mutualtype}} == 0">我响应的</view>
+                <view wx:else>我发布的</view>
+              </view>
+          </view>
+          <view class="weui-cell">
+              <view class="weui-cell__bd">服务内容：</view>
+              <view class="weui-cell__ft">{{serviceList.Content}}</view>
+          </view>
+          <view class="weui-cell">
+              <view class="weui-cell__bd">开始时间：</view>
+              <view class="weui-cell__ft">{{DemandStartTime}}</view>
+          </view>
+          <view class="weui-cell">
+              <view class="weui-cell__bd">结束时间</view>
+              <view class="weui-cell__ft">{{DemandEndTime}}</view>
+          </view>
+          <view class="weui-cell">
+              <view class="weui-cell__bd">当前状态</view>
+              <view class="weui-cell__ft">
+                <view wx:if="{{serviceList.Status}} == 1">未完成勋章申请</view>
+                <view wx:elif="{{serviceList.Status}} == 2">已完成勋章申请</view>
+                <view wx:else>交易已完成</view>
+              </view>
+          </view>
+        </view>
+        
+          
+      </view>
+    </view>
+
+     <Screen class="fixed-bottom">
+      <view style="display: flex;">
+          <button @tap="handle()" disabled="{{serviceList.Status==3}}" class="weui-btn btn-block btn-flex-full" type="primary">
+            <text wx:if="{{serviceList.Status==1}}">申请勋章</text>
+            <text wx:elif="{{serviceList.Status==2}}">查看已审核人数</text>
+            <text wx:else>交易已完成</text>
+          </button>
+      </view>
+      <!-- <button slot="placeholder" class="weui-btn btn-block" type="primary">借阅</button> -->
+    </Screen>
+
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import { service } from '../../config.js'
+  import http from '../../mixins/http'
+  import base from '../../mixins/base'
+  import user from '../../mixins/user'
+  import publicProcess from '../../mixins/publicProcess'
+  import Screen from '../../components/screen'
+
+  export default class mainDetail extends wepy.page {
+    mixins = [base, http, user,publicProcess]
+    config = {
+      navigationBarTitleText: '服务详情'
+    }
+
+    data = {
+      createtime:'',
+      DemandStartTime:'',
+      DemandEndTime:'',
+      serviceList:[],
+      icon_delete: '/images/icon/icon-delete.png',
+      icon_delete_active: '/images/icon/icon-delete-active.png',
+      icon_edit: '/images/icon/icon-edit.png',
+      icon_edit_active: '/images/icon/icon-edit-active.png',
+      navigate: false,
+      demand: {}
+    }
+
+    computed = {
+      isEnabled() {
+        return Boolean(this.demand && +this.demand.status == '0')
+      }
+    }
+
+    async onLoad(query) {
+      console.log(query)
+      const Serviceid = query && +query.id
+      this.getList(Serviceid)
+      this.$apply()
+    }
+    async getList(Serviceid){
+      let res = await wepy.request({
+         url: service.host + '/FindServiceByServiceID',
+         data:{
+           'serviceID': parseInt(Serviceid)
+         },
+         method: 'POST'
+        })
+        console.log(res)
+        this.serviceList = res.data.list.rows[0]
+        this.createtime = this.IsformatDate(this.serviceList.CreateTime)
+        this.DemandStartTime = this.IsformatDatex(this.serviceList.DemandStartTime)
+        this.DemandEndTime = this.IsformatDatex(this.serviceList.DemandEndTime)
+        this.$apply()
+    }
+
+    onShow() {
+      // 初始化页面数据
+      this.initPageData()
+    }
+
+    onPullDownRefresh() {
+      this.initPageData()
+    }
+
+    IsformatDate(time) {
+        var date = new Date(time)
+        return this.formatDate(date, 'yyyy-MM-dd hh:mm:ss')
+    }
+
+    IsformatDatex(time) {
+      var date = new Date(time)
+      return this.formatDatex(date, 'yyyy-MM-dd hh:mm:ss')
+    }
+
+    // 初始化页面数据
+    initPageData() {
+      wx.stopPullDownRefresh()
+     
+    }
+
+    methods = {
+      
+      async handle() {
+        if(this.serviceList.Status==1){
+          wx.navigateTo({
+            url: '/pages/user/volunteer/apply?Serviceid='+this.serviceList.ServiceID
+          })
+        }
+        else if(this.serviceList.Status==2){
+          let res = await wepy.request({
+           url: service.host + '/getCheckNum', //开发者服务器接口地址",
+           data: {
+             'ServiceId' : this.serviceList.Serviceid,
+             'UserID': this.$parent.globalData.id
+           },
+           method: 'POST'
+         });
+         console.log(res)
+         if(res.data.list!=null){
+           wepy.showModal({
+             content: '当前已审核人数：'+res.data.num, 
+             showCancel: false, 
+             confirmColor: '#049BFF'
+           });
+           
+          }else{
+            wepy.showToast({
+              title: '请重试',
+              icon: 'loading',
+              duration: 800
+            });
+          }
+         this.$apply()
+        }
+         
+      }
+    }
+
+    components = {
+      Screen
+    }
+  }
+</script>
+
+<style lang="less">
+@import "../../styles/custom/fn.less";
+
+.main-detail{
+  .weui-cell__ft{
+    color: black;
+    word-break: break-all; 
+    align-content: right;
+  }
+  .weui-cell{
+    margin:10rpx;
+  }
+  .detail-tags{
+    .h4();
+    padding: 0.4em 0;
+  }
+  .btn-flex-1{
+    padding: 0;
+    width: 4em;
+    line-height: 1.6;
+    overflow: hidden;
+  }
+  .btn-flex-full{
+    flex: 1 1 auto;
+  }
+  .btn-text-bottom{
+    .h5();
+    line-height: 1;
+    color: #777;
+  }
+  .weui-cell__bd{
+    width: 35%;
+  }
+
+}
+</style>

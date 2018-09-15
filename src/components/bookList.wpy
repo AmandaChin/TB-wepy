@@ -11,9 +11,9 @@
           <view class="booklist-content-wrapper" >
             <view class="booklist-title">{{item.title}}</view>
             <view class="booklist-abstract">发布者:{{item.name}}</view>
-            <view class="booklist-abstract">发布时间:{{item.date}}</view>
+            <view class="booklist-abstract">开始时间:{{item.date}}</view>
             <view class="booklist-abstract">详情:{{item.content}}</view>
-            <view wx:if="{{isCollectList}}" >
+            <view wx:if="{{OrderType}}" >
               <view >
                 <block wx:if="{{item.mutualtype == '0'}}">
                    <view class="booklist-abstract color-green">订单属性: 我发布的</view>
@@ -22,15 +22,21 @@
                    <view class="booklist-abstract color-green">订单属性: 我响应的</view>
                 </block>
               </view>
+            </view>
+            <view wx:if="{{OrderStatus}}">
               <view class="booklist-tags">
                 <view class=" booklist-status">
-                <block wx:if="{{item.status != 0}}">
+                <block wx:if="{{item.status == 0}}">
+                  <image class="imgicon" src="{{icon_star}}" mode="aspectFit"/>
+                  <text class="booklist-text reset-text-star color-blue">未响应</text>
+                </block>
+                <block wx:elif="{{item.status == 3}}">
                   <image class="imgicon" src="{{icon_star_active}}" mode="aspectFit"/>
-                  <text class="booklist-text reset-text-star color-999">已被响应</text>
+                  <text class="booklist-text reset-text-star color-999">已完成</text>
                 </block>
                 <block wx:else>
-                  <image class="imgicon" src="{{icon_star}}" mode="aspectFit"/>
-                  <text class="booklist-text reset-text-star color-blue">未被响应</text>
+                  <image class="imgicon" src="{{icon_star_active}}" mode="aspectFit"/>
+                  <text class="booklist-text reset-text-star color-999">已响应</text>
                 </block>
                 </view>
               </view>
@@ -50,7 +56,6 @@
         <view class="weui-loadmore__tips weui-loadmore__tips_in-line weui-loadmore__tips_in-dot"></view>
       </view>
     </block>
-  </block>
   <block wx:else>
     <view class="weui-loadmore weui-loadmore_line">
       <view class="weui-loadmore__tips weui-loadmore__tips_in-line">暂无数据</view>
@@ -97,8 +102,13 @@
         type: String,
         default: 'list'
       },
-      //是否需要加属性logo
-      isCollectList: {
+      //是否需要加订单属性
+      OrderType: {
+        type: Boolean,
+        default: false
+      },
+      //是否需要加当前状态
+      OrderStatus: {
         type: Boolean,
         default: false
       }
