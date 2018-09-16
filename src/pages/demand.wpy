@@ -41,24 +41,24 @@
       timeIndex: 0
     }
     computed = {
-     
+  
     }
     methods = {
-      oldman(){
+      oldman() {
         wepy.navigateTo({ url: '/pages/demand/oldmanDemand' })
       },
-      volunteer(){
+      volunteer() {
         wepy.navigateTo({url: '/pages/demand/volunteerDemand'})
       }
     }
 
     onShow() {
       // 初始化页面数据
-      //this.initUserData()
+      // this.initUserData()
     }
 
     onPullDownRefresh() {
-      //this.initUserData()
+      // this.initUserData()
     }
      // 初始化页面数据
     initUserData() {
@@ -67,8 +67,7 @@
       console.log(this.$parent.globalData.user)
       console.log(this.$parent.globalData.id)
     }
-  
-  }
+}
 </script>
 
 <style lang="less">

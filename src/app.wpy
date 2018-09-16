@@ -6,7 +6,7 @@ import 'wepy-async-function'
 export default class extends wepy.app {
   config = {
     pages: [
-      'pages/index', 
+      'pages/index',
       'pages/demand',
       'pages/user',
       'pages/main/list',
@@ -76,14 +76,14 @@ export default class extends wepy.app {
   globalData = {
     user: null,
     openid: null,
-    id:-1,
-    userinfo:null,
-    accountNum:0
+    id: -1,
+    userinfo: null,
+    accountNum: 0
   }
 
   constructor () {
     super()
-    //this.use('requestfix')
+    // this.use('requestfix')
     this.use('promisify')
   }
 

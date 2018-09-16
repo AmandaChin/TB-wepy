@@ -1,26 +1,36 @@
 <template>
   <view class="main-search">
-    <block wx:if="{{items1}}">
-      <radioButton1 :title.sync="title1" :list.sync="items1" :value.sync="value1"></radioButton1>
-    </block>
-    <block wx:if="{{items2}}">
+    <view class="button1">
+      <view wx:if="{{items1}}">
+        <radioButton1 :title.sync="title1" :list.sync="items1" :value.sync="value1"></radioButton1>
+      </view>
+    </view>
+
+    <view class="button2">
+    <view wx:if="{{items2}}">
       <radioButton2 :title.sync="title2" :list.sync="items2" :value.sync="value2"></radioButton2>
-    </block>
+    </view>
+    </view>
+
     <block>
       <view class="checkbox-title">服务日期</view>
       <view class="weui-cell weui-cell_input">
         <view class="weui-cell__bd h3">
           <picker class="dateoption" mode="date" value="{{date}}" start="{{today}}" end="{{endday}}" @change="bindDateChange">
-            <text  wx:if="{{dateisnull}}" style="color:#999;font-size:30rpx;">请选择服务日期</text>
+            <text wx:if="{{dateisnull}}" style="color:#999;font-size:30rpx;">请选择服务日期</text>
             <view wx:else ><text class="weui-input">{{date}}</text></view>
           </picker>
         </view>
       </view>
     </block>
+
+    <view class="button4">
+
     <block wx:if="{{items4}}">
       <radioButton4 :title.sync="title4" :list.sync="items4" :value.sync="value4"></radioButton4>
     </block>
     <button @tap="search" class="weui-btn" type="primary">搜索</button>
+  </view>
   </view>
 </template>
 
@@ -49,19 +59,22 @@
       value2: '',
       value3: '',
       value4: '',
-      items1: [{value:'志愿信息',name:'志愿信息',checked:false},{value:'需求信息',name:'需求信息',checked:false}],
+      items1: [
+        {value:'志愿信息111',name:'志愿信息',checked:false},
+        {value:'需求信息222',name:'需求信息',checked:false}
+        ],
       items2: undefined,
       items3: undefined,
-      items4: [{value:'0',name:'全国不限',checked:true},{value:'1',name:'同区选择',checked:false},{value:'2',name:'同市选择',checked:false},{value:'3',name:'同省选择',checked:false}],
+      items4: [{value:'11',name:'全国不限',checked:true},{value:'22',name:'同区选择',checked:false},{value:'33',name:'同市选择',checked:false},{value:'44',name:'同省选择',checked:false}],
       lists: [],
       dateisnull : true,
-      date:''
+      date: ''
     }
 
     onLoad(query) {
       const {index, value} = this.$parse(query && query.params)
       if (index && value) {
-        console.log('index'+index)
+        console.log('index' + index)
         // 多选时，预置对应value为对应数组
         this[`value${index}`] = ''
       }
@@ -80,13 +93,12 @@
     async initPageData() {
       console.log('init')
       let res = await wepy.request({
-        url: service.host+'/itemOperation', //开发者服务器接口地址",
+        url: service.host + '/itemOperation', //开发者服务器接口地址",
         method: 'GET'});
       var list = res.data.list
       //console.log(res.data.count)
       let itemlist = await this.handleItem(list)
       this.items2 = itemlist
-      
       this.$apply();
     }
     async handleItem(list){
@@ -107,33 +119,9 @@
         this.dateisnull = false
       },
       search() {
-        console.log(this.value1)
-        console.log(this.value2)
-        console.log(this.value4)
-        // const params = {title: []}
-        // ;[1, 2, 3, 4].map((i) => {
-        //   const items = `items${i}`
-        //   const value = `value${i}`
-        //   const key = `key${i}`
-        //   if (this[value] && this[key]) {
-        //     params[`${this[key]}`] = this.isArray(this[value]) ? this[value] : [this[value]]
-        //   }
-        //   // 整理条件对应的文案信息
-        //   if (this[items]) {
-        //     const titleArr = this.getArray(this[items]).filter((item) => {
-        //       return this.getArray(params[`${this[key]}`]).indexOf(this.getString(item.value)) > -1
-        //     }).map((item) => {
-        //       return item.name
-        //     })
-        //     if (titleArr && titleArr.length) {
-        //       params.title = [...params.title, ...titleArr]
-        //     }
-        //   }
-        // })
-        // params.title = params.title.join(' ')
-        // wx.redirectTo({
-        //   url: `/pages/main/list?params=${JSON.stringify(params)}`
-        // })
+        console.log('信息类型输出     ' + this.value1)
+        console.log('内容类型输出     ' + this.value2)
+        console.log('地区类输出      ' + this.value4)
       }
     }
 
