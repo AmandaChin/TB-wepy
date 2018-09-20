@@ -33,6 +33,8 @@ import http from '../../../mixins/http'
 import publicProcess from '../../../mixins/publicProcess'
 import { funImages } from '../../../mixins/demo'
 import MedalList from '../../../components/MedalList'
+import checkedlist from '../../../components/checkedlist'
+import checkinglist from '../../../components/checkinglist'
 const sliderWidth = 96; // 需要设置slider的宽度，用于计算中间位置
 export default class pageIndex extends wepy.page {
   mixins = [base, http,publicProcess]
@@ -92,46 +94,51 @@ export default class pageIndex extends wepy.page {
     // 初始化参数
     this.page = 0
     // 请求列表
-    this.updateHaveGotList()
-    this.updateApplyList()
+    this.getCheckedList()
+    this.getCheckingList()
   }
    // 更新图书列表
-  async updateHaveGotList() {
+  async getCheckedList() {
     //if (this.loading || this.noMoreList) return
     let res = await wepy.request({
-         url: service.host + '/getGetInfo',
+         url: service.host + '/getCheckList',
          data:{
            //'UserID': 2
-           'UserID': parseInt(this.$parent.globalData.id)
+           'UserID': parseInt(this.$parent.globalData.id),
+           'status': parseInt(1)
          },
          method: 'POST'
     })
-    console.log(res)
-    const list = res.data.list
-    const data = list.rows
+   // console.log('updatechecklist1')
+   // console.log(res.data.list)
+    const data = res.data.list
+    //const data = list.rows
+    // console.log('this is data')
+   // console.log(data)
     // 请求到空列表后就认为没有更多了
     if (this.isArray(data) && data.length === 0) {
       this.noMoreList = true
       return
        }
-    this.list1 = this.getItems(data,0)
+    this.list1 = this.getItems2(data,0)
     this.$apply()
 
   }
-  async updateApplyList() {
+  async getCheckingList() {
     //if (this.loading || this.noMoreList) return
     let res = await wepy.request({
-         url: service.host + '/getGiveInfo',
+         url: service.host + '/getCheckList',
          data:{
            //'UserID': 2
-           'UserID': parseInt(this.$parent.globalData.id)
+           'UserID': parseInt(this.$parent.globalData.id),
+           'status': parseInt(0)
          },
          method: 'POST'
     })
-    console.log('update')
-    console.log(res)
-    const list = res.data.list
-    const data = list.rows
+    //console.log('update')
+    //console.log(res)
+    const data = res.data.list
+   // const data = list.rows
     // 请求到空列表后就认为没有更多了
     if (this.isArray(data) && data.length === 0) {
       this.noMoreList = true
@@ -144,25 +151,52 @@ export default class pageIndex extends wepy.page {
 
   // 处理列表
   getItems(data,i) {
+
     //const len = this.list.length
     return this.getArray(data).map((item, index) => {
       // 拼接示例数据
+      //console.log('this is startTime' + item.startTime)
       return {
-        serviceId: item.ServiceID,
-        userId: item.volunteerID,
-        title: '交易信息',
-        num: item.medalnum,
-        image: this.image[i],
-        transferHASH:item.TransferHASH,
-        time: item.getmedaltime.substring(0,10)
+        serviceId: item.serviceId,
+        content: item.content,
+        duration: item.duration,
+        remark: this.convertHtmlToText(item.remark),
+        volunteerName: item.volunteerName,
+        oldManName: item.oldManName,
+        title: '待审核信息',
+        mydate: item.startTime.substring(0,10),
+        starttime: item.startTime.substring(11,19),
+        endtime: item.endTime.substring(11,19),
+        image: this.image[i]
+      }
+      //console.log('this is Time2' + item.starttime)
+    })
+    this.$apply()
+  }
+
+   // 处理列表
+  getItems2(data,i) {
+     //console.log('updatechecklist2')
+    //const len = this.list.length
+    return this.getArray(data).map((item, index) => {
+      // 拼接示例数据
+      //console.log('this is startTime' + item.startTime)
+      return {
+        content: item.content,
+        volunteer: item.volunteerName,
+        title: '已审核信息',
+        mydate: item.startTime.substring(0,10),
+        starttime: item.startTime.substring(11,19),
+        endtime: item.endTime.substring(11,19),
+        image: this.image[i]
       }
     })
     this.$apply()
   }
 
   components = {
-    MedalList1 : MedalList,
-    MedalList2 : MedalList
+    MedalList1 : checkedlist,
+    MedalList2 : checkinglist
   }
 }
 </script>

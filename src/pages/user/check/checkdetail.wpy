@@ -1,0 +1,139 @@
+<template>
+  <view class="page-hash">
+      <view class="weui-cell weui-cell_input" style="margin-top:20%">
+        <view class="weui-cell__bd">
+          <view class="weui-label reset-label-left h3">服务内容</view>
+          <view class="weui-cell__ft h3">
+          <view style=" word-break: break-all">{{ temp.content }}</view>
+        </view>
+        </view>
+      </view>
+
+      <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__bd">
+          <view class="weui-label reset-label-left h3">志愿者</view>
+          <view class="weui-cell__ft h3">
+          <view style=" word-break: break-all">{{temp.volunteer }}</view>
+        </view>
+        </view>
+      </view>
+
+      <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__bd">
+          <view class="weui-label reset-label-left h3">服务日期</view>
+          <view class="weui-cell__ft h3">
+          <view style=" word-break: break-all">{{temp.mydate}}</view>
+        </view>
+        </view>
+      </view>
+
+      <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__bd">
+          <view class="weui-label reset-label-left h3">服务开始时间</view>
+          <view class="weui-cell__ft h3">
+          <view style=" word-break: break-all">{{temp.starttime}}</view>
+        </view>
+        </view>
+      </view>
+
+       <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__bd">
+          <view class="weui-label reset-label-left h3">服务结束时间</view>
+          <view class="weui-cell__ft h3">
+          <view style=" word-break: break-all">{{temp.endtime}}</view>
+        </view>
+        </view>
+      </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import base from '../../../mixins/base'
+import http from '../../../mixins/http'
+import { service } from '../../../config.js'
+
+export default class v2c extends wepy.page {
+  mixins = [base, http]
+  config = {
+    navigationBarTitleText: '审核详情',
+    enablePullDownRefresh: false
+  }
+  components = {}
+  data = {
+    info:{
+      volunteer:'',
+      content:'',
+      mydate:'',
+      starttime:'',
+      endtime:''
+    },
+    temp: {
+        volunteer:"加载中",
+        content: "加载中",
+        mydate:"加载中",
+        starttime:"加载中",
+        endtime:"加载中"
+         }
+  }
+  computed = {}
+  async onLoad(query) {
+      //console.log('this is query')
+      //console.log(query)
+      const volunteer = query.volunteer
+      const content = query && query.content
+      const mydate = query && query.mydate
+      const starttime = query.starttime
+      const endtime = query.endtime
+      //console.log(query.volunteer)
+      setTimeout(() => {
+        this.info = Object.assign({}, this.info, {
+            volunteer: volunteer,
+            content: content,
+            mydate: mydate,
+            starttime: starttime,
+            endtime: endtime
+        })
+        this.initPageData()
+        this.$apply()
+      }, 300)
+    }
+
+  onShow() {
+    //this.initPageData()
+  }
+
+  onPullDownRefresh() {
+    this.initPageData()
+  }
+
+  onReachBottom() {
+    setTimeout(() => {
+      this.initPageData()
+      this.$apply()
+    }, 200);
+  }
+
+  // 初始化页面数据
+  async initPageData(){
+
+    //console.log('this is checkdetail')
+    //console.log(this.info.volunteer)
+    //if (this.loading || this.noMoreList) return
+    //const data = res.data.list
+    this.temp.content = this.info.content
+    this.temp.volunteer = this.info.volunteer
+    this.temp.mydate = this.info.mydate
+    this.temp.starttime = this.info.starttime
+    this.temp.endtime = this.info.endtime
+    this.$apply()
+
+  }
+}
+</script>
+
+<style lang="less">
+ .page-hash{
+   background-color:white;
+ }
+</style>

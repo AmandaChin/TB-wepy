@@ -3,15 +3,15 @@
     <view wx:if="{{title}}" class="booklist-name">{{title}}</view>
     <block wx:if="{{list.length > 0}}">
       <block wx:for="{{list}}" wx:key="index">
-        <navigator url="/pages/user/medal/detail?id={{item.userId}}&transferHASH={{item.transferHASH}}" 
+        <navigator url="/pages/user/check/checkdetail?content={{item.content}}&volunteer={{item.volunteer}}&mydate={{item.mydate}}&starttime={{item.starttime}}&endtime={{item.endtime}}" 
         class="booklist-item clearfix">
           <view class="booklist-cover-wrapper">
             <image src="{{item.image}}" mode="widthFix" style="width:100%;" />
           </view>
           <view class="booklist-content-wrapper" >
             <view class="booklist-title">{{item.title}}</view>
-            <view class="booklist-abstract">交易数目: {{item.num}}VLT</view>
-            <view class="booklist-abstract">获得时间: {{item.time}}</view>
+            <view class="booklist-abstract">服务内容: {{item.content}}</view>
+            <view class="booklist-abstract">志愿者: {{item.volunteer}}</view>
             <!-- <view class="booklist-abstract">详情:{{item.content}}</view> -->
           </view>
         </navigator>
@@ -44,7 +44,7 @@
   } from '../config.js'
   import http from '../mixins/http'
   import base from '../mixins/base'
-  export default class MedalList extends wepy.component {
+  export default class checkedlist extends wepy.component {
     mixins = [base, http]
     props = {
       list: {
