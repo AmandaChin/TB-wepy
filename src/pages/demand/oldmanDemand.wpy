@@ -157,6 +157,9 @@
         return ''
       }
     },
+      bindTextAreaBlur: function(e) {
+          this.remark = e.detail.value
+      },
       showChooseAddress() {
         if(!wepy.chooseLocation){
         wepy.showModal({
@@ -172,9 +175,7 @@
       }
     }
     methods = {
-      bindTextAreaBlur: function(e) {
-          this.remark = e.detail.value
-      },
+      
       bindtypeChange (e) {
         this.typeIndex = e.detail.value
         this.typeisnull = false
@@ -217,7 +218,7 @@
       // 初始化页面数据
       this.initUserData()
       this.initTypes()
-      console.log(parseInt(this.$parent.globalData.id))
+      //console.log(parseInt(this.$parent.globalData.id))
     }
     onReady(){
       this.initUserData()
@@ -293,7 +294,7 @@
         method: 'GET'});
       this.typesid = res.data.list.rows;
       await this.getlist(res.data.list.rows);
-      
+      this.$apply()
     }
     async getlist(list){
       var item = []

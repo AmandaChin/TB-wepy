@@ -53,42 +53,12 @@
             <picker @change="bindDurationChange" value="{{timeIndex}}" range="{{times}}">
               <text wx:if="{{durationisnull}}" style="color:#999;font-size:30rpx;">请选择服务时长</text>
               <view wx:else>
-                <text class="weui-select weui-select_in-select-after h3">{{times[timeIndex]}}</text>
+                <text class="weui-select weui-select_in-select-after h3">{{times[timeIndex]}}小时</text>
               </view>
               </picker>
             </view>
       </view>
 
-      <view class="weui-cell weui-cell_input">
-        <view class="weui-cell__hd">
-          <view class="weui-label reset-label-left h3">服务位置</view>
-        </view>
-        <view class="weui-cell__bd h3">
-          <view wx:if="{{showChooseAddress}}">
-            <view @tap="typeAddress" placeholder="请选择地址">
-              <text wx:if="{{locationisnull}}" style="color:#999;font-size:30rpx;">请选择地址</text>{{location}}
-            </view>
-          </view>
-          <view wx:else>
-            <input class="weui-input"  placeholder="请填写地址" data-wpytyping-a="receiver"/>
-          </view>
-          
-        </view>
-      </view>
-     
-      <view class="weui-cell weui-cell_input">
-        <view class="weui-cell__hd">
-          <view class="weui-label reset-label-left h3">勋章支付</view>
-        </view>
-        <view class="weui-cell__bd">
-            <picker @change="bindpaytypeChange" value="{{paytypeIndex}}" range="{{paytypes}}">
-              <text wx:if="{{paytypeisnull}}" style="color:#999;font-size:30rpx;">请选择支付方式</text>
-              <view wx:else>
-                <text class="weui-select weui-select_in-select-after h3">{{paytypes[paytypeIndex]}}</text>
-              </view>
-              </picker>
-        </view>
-      </view>
     <view class="weui-cell weui-cell_input">
       <view class="weui-cell__hd">
         <view class="weui-label reset-label-left h3">详细描述</view>
@@ -97,13 +67,13 @@
     <view class="weui-cells weui-cells_after-title">
       <view class="weui-cell">
         <view class="weui-cell__bd">
-          <textarea class="weui-textarea h3" placeholder="请输入详细描述" style="height: 3.3em" />
+          <textarea bindblur="bindTextAreaBlur" class="weui-textarea h3" value="{{remark}}" placeholder="请输入详细描述" style="height: 3.3em" />
         </view>
       </view>
     </view>
     
    </view>
-    <button @tap="pushdemand" class="weui-btn btn-primary" type="primary">发布需求</button>
+    <button @tap="pushdemand" class="weui-btn btn-primary" type="primary">发布可提供服务</button>
   </view>
 </template>
 
@@ -137,12 +107,14 @@
       endday:'',
       loaded: false,
       loading: false,
-      types: ['陪护', '打扫', '剪发', '做饭'],
+      types: [],
+      typesid:[],
       typeIndex: 0,
-      paytypes: ['平台代付', '自行支付'],
+      paytypes: ['自行支付'],
       paytypeIndex: 0,
-      times: ['0.5h','1h','1.5h','2h','3h','4h','5h','6h'],
-      timeIndex: 0
+      times: ['1','1.5','2','2.5','3','3.5','4'],
+      timeIndex: 0,
+      remark:''
     }
     computed = {
       nickName() {
@@ -169,11 +141,12 @@
       return !!wepy.chooseLocation
       }
     }
-    methods = {
-      bindtypeChange (e) {
+     bindtypeChange (e) {
         this.typeIndex = e.detail.value
         this.typeisnull = false
-      },
+      }
+    methods = {
+      
       bindpaytypeChange (e) {
         this.paytypeIndex = e.detail.value
         this.paytypeisnull = false
@@ -181,9 +154,9 @@
       bindDurationChange (e){
         this.timeIndex = e.detail.value
         this.durationisnull = false
+        //console.log(this.times[this.timeIndex])
       },
       bindDateChange (e) {
-        console.log("datechange"+this.today)
         this.date = e.detail.value
         this.dateisnull = false
       },
@@ -192,7 +165,9 @@
         this.timeisnull = false
       },
       pushdemand(){
-        wx.switchTab({url: '/pages/index'})
+        console.log('pushDemand!!')
+        this.submitDemand()
+        this.$apply()
       },
       toSubscribe() {
         wx.navigateTo({url: '/pages/borrow/subscribe'})
@@ -206,25 +181,105 @@
         }
       }
     }
-
     onShow() {
       // 初始化页面数据
       this.initUserData()
+      this.initTypes()
+      //console.log(parseInt(this.$parent.globalData.id))
     }
-    
     onReady(){
       this.initUserData()
+      this.initTypes()
     }
-
     onPullDownRefresh() {
       this.initUserData()
+      this.initTypes()
+    }
+    //提交需求单
+    async submitDemand(){
+      //拼接时间
+        var StartTimestamp = new Date(String(this.date) + ' ' + this.time)
+        var EndTimestamp = StartTimestamp.getTime() + this.times[this.timeIndex] * 60 * 60 * 1000
+        var finalbegin = this.formatDateTime(StartTimestamp.getTime())
+        var finalend = this.formatDateTime(EndTimestamp)
+        var id = parseInt(this.$parent.globalData.id)
+        var finalremark = this.remark
+        console.log(finalbegin)
+        console.log(finalend)
+        console.log(this.remark)
+        console.log(finalremark)
+        let res = await wepy.request({
+          url:service.host+'/postNewApplication',
+          data:{
+            'UserId': parseInt(this.$parent.globalData.id),
+            'Content': parseInt(this.typesid[this.typeIndex].ID),
+            'DemandStartTime': finalbegin,
+            'DemandEndTime': finalend,
+            'Duration':parseInt(this.times[this.timeIndex]),
+            'Remark':finalremark
+          },
+          method:'POST'
+        })
+        console.log('res')
+        console.log(res)
+        if(res.data.num == 1){
+          wx.showToast({
+            title: '已发布',
+            icon: 'success',
+            duration: 800
+          });
+          setTimeout(() => {
+              this.$switch({url:'/pages/user'});
+            }, 800);
+          
+        }else{
+          wx.showToast({
+            title: '发布失败',
+            icon: 'loading',
+            duration: 800
+          });
+        }
+        console.log(res)
+    }
+    //时间戳换时间
+    formatDateTime(inputTime) {
+        var date = new Date(inputTime)
+        var y = date.getFullYear()
+        var m = date.getMonth() + 1
+        m = m < 10 ? ('0' + m) : m
+        var d = date.getDate()
+        d = d < 10 ? ('0' + d) : d
+        var h = date.getHours()
+        h = h < 10 ? ('0' + h) : h
+        var minute = date.getMinutes()
+        var second = date.getSeconds()
+        minute = minute < 10 ? ('0' + minute) : minute
+        second = second < 10 ? ('0' + second) : second
+        return y + '-' + m + '-' + d + ' ' + h + ':' + minute + ':' + second
+      }
+    //初始化服务类型
+     async initTypes() {
+      let res = await wepy.request({
+        url: service.host+'/itemOperation', //开发者服务器接口地址",
+        method: 'GET'});
+      this.typesid = res.data.list.rows;
+      await this.getlist(res.data.list.rows);
+       this.$apply()
+    }
+    async getlist(list){
+      var item = []
+      for(var i=0;i<list.length;i++){
+        item.push(list[i].type)
+      }
+      if(item.length==list.length){
+        this.types = item
+        return
+      }
     }
      // 初始化页面数据
     initUserData() {
       this.getInfo()
       this.$apply()
-      console.log(this.$parent.globalData.user)
-      console.log(this.$parent.globalData.id)
     }
   
   }
