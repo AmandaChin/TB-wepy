@@ -34,7 +34,9 @@ export default class extends wepy.app {
       'pages/user/notice/detail',
       'pages/demand/oldmanDemand',
       'pages/demand/volunteerDemand',
-      'pages/user/check/mycheck'
+      'pages/user/check/mycheck',
+      'pages/user/check/checkdetail',
+      'pages/main/check'
     ],
     window: {
       navigationBarTitleText: '时间银行志愿服务系统',
