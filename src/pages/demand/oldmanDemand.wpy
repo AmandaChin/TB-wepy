@@ -250,7 +250,7 @@
       // 初始化页面数据
       this.initUserData()
       this.initTypes()
-      console.log(parseInt(this.$parent.globalData.id))
+      //console.log(parseInt(this.$parent.globalData.id))
     }
     onReady(){
       this.initUserData()

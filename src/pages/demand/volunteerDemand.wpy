@@ -173,7 +173,9 @@
       bindtypeChange (e) {
         this.typeIndex = e.detail.value
         this.typeisnull = false
-      },
+      }
+    methods = {
+      
       bindpaytypeChange (e) {
         this.paytypeIndex = e.detail.value
         this.paytypeisnull = false
@@ -181,6 +183,7 @@
       bindDurationChange (e){
         this.durationIndex = e.detail.value
         this.durationisnull = false
+        //console.log(this.times[this.timeIndex])
       },
       bindDateChange (e) {
         this.date = e.detail.value
