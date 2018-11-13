@@ -1,5 +1,5 @@
 <template>
-  <view class="page-index">
+  <view class="course-index">
     <view class="navbar page">
         <view class="page__bd">
             <view class="weui-tab">
@@ -11,12 +11,14 @@
                 </view>
                 <view class="weui-tab__panel">
                     <view class="weui-tab__content" hidden="{{activeIndex != 0}}">
-                      <MedalList1 :list.sync="list1" title=""
-                      :loading.sync="loading" :noMore.sync="noMoreList"> </MedalList1>
+                      <CourseList1 :list.sync="list1" title=""
+                      :page.sync="pagetype1" :OrderType.sync="OrderType" :ownOrder.sync="ownOrder"
+                      :loading.sync="loading" :noMore.sync="noMoreList"> </CourseList1>
                     </view>
                     <view class="weui-tab__content" hidden="{{activeIndex != 1}}">
-                      <MedalList2 :list.sync="list2" title=""
-                      :loading.sync="loading" :noMore.sync="noMoreList"> </MedalList2>
+                      <CourseList2 :list.sync="list2" title=""
+                      :loading.sync="loading" :noMore.sync="noMoreList" :ownOrder.sync="ownOrder"
+                      :page.sync="pagetype2" :OrderLocation.sync="OrderLocation"> </CourseList2>
                     </view>
                 </view>
             </view>
@@ -29,30 +31,32 @@
 import wepy from 'wepy'
 import { service } from '../../../config.js'
 import base from '../../../mixins/base'
-import http from '../../../mixins/http'
 import publicProcess from '../../../mixins/publicProcess'
-import MedalList from '../../../components/MedalList'
-import checkedlist from '../../../components/checkedlist'
-import checkinglist from '../../../components/checkinglist'
+import CourseList from '../../../components/courseList'
 const sliderWidth = 96; // 需要设置slider的宽度，用于计算中间位置
 export default class pageIndex extends wepy.page {
-  mixins = [base, http,publicProcess]
+  mixins = [base, publicProcess]
   config = {
-    navigationBarTitleText: '我的审核',
+    navigationBarTitleText: '我的课程',
     navigationBarTextStyle: 'white',
     navigationBarBackgroundColor: '#049BFF',
     enablePullDownRefresh: false
   }
   data = {
-    tabs: ['已审核', '待审核'],
+    OrderType:true,
+    OrderLocation:true,
+    //1代表是个人课程，默认0
+    ownOrder:1,
+    tabs: ['线上课程', '线下课程'],
     activeIndex: 0,
     sliderOffset: 0,
     sliderLeft: 0,
+    pagetype1:'myOnlineCourses',
+    pagetype2:'myOfflineCourses',
     noMoreList: false,
     loading: false,
     list1: [],
     list2: [],
-    image:['http://timebank-icon.oss-cn-beijing.aliyuncs.com/finish.png','http://timebank-icon.oss-cn-beijing.aliyuncs.com/out.png'],
     page: 0,
     size: 5
   }
@@ -90,112 +94,82 @@ export default class pageIndex extends wepy.page {
 
   // 初始化页面数据
   initPageData() {
-    // 初始化参数
-    this.page = 0
     // 请求列表
-    this.getCheckedList()
-    this.getCheckingList()
+    this.getOnlineCourses()
+    this.getOfflinCourses()
   }
-   // 更新图书列表
-  async getCheckedList() {
-    //if (this.loading || this.noMoreList) return
+
+  async getOnlineCourses() {
     let res = await wepy.request({
-         url: service.host + '/getCheckList',
-         data:{
-           //'UserID': 2
-           'UserID': parseInt(this.$parent.globalData.id),
-           'status': parseInt(1)
-         },
-         method: 'POST'
+        url: service.host + '/online-courses/student/courses',
+        data:{
+        'UserID': parseInt(this.$parent.globalData.id)
+        },
+        method: 'GET'
     })
-   // console.log('updatechecklist1')
-   // console.log(res.data.list)
-    const data = res.data.list
-    //const data = list.rows
-    // console.log('this is data')
-   // console.log(data)
+    console.log(res.data)
+    const data = res.data
     // 请求到空列表后就认为没有更多了
     if (this.isArray(data) && data.length === 0) {
       this.noMoreList = true
       return
        }
-    this.list1 = this.getItems2(data,0)
+    this.list1 = this.getItems(data,data.length)
     this.$apply()
 
   }
-  async getCheckingList() {
-    //if (this.loading || this.noMoreList) return
+  async getOfflinCourses() {
     let res = await wepy.request({
-         url: service.host + '/getCheckList',
+         url: service.host + '/offline-courses/student/courses',
          data:{
-           //'UserID': 2
-           'UserID': parseInt(this.$parent.globalData.id),
-           'status': parseInt(0)
+           'UserID': parseInt(this.$parent.globalData.id)
          },
-         method: 'POST'
+         method: 'GET'
     })
-    //console.log('update')
-    //console.log(res)
-    const data = res.data.list
-   // const data = list.rows
+    console.log(res.data)
+    const data = res.data
     // 请求到空列表后就认为没有更多了
     if (this.isArray(data) && data.length === 0) {
       this.noMoreList = true
       return
-       }
-    this.list2 = this.getItems(data,1)
+    }
+    this.list2 = this.getItems(data,data.length)
     this.$apply()
 
   }
 
-  // 处理列表
-  getItems(data,i) {
-
-    //const len = this.list.length
+ // 处理图书列表
+  getItems(data,len) {
     return this.getArray(data).map((item, index) => {
-      // 拼接示例数据
-      //console.log('this is startTime' + item.startTime)
-      return {
-        serviceId: item.serviceId,
-        content: item.content,
-        duration: item.duration,
-        remark: this.convertHtmlToText(item.remark),
-        volunteerName: item.volunteerName,
-        oldManName: item.oldManName,
-        title: '待审核信息',
-        mydate: item.startTime.substring(0,10),
-        starttime: item.startTime.substring(11,19),
-        endtime: item.endTime.substring(11,19),
-        image: this.image[i]
+      var time
+      if(item.date){
+        time = this.formatDateTime(item.date)
+      }else if(item.time){
+        time = this.formatDateTime(item.time)
       }
-      //console.log('this is Time2' + item.starttime)
-    })
-    this.$apply()
-  }
-
-   // 处理列表
-  getItems2(data,i) {
-     //console.log('updatechecklist2')
-    //const len = this.list.length
-    return this.getArray(data).map((item, index) => {
       // 拼接示例数据
-      //console.log('this is startTime' + item.startTime)
       return {
-        content: item.content,
-        volunteer: item.volunteerName,
-        title: '已审核信息',
-        mydate: item.startTime.substring(0,10),
-        starttime: item.startTime.substring(11,19),
-        endtime: item.endTime.substring(11,19),
-        image: this.image[i]
+        id: item.id,
+        title: item.title,
+        teacher: item.teacher,
+        author: item.author,
+        price: item.price,
+        time: time,
+        content: this.convertHtmlToText(item.content),
+        abstract: this.convertHtmlToText(item.abstract),
+        place: item.place,
+        currentnum:item.currentnum,
+        limit:item.limit,
+        type:item.type
+        
       }
     })
     this.$apply()
   }
 
   components = {
-    MedalList1 : checkedlist,
-    MedalList2 : checkinglist
+    CourseList1 : CourseList,
+    CourseList2 : CourseList
   }
 }
 </script>

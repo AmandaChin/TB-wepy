@@ -21,21 +21,22 @@
           </view>
           <view class="weui-cell">
               <view class="weui-cell__bd">服务内容：</view>
-              <view class="weui-cell__ft">{{serviceList.Content}}</view>
+              <view class="weui-cell__ft">{{serviceList.serviceContent}}</view>
           </view>
           <view class="weui-cell">
               <view class="weui-cell__bd">开始时间：</view>
               <view class="weui-cell__ft">{{DemandStartTime}}</view>
           </view>
           <view class="weui-cell">
-              <view class="weui-cell__bd">结束时间</view>
+              <view class="weui-cell__bd">结束时间:</view>
               <view class="weui-cell__ft">{{DemandEndTime}}</view>
           </view>
           <view class="weui-cell">
-              <view class="weui-cell__bd">当前状态</view>
+              <view class="weui-cell__bd">当前状态:</view>
               <view class="weui-cell__ft">
-                <view wx:if="{{serviceList.Status}} == 1">未完成勋章申请</view>
-                <view wx:elif="{{serviceList.Status}} == 2">已完成勋章申请</view>
+                <view class="color-green" wx:if="{{serviceList.status1 == 0}}">未响应</view>                
+                <view class="color-green" wx:if="{{serviceList.status2==0}}">未完成勋章申请</view>
+                <view class="color-blue" wx:elif="{{serviceList.status2==1}} ">已完成勋章申请</view>
                 <view wx:else>交易已完成</view>
               </view>
           </view>
@@ -45,16 +46,42 @@
       </view>
     </view>
 
-     <Screen class="fixed-bottom">
+    <Screen class="fixed-bottom">
       <view style="display: flex;">
-          <button @tap="handle()" disabled="{{serviceList.Status==3}}" class="weui-btn btn-block btn-flex-full" type="primary">
-            <text wx:if="{{serviceList.Status==1}}">申请勋章</text>
-            <text wx:elif="{{serviceList.Status==2}}">查看已审核人数</text>
+        <button @tap="toDelete" disabled="{{serviceList.status1!=0}}" class="btn-block  btn-flex-full">
+          <block wx:if="{{serviceList.status1==0}}">
+            <image class="imgicon" src="{{icon_delete_active}}" mode="aspectFit"/>
+          </block>
+          <block wx:else>
+            <image class="imgicon" src="{{icon_delete}}" mode="aspectFit"/>
+          </block>
+          <view class="btn-text-bottom">删除</view>
+        </button>
+        <button @tap="toEdit" disabled="{{serviceList.status1!=0||this.isOnDate=='true'}}" class="btn-block  btn-flex-full">
+          <block wx:if="{{serviceList.status1==0 && this.isOnDate=='false'}}">
+            <image class="imgicon" src="{{icon_edit_active}}" mode="aspectFit"/>
+          </block>
+          <block wx:else>
+            <image class="imgicon" src="{{icon_edit}}" mode="aspectFit"/>
+          </block>
+          <view class="btn-text-bottom">编辑</view>
+        </button>
+        <button @tap="handle()" disabled="{{serviceList.status2==2}}" class="weui-btn btn-block btn-flex-full" type="primary">
+          <text  wx:if="{{serviceList.status2==0}}">申请勋章</text>
+          <text  wx:elif="{{serviceList.status2==1}}">查看已审核人数</text>
+          <text wx:else>交易已完成</text>
+        </button>
+      </view>
+    </Screen>
+     <!-- <Screen class="fixed-bottom">
+      <view style="display: flex;">
+          <button @tap="handle()" disabled="{{serviceList.status2==2}}" class="weui-btn btn-block btn-flex-full" type="primary">
+            <text  wx:if="{{serviceList.status2==0}}">申请勋章</text>
+            <text  wx:elif="{{serviceList.status2==1}}">查看已审核人数</text>
             <text wx:else>交易已完成</text>
           </button>
       </view>
-      <!-- <button slot="placeholder" class="weui-btn btn-block" type="primary">借阅</button> -->
-    </Screen>
+    </Screen> -->
 
   </view>
 </template>
@@ -62,14 +89,13 @@
 <script>
   import wepy from 'wepy'
   import { service } from '../../config.js'
-  import http from '../../mixins/http'
   import base from '../../mixins/base'
   import user from '../../mixins/user'
   import publicProcess from '../../mixins/publicProcess'
   import Screen from '../../components/screen'
 
   export default class mainDetail extends wepy.page {
-    mixins = [base, http, user,publicProcess]
+    mixins = [base, user,publicProcess]
     config = {
       navigationBarTitleText: '服务详情'
     }
@@ -84,35 +110,42 @@
       icon_edit: '/images/icon/icon-edit.png',
       icon_edit_active: '/images/icon/icon-edit-active.png',
       navigate: false,
-      demand: {}
+      demand: {},
+      isOnDate: 'false'
     }
 
     computed = {
-      isEnabled() {
-        return Boolean(this.demand && +this.demand.status == '0')
-      }
     }
 
     async onLoad(query) {
-      console.log(query)
       const Serviceid = query && +query.id
       this.getList(Serviceid)
       this.$apply()
     }
     async getList(Serviceid){
-      let res = await wepy.request({
-         url: service.host + '/FindServiceByServiceID',
-         data:{
-           'serviceID': parseInt(Serviceid)
-         },
-         method: 'POST'
-        })
-        console.log(res)
-        this.serviceList = res.data.list.rows[0]
-        this.createtime = this.IsformatDate(this.serviceList.CreateTime)
-        this.DemandStartTime = this.IsformatDatex(this.serviceList.DemandStartTime)
-        this.DemandEndTime = this.IsformatDatex(this.serviceList.DemandEndTime)
-        this.$apply()
+      console.log("serviceid:"+Serviceid)
+     let res = await wepy.request({
+      url: service.host + '/demands/'+ this.$parent.globalData.id,
+      data:{
+        'type': 1
+      },
+      method: 'GET'
+      })
+      console.log(res)
+      var list = res.data
+      for(var i=0;i<list.length;i++){
+        if(list[i].id == Serviceid){
+          this.serviceList = list[i]
+          this.createtime = this.IsformatDate(this.serviceList.createdAt)
+          this.DemandStartTime = this.IsformatDate(this.serviceList.startTime)
+          this.DemandEndTime = this.IsformatDate(this.serviceList.endTime)
+          if(new Date(this.serviceList.endTime).getTime()<new Date().getTime()){
+            this.isOnDate = 'true'
+          }
+          break;
+        }
+      }
+      this.$apply()
     }
 
     onShow() {
@@ -143,24 +176,20 @@
     methods = {
       
       async handle() {
-        if(this.serviceList.Status==1){
+        if(this.serviceList.status2==0){
           wx.navigateTo({
-            url: '/pages/user/volunteer/apply?Serviceid='+this.serviceList.ServiceID
+            url: '/pages/user/volunteer/apply?Serviceid='+this.serviceList.id
           })
         }
-        else if(this.serviceList.Status==2){
+        else if(this.serviceList.status2==1){
           let res = await wepy.request({
-           url: service.host + '/getCheckNum', //开发者服务器接口地址",
-           data: {
-             'ServiceId' : this.serviceList.Serviceid,
-             'UserID': this.$parent.globalData.id
-           },
-           method: 'POST'
-         });
+           url: service.host2 + '/check/'+ this.serviceList.id, //开发者服务器接口地址",
+           method: 'GET'
+            });
          console.log(res)
-         if(res.data.list!=null){
+         if(res){
            wepy.showModal({
-             content: '当前已审核人数：'+res.data.num, 
+             content: '当前已审核人数：'+ res.data.checkNum +'人，已获得勋章' + res.data.medalNum +'。', 
              showCancel: false, 
              confirmColor: '#049BFF'
            });
@@ -172,9 +201,8 @@
               duration: 800
             });
           }
-         this.$apply()
         }
-         
+         this.$apply()
       }
     }
 

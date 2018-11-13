@@ -1,47 +1,35 @@
 <template>
-  <view class="booklist">
-    <view wx:if="{{title}}" class="booklist-name">{{title}}</view>
+  <view class="courselist">
+    <view wx:if="{{title}}" class="courselist-name">{{title}}</view>
     <block wx:if="{{list.length > 0}}">
       <block wx:for="{{list}}" wx:key="index">
-        <navigator url="/pages/main/{{page}}?id={{item.id}}&title={{item.title}}&status1={{item.status1}}&status2={{item.status2}}&serviceItem={{item.serviceItem}}&date={{item.date}}&name={{item.name}}&authorID={{item.authorID}}&content={{item.content}}&duration={{item.duration}}&phone={{item.phone}}&mutualtype={{item.mutualtype}}&type={{item.type}}&isOnDate={{item.isOnDate}}" 
-        class="booklist-item clearfix">
-          <view class="booklist-cover-wrapper">
+        <navigator url="/pages/main/{{page}}?id={{item.id}}" 
+        class="courselist-item clearfix">
+          <view class="courselist-cover-wrapper">
             <image src="{{item.image}}" mode="widthFix" style="width:100%;" />
           </view>
-          <view class="booklist-content-wrapper" >
-            <view class="booklist-title">{{item.title}}</view>
-            <view class="booklist-abstract">发布者:{{item.name}}</view>
-            <view class="booklist-abstract">开始时间:{{item.date}}</view>
-            <view class="booklist-abstract">详情:{{item.content}}</view>
-            <view wx:if="{{OrderType}}" >
+          <view class="courselist-content-wrapper" >
+            <view class="courselist-title">{{item.title}}</view>
+            <view wx:if="{{item.teacher}}" >
               <view >
-                <block wx:if="{{item.mutualtype == item.type}}">
-                   <view class="booklist-abstract color-green">订单属性: 我发布的</view>
-                </block>
-                <block wx:else>
-                   <view class="booklist-abstract color-green">订单属性: 我响应的</view>
-                </block>
+                <view class="courselist-abstract">教员: {{item.teacher.name}}--{{item.teacher.qualification.tag}}--{{item.teacher.qualification.level}}</view>
               </view>
             </view>
-            <view wx:if="{{OrderStatus}}">
-              <view class="booklist-tags">
-                <view class=" booklist-status">
-                <block wx:if="{{item.status1 == 0 && item.isOnDate=='true'}}">
-                  <text class="booklist-text reset-text-star color-red">已过期</text>
-                </block>
-                <block wx:elif="{{item.status1 == 0 && item.mutualtype == item.type}}">
-                  <image class="imgicon" src="{{icon_star}}" mode="aspectFit"/>
-                  <text class="booklist-text reset-text-star color-blue">未响应</text>
-                </block>
-                <block wx:elif="{{item.status2 == 2 && item.type=='1'}}">
-                  <image class="imgicon" src="{{icon_star_active}}" mode="aspectFit"/>
-                  <text class="booklist-text reset-text-star color-999">已完成</text>
-                </block>
-                <block wx:else>
-                  <image class="imgicon" src="{{icon_star_active}}" mode="aspectFit"/>
-                  <text class="booklist-text reset-text-star color-999">已响应</text>
-                </block>
-                </view>
+            <view wx:else>
+              <view >
+                <view class="courselist-abstract">教员: {{item.author.name}}--{{item.author.qualification.tag}}--{{item.author.qualification.level}}</view>
+              </view>
+            </view>
+            <view class="courselist-abstract">开始时间: {{item.time}}</view>
+            <view class="courselist-abstract">价格: {{item.price}}</view>
+            <view wx:if="{{OrderType}}" >
+              <view >
+                <view class="courselist-abstract">类型: {{item.type}}</view>
+              </view>
+            </view>
+            <view wx:if="{{OrderLocation}}">
+              <view >
+                <view class="courselist-abstract">地点: {{item.place}}</view>
               </view>
             </view>
           </view>
@@ -73,7 +61,7 @@
     service
   } from '../config.js'
   import base from '../mixins/base'
-  export default class BookList extends wepy.component {
+  export default class CourseList extends wepy.component {
     mixins = [base]
     props = {
       list: {
@@ -109,8 +97,8 @@
         type: Boolean,
         default: false
       },
-      //是否需要加当前状态
-      OrderStatus: {
+      //是否需要加地点状态
+      OrderLocation: {
         type: Boolean,
         default: false
       }
@@ -131,23 +119,23 @@
 
 <style type="less">
   @import "../styles/custom/fn.less";
-  @bookListSpace: 18 * 2 * 0.8rpx;
-  @bookListImageWidth: 25%;
-  .booklist {
+  @courselistSpace: 18 * 2 * 0.8rpx;
+  @courselistImageWidth: 25%;
+  .courselist {
     position: relative;
     width: 100%;
     font-size: 28rpx;
     border-bottom: 20rpx solid transparent;
-    padding: 0 @bookListSpace;
-    padding-top: @bookListSpace;
+    padding: 0 @courselistSpace;
+    padding-top: @courselistSpace;
     box-sizing: border-box;
     background: #fff;
   }
-  .booklist-name {
+  .courselist-name {
     position: relative;
     height: 1em;
     line-height: 1;
-    margin: 0 0 @bookListSpace -@bookListSpace;
+    margin: 0 0 @courselistSpace -@courselistSpace;
     padding-left: 0.8em;
     color: @weuiColorPrimary;
     font-size: 36rpx;
@@ -161,58 +149,58 @@
       background: @weuiColorPrimary;
     }
   }
-  .booklist-item {
+  .courselist-item {
     position: relative;
     display: block;
-    margin: @bookListSpace 0;
-    padding-bottom: @bookListSpace;
+    margin: @courselistSpace 0;
+    padding-bottom: @courselistSpace;
     border-bottom: 1rpx solid @uiBorderColor;
     box-sizing: border-box;
     &:last-child {
       border: none;
     }
   }
-  .booklist-cover-wrapper {
+  .courselist-cover-wrapper {
     width: 25%;
     height: 0;
-    padding-bottom: @bookListImageWidth / 0.75;
+    padding-bottom: @courselistImageWidth / 0.75;
     overflow: hidden;
     background: transparent no-repeat top left;
     background-size: 100% auto;
   }
-  .booklist-content-wrapper {
+  .courselist-content-wrapper {
     position: absolute;
     top: 0;
     left: 5%;
-    bottom: @bookListSpace;
+    bottom: @courselistSpace;
     width: 100% ;
     padding-left: 0;
     box-sizing: border-box;
   }
-  .booklist-cover {
+  .courselist-cover {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     width: 100%;
   }
-  .booklist-title {
+  .courselist-title {
     font-size: 40rpx;
     color: #333;
     .text-ellipsis();
   }
-  .booklist-abstract {
+  .courselist-abstract {
     color: #999;
     .text-ellipsis-line(2);
   }
-  .booklist-tags {
+  .courselist-tags {
     position: absolute;
-    left: @bookListSpace;
+    left: @courselistSpace;
     bottom: 0;
     right: 30rpx;
     top: 20rpx;
   }
-  .booklist-tag {
+  .courselist-tag {
     display: inline-block;
     padding: 0 0.6em;
     border-radius: 1em;
@@ -221,7 +209,7 @@
     color: #9B9B9B;
     background: #F1F1F1;
   }
-  .booklist-status {
+  .courselist-status {
     position: relative;
     display: inline-block;
     float: right;
@@ -229,7 +217,7 @@
       vertical-align: text-top;
     }
   }
-  .booklist-text {
+  .courselist-text {
     padding-left: 0.3em;
   }
 </style>

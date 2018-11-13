@@ -12,11 +12,10 @@ import wepy from 'wepy'
 import { service } from '../../../config.js'
 import { funImages } from '../../../mixins/demo'
 import base from '../../../mixins/base'
-import http from '../../../mixins/http'
 import user from '../../../mixins/user'
 import publicProcess from '../../../mixins/publicProcess'
 export default class myVolunteer extends wepy.page {
-  mixins = [base, user, http ,publicProcess]
+  mixins = [base, user, publicProcess]
   config = {
     navigationBarTitleText: '我的服务',
     enablePullDownRefresh: false
@@ -44,21 +43,14 @@ export default class myVolunteer extends wepy.page {
   async updateDemandList() {
     //if (this.loading || this.noMoreList) return
     let res = await wepy.request({
-         url: service.host + '/getServicedList',
-         data:{
-           //'UserID': 2
-           'UserID': parseInt(this.$parent.globalData.id)
-         },
-         method: 'POST'
+      url: service.host + '/demands/'+ this.$parent.globalData.id,
+      data:{
+        'type': 1
+      },
+      method: 'GET'
     })
-    console.log('update')
     console.log(res)
-    const list = res.data.list
-    // 请求到空列表后就认为没有更多了
-    if (this.isArray(list) && list.length === 0) {
-      this.noMoreList = true
-      return
-       }
+    const list = res.data
     this.list = this.getItems(list)
     this.$apply()
 
@@ -68,18 +60,28 @@ export default class myVolunteer extends wepy.page {
   getItems(data) {
     //const len = this.list.length
     return this.getArray(data).map((item, index) => {
+      var isOnDate = 'false';
+      if(new Date(item.endTime).getTime()<new Date().getTime()){
+        isOnDate = 'true'
+      }
+      console.log("isOnDate:"+isOnDate)
       // 拼接示例数据
       return {
-        id: item.ServiceID,
-        title: item.Content,
-        name: item.Name,
-        date: item.DemandStartTime.substring(0,10),
-        time: item.DemandStartTime.substring(11,19),
-        content: this.convertHtmlToText(item.Remark),
-        status: item.Status,
-        duration: item.Duration,
-        phone:item.Phone,
-        mutualtype:item.mutualtype
+        id: item.id,
+        title: item.serviceContent,
+        name: item.name,
+        date: item.startTime.substring(0,10),
+        time: item.startTime.substring(11,19),
+        content: this.convertHtmlToText(item.remark),
+        status1: item.status1,
+        status2: item.status2,
+        duration: item.duration,
+        phone:item.phone,
+        //判断是发布/响应
+        mutualtype:item.type,
+        type: '1',
+        //判断是否过期
+        isOnDate:isOnDate
       }
     })
     this.$apply()
@@ -103,6 +105,6 @@ export default class myVolunteer extends wepy.page {
 
 <style lang="less">
 .page-index {
-  // some style
+  
 }
 </style>

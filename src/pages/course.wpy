@@ -6,22 +6,21 @@
       <view class="weui-search-bar__form">
         <view class="weui-search-bar__box">
           <icon class="weui-icon-search_in-box" type="search" size="14"></icon>
-          <view class="weui-search-bar__text">搜索感兴趣的义工需求</view>
+          <view class="weui-search-bar__text">搜索感兴趣的课程信息</view>
         </view>
         <label class="weui-search-bar__label" hidden="{{inputShowed}}">
           <icon class="weui-icon-search" type="search" size="14"></icon>
-          <view class="weui-search-bar__text">搜索感兴趣的义工需求</view>
+          <view class="weui-search-bar__text">搜索感兴趣的课程信息</view>
         </label>
       </view>
     </view>
     </navigator>
-    <Swiper :list.sync="swipers" height="280"></Swiper>
-    <BookList1 :list.sync="list0" title="老人被服务需求"
+    <CourseList1 :list.sync="list0" title="线上课程"
      :loading.sync="loading1" :noMore.sync="noMoreList1"
-     :page.sync="pagetype1" ></BookList1>
-     <BookList2 :list.sync="list1" title="志愿者可提供服务"
+     :page.sync="pagetype1" :OrderType.sync="OrderType" ></CourseList1>
+     <CourseList2 :list.sync="list1" title="线下课程"
      :loading.sync="loading2" :noMore.sync="noMoreList2"
-     :page.sync="pagetype2" ></BookList2>
+     :page.sync="pagetype2" :OrderLocation.sync="OrderLocation" ></CourseList2>
   </view>
 </template>
 
@@ -31,30 +30,26 @@ import { service } from '../config.js'
 import base from '../mixins/base'
 import user from '../mixins/user'
 import publicProcess from '../mixins/publicProcess'
-import Swiper from '../components/swiper'
 import SearchBar from '../components/searchbar'
-import BookList from '../components/bookList'
+import CourseList from '../components/courseList'
 
 export default class pageIndex extends wepy.page {
   mixins = [base, user, publicProcess]
   config = {
-    navigationBarTitleText: '首页',
+    navigationBarTitleText: '课程',
     navigationBarTextStyle: 'white',
     navigationBarBackgroundColor: '#049BFF'
   }
   data = {
+    OrderType:true,
+    OrderLocation:true,
     inputShowed: false,
-    swipers: [
-      // 占位图，防止请求错误无图显示
-      { image: '/images/timg.gif', url: '/pages/index' },
-      { image: '/images/yigong.jpg', url: '/pages/index' }
-    ],
     noMoreList1: false,
     loading1: false,
     noMoreList2: false,
     loading2: false,
-    pagetype1:'demandDetail',
-    pagetype2:'volunteerDetail',
+    pagetype1:'onlineCourses',
+    pagetype2:'offlineCourses',
     list0: [],
     list1: [],
     page: 0,
@@ -65,7 +60,6 @@ export default class pageIndex extends wepy.page {
     this.initPageData()
   }
   onShow() {
-    console.log("触发onshow")
     this.initPageData()
   }
 
@@ -75,8 +69,8 @@ export default class pageIndex extends wepy.page {
 
   onReachBottom() {
     setTimeout(() => {
-      this.updateDemandList()
-      this.updateServiceList()
+      this.updateOnline()
+      this.updateOffline()
     }, 200);
   }
    // 初始化用户数据
@@ -87,23 +81,20 @@ export default class pageIndex extends wepy.page {
   // 初始化页面数据
   async initPageData() {
     var id = this.$parent.globalData.id
-    console.log("id:"+id)
     // 请求列表
-    this.updateDemandList(id)
-    this.updateServiceList(id)
+    this.updateOnline()
+    this.updateOffline()
     this.$apply()
   }
 
   // 更新图书列表
-  async updateDemandList(id) {
+  async updateOnline() {
     let res = await wepy.request({
-         url: service.host + '/search/'+id,
-         data:{
-           type:0
-         },
+         url: service.host + '/online-courses',
          method: 'GET'
     })
     const data = res.data
+    console.log(data)
     // 请求到空列表后就认为没有更多了
     if (data.length !== 0) {
       this.noMoreList1 = true
@@ -112,15 +103,13 @@ export default class pageIndex extends wepy.page {
     this.$apply()
 
   }
-  async updateServiceList(id) {
+  async updateOffline() {
     let res = await wepy.request({
-         url: service.host + '/search/'+id,
-         data:{
-           type:1
-         },
+         url: service.host + '/offline-courses',
          method: 'GET'
     })
     const data = res.data
+    console.log(data)
     // 请求到空列表后就认为没有更多了
     if (data.length !== 0) {
       this.noMoreList2 = true
@@ -132,17 +121,26 @@ export default class pageIndex extends wepy.page {
   // 处理图书列表
   getItems(data,len) {
     return this.getArray(data).map((item, index) => {
+      var time
+      if(item.date){
+        time = this.formatDateTime(item.date)
+      }else if(item.time){
+        time = this.formatDateTime(item.time)
+      }
       // 拼接示例数据
       return {
-        id: item.ServiceID,
-        title: item.serviceContent,
-        name: item.name,
-        authorID: item.UserID,
-        date: item.createdAt.substring(0,10),
-        time: item.createdAt.substring(11,19),
-        content: this.convertHtmlToText(item.remark),
-        duration: item.duration,
-        phone:item.phone
+        id: item.id,
+        title: item.title,
+        teacher: item.teacher,
+        author: item.author,
+        price: item.price,
+        time: time,
+        content: this.convertHtmlToText(item.content),
+        abstract: this.convertHtmlToText(item.abstract),
+        place: item.place,
+        currentnum:item.currentnum,
+        limit:item.limit,
+        type:item.type
       }
     })
     this.$apply()
@@ -154,9 +152,8 @@ export default class pageIndex extends wepy.page {
 
   components = {
     SearchBar,
-    BookList1 : BookList,
-    BookList2 : BookList,
-    Swiper
+    CourseList1 : CourseList,
+    CourseList2 : CourseList
   }
 }
 </script>

@@ -3,15 +3,20 @@
     <view wx:if="{{title}}" class="notice-name">{{title}}</view>
     <block wx:if="{{list.length > 0}}">
       <block wx:for="{{list}}" wx:key="index">
-        <navigator url="/pages/user/notice/detail?id={{item.id}}&title={{item.title}}&status={{item.status}}" class="booklist-item clearfix">
+        <navigator url="/pages/user/notice/detail?id={{item.id}}&title={{item.title}}&author={{item.name}}&content={{item.content}}&createdAt={{item.time}}" class="booklist-item clearfix">
           <view class="notice-cover-wrapper">
             <image src="/images/icon/notice.png" mode="widthFix" style="width:100%;" />
           </view>
           <view class="notice-content-wrapper">
            <view class="notice-title">{{item.title}}</view>
-           <view class="notice-abstract">{{item.name}}</view>
-           <view class="notice-abstract">{{item.time}}</view>
-           <view class="notice-abstract">{{item.content}}</view>
+           <view class="notice-abstract">日期：{{item.time}}</view>
+           <view class="notice-abstract">发布者：{{item.name}}</view>
+           <block wx:if="{{item.checked}}">
+              <view class="notice-abstract">已读</view>
+            </block>
+            <block wx:else>
+              <view class="notice-abstract color-blue">未读</view>
+            </block>
           </view>
         </navigator>
       </block>

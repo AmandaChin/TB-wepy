@@ -2,16 +2,26 @@
   <view class="main-search">
     <view class="button1">
       <view wx:if="{{items1}}">
-        <radioButton1 :title.sync="title1" :list.sync="items1" :value.sync="value1"></radioButton1>
+        <radioButton1  :title.sync="title1" :list.sync="items1" :value.sync = "value1"></radioButton1>
       </view>
     </view>
 
     <view class="button2">
     <view wx:if="{{items2}}">
-      <radioButton2 :title.sync="title2" :list.sync="items2" :value.sync="value2"></radioButton2>
+      <radioButton2 :title.sync="title2" :list.sync="items2" :value.sync = "value2"></radioButton2>
     </view>
     </view>
-
+    <block>
+      <view class="checkbox-title">服务时长</view>
+      <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__bd h3">
+            <picker class="dateoption" @change="bindDurationChange" value="{{durationIndex}}" range="{{durations}}">
+              <text wx:if="{{durationisnull}}" style="color:#999;font-size:30rpx;">请选择服务时长</text>
+              <view wx:else> <text class="weui-input">{{durations[durationIndex]}}小时</text> </view>
+            </picker>
+        </view>
+      </view>
+    </block>
     <block>
       <view class="checkbox-title">服务日期</view>
       <view class="weui-cell weui-cell_input">
@@ -27,7 +37,7 @@
     <view class="button4">
 
     <block wx:if="{{items4}}">
-      <radioButton4 :title.sync="title4" :list.sync="items4" :value.sync="value4"></radioButton4>
+      <radioButton4 :title.sync="title4" :list.sync="items4" :value.sync = "value4"></radioButton4>
     </block>
     <button @tap="search" class="weui-btn" type="primary">搜索</button>
   </view>
@@ -38,51 +48,44 @@
   import wepy from 'wepy'
   import { service } from '../../config.js'
   import base from '../../mixins/base'
-  import http from '../../mixins/http'
   import radioButton from '../../components/radioButton'
 
   export default class mainSearch extends wepy.page {
-    mixins = [base, http]
+    mixins = [base]
     config = {
       navigationBarTitleText: '分类选择'
     }
     data = {
-      key1: '',
-      key2: '',
-      key3: '',
-      key4: '',
       title1: '信息类型',
       title2: '内容类型',
       title3: '服务日期',
       title4: '地区选择',
-      value1: '',
-      value2: '',
-      value3: '',
-      value4: '',
+      value1:'0',
+      value2:'',
+      value4:'4',
       items1: [
-        {value:'志愿信息111',name:'志愿信息',checked:false},
-        {value:'需求信息222',name:'需求信息',checked:false}
+        {value:'0',name:'需求信息',checked:true},
+        {value:'1',name:'志愿信息',checked:false}
         ],
-      items2: undefined,
-      items3: undefined,
-      items4: [{value:'11',name:'全国不限',checked:true},{value:'22',name:'同区选择',checked:false},{value:'33',name:'同市选择',checked:false},{value:'44',name:'同省选择',checked:false}],
+      items2: [],
+      items3: [],
+      items4: [{value:'4',name:'全国不限',checked:true},{value:'3',name:'同区选择',checked:false},{value:'2',name:'同市选择',checked:false},{value:'1',name:'同省选择',checked:false}],
       lists: [],
+      durations: ['1','1.5','2','2.5','3','3.5','4'],
+      durationIndex: -1,
       dateisnull : true,
+      durationisnull:true,
       date: ''
     }
 
-    onLoad(query) {
-      const {index, value} = this.$parse(query && query.params)
-      if (index && value) {
-        console.log('index' + index)
-        // 多选时，预置对应value为对应数组
-        this[`value${index}`] = ''
-      }
+    async onLoad() {
+      let res = await this.initPageData()
+      this.items2 = res
+      console.log(this.items2)
+      this.$apply()
     }
 
     onReady() {
-      // 初始化页面数据
-      this.initPageData()
     }
 
     onPullDownRefresh() {
@@ -91,29 +94,28 @@
 
     // 初始化页面数据
     async initPageData() {
-      console.log('init')
       let res = await wepy.request({
-        url: service.host + '/itemOperation', //开发者服务器接口地址",
+        url: service.host + '/items', //开发者服务器接口地址",
         method: 'GET'});
-      var list = res.data.list
-      //console.log(res.data.count)
-      let itemlist = await this.handleItem(list)
-      this.items2 = itemlist
-      this.$apply();
-    }
-    async handleItem(list){
+      var list = res.data
       var item2 = []
-      for(var i=0; i<list.count; i++){
+      for(var i=0; i<list.length; i++){
         var item = {}
-        item.name = list.rows[i].type
-        item.value = list.rows[i].ID
+        item.name = list[i].title
+        item.value = list[i].id
         item.checked = false
         item2.push(item)
       }
-      this.$apply()
       return item2
+      this.$apply();
     }
+
+
     methods = {
+      bindDurationChange (e){
+        this.durationIndex = e.detail.value
+        this.durationisnull = false
+      },
       bindDateChange (e) {
         this.date = e.detail.value
         this.dateisnull = false
@@ -121,7 +123,11 @@
       search() {
         console.log('信息类型输出     ' + this.value1)
         console.log('内容类型输出     ' + this.value2)
+        console.log('日期输出     ' + this.date)
         console.log('地区类输出      ' + this.value4)
+        wx.navigateTo({
+          url: '/pages/main/searchDetail?type='+this.value1+'&serviceItem='+this.value2+'&startTime='+this.date+'&duration='+this.durations[this.durationIndex]+'&region='+this.value4
+        })
       }
     }
 

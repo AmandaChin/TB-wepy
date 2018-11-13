@@ -1,5 +1,6 @@
 <template>
   <view class="page-user">
+    <view wx:if="{{isLogin}}">
     <view class="weui-panel">
       <view class="weui-cells weui-cells_after-title">
         <view class="weui-cell">
@@ -36,6 +37,12 @@
             <!-- <text class="color-green">20</text> -->
           </view>
         </navigator>
+        <navigator url="/pages/user/course/myCourse" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
+          <view class="weui-cell__bd">我的课程</view>
+          <view class="weui-cell__ft weui-cell__ft_in-access">
+            <!-- <text class="color-green">20</text> -->
+          </view>
+        </navigator>
         <navigator url="/pages/user/check/mycheck" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
           <view class="weui-cell__bd">
             <view style="display: inline-block; vertical-align: middle">我的审核</view>
@@ -56,36 +63,53 @@
         </navigator>
       </view>
     </view>
+    </view>
+     <view wx:else class="text-center tip-page page-borrow-tip">
+    <block>
+      <icon class="tip-icon" type="cancel" size="70" color="#bbb"></icon>
+      <view class="h4">您还没有登录，快去登录/注册吧~</view>
+      <view style="margin-bottom:0;" >
+      <button @tap="login" class="weui-btn" type="primary" size="mini">立即登录</button>
+      </view>
+      <button style="margin-top:30px;" @tap="register" class="weui-btn" type="primary" size="mini">立即注册</button>
+    </block>
+  </view>
   </view>
 </template>
 
 <script>
 import wepy from 'wepy'
 import { service } from '../config.js'
-import http from '../mixins/http'
 import base from '../mixins/base'
 import user from '../mixins/user'
 
 export default class pageUser extends wepy.page {
-  mixins = [base, http, user];
+  mixins = [base, user];
   config = {
     navigationBarTitleText: '我的',
     enablePullDownRefresh: false
   };
   data = {
-      nickName: '未授权用户',
+      nickName: '',
       // 头像占位图
       avatarUrl: '../images/icon/icon-avatar@2x.png',
-      myAccount: 0
-      
+      accountNum:0
   };
 
   computed = {
+    isLogin() {
+        // if(this.$parent.globalData.userinfo !== null){
+        //   return true;
+        // }else{
+        //   return false;
+        // }
+        return true;
+    },
     nickName() {
-      const info = this.$parent.globalData.user
+      const info = this.$parent.globalData.userinfo
       if(info){
         // 名称或头像不为空的，才认为是授权用户
-        return info.nickName
+        return info.name
       }
       else{
         return '未授权用户'
@@ -102,7 +126,7 @@ export default class pageUser extends wepy.page {
       }
     },
     myAccount() {
-     const num = this.$parent.globalData.accountNum
+     const num = this.accountNum
       if(num){
         return parseFloat(num).toFixed(2)
       }
@@ -122,25 +146,32 @@ export default class pageUser extends wepy.page {
   
   // 初始化页面数据
   initUserData() {
-    this.getInfo()
-    console.log('[global]'+this.$parent.globalData.user)
+    this.getWeInfo()
     this.getUserAccount()
     this.$apply()
   }
   async getUserAccount(){
     console.log('get account!')
     let res = await wepy.request({
-          url: service.host + '/getUserAccount', //开发者服务器接口地址",
-          data: {
-            'UserId': 19
-          }, //请求的参数",
-          method: 'POST'
-        });
-    this.$parent.globalData.accountNum = res.data.list
+      url: service.host2 + '/wallet/'+this.$parent.globalData.id, //开发者服务器接口地址",
+      method: 'GET'
+    });
+    this.accountNum = res.data.coins
     this.$apply()
   }
 
-  methods = {}
+  methods = {
+    login(){
+      wx.navigateTo({
+          url: `/pages/login/login`
+        })
+    },
+    register(){
+      wx.navigateTo({
+          url: `/pages/login/register`
+        })
+    }
+  }
 
   components = {}
 }

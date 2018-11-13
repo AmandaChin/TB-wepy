@@ -1,0 +1,276 @@
+<template>
+  <view class="main-detail">
+    <view wx:if="{{isLogin}}">
+        <view class="weui-panel">
+          <view class="page__hd">
+            <view class="page__title" style="text-align:center;">{{demand.title}}</view>
+          </view>
+      <!-- <view class="weui-media-box weui-media-box_text weui-cells_in-small-appmsg">
+        <view class="h2 color-333">{{demand.title}}</view>
+        <view class="detail-tags">
+          <text wx:for="{{tags}}" wx:key="index" wx:for-item="tag" class="tag">{{tag}}</text>
+        </view>
+      </view> -->
+    
+      <view class="page__bd">
+        <view class="weui-cells__title">课程详情：</view>
+        <view class="weui-cells weui-cells_after-title">
+          <view class="weui-cell">
+              <view class="weui-cell__bd">课程发布者姓名：</view>
+              <view class="weui-cell__ft"> {{offlineCourse.teacher.name}}</view>
+          </view>
+          <view class="weui-cell">
+              <view class="weui-cell__bd">课程发布者类型：</view>
+              <view class="weui-cell__ft">{{offlineCourse.teacher.qualification.level}} , {{offlineCourse.teacher.qualification.tag}}</view>
+          </view>
+          <view class="weui-cell">
+              <view class="weui-cell__bd">课程标题：</view>
+              <view class="weui-cell__ft">{{offlineCourse.title}}</view>
+          </view>
+          <view class="weui-cell">
+              <view class="weui-cell__bd">课程内容：</view>
+              <view class="weui-cell__ft">{{content}}</view>
+          </view>
+          <view class="weui-cell">
+              <view class="weui-cell__bd">授课时间：</view>
+              <view class="weui-cell__ft">{{teachingTime}}</view>
+          </view>
+          <view class="weui-cell">
+              <view class="weui-cell__bd">授课地点：</view>
+              <view class="weui-cell__ft">{{offlineCourse.place}}</view>
+          </view>
+          <view class="weui-cell">
+              <view class="weui-cell__bd">课程时长：</view>
+              <view class="weui-cell__ft">{{offlineCourse.duration}}小时</view>
+          </view>
+          <view class="weui-cell">
+              <view class="weui-cell__bd">人数上限：</view>
+              <view class="weui-cell__ft">{{offlineCourse.limit}}人</view>
+          </view>
+          <view class="weui-cell">
+              <view class="weui-cell__bd">课程价格：</view>
+              <view class="weui-cell__ft">{{offlineCourse.price}}</view>
+          </view>
+          <view class="weui-cell">
+              <view class="weui-cell__bd">课程发布日期：</view>
+              <view class="weui-cell__ft">{{publicTime}}</view>
+          </view>
+          <view class="weui-cell">
+              <view class="weui-cell__bd">当前选课人数：</view>
+              <view class="weui-cell__ft">{{offlineCourse.currentnum}}人</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+   <Screen class="fixed-bottom">
+      <view style="display: flex;">
+       <button @tap="toAdd()" disabled="{{isFull}}"  class="weui-btn btn-block btn-flex-full" type="primary">
+          <text wx:if="{{!isFull}}">报 名</text>
+          <text wx:else>人 数 已 满</text>
+        </button>
+      </view>
+    </Screen>
+  </view>
+  <view wx:else class="text-center tip-page page-borrow-tip">
+    <block>
+      <icon class="tip-icon" type="cancel" size="70" color="#bbb"></icon>
+      <view class="h4">您还没有登录，快去登录/注册吧~</view>
+      <view style="margin-bottom:0;" >
+      <button @tap="login" class="weui-btn" type="primary" size="mini">立即登录</button>
+      </view>
+      <button style="margin-top:30px;" @tap="register" class="weui-btn" type="primary" size="mini">立即注册</button>
+    </block>
+  </view>
+  </view>
+  
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import { service } from '../../config.js'
+  import base from '../../mixins/base'
+  import user from '../../mixins/user'
+  import publicProcess from '../../mixins/publicProcess'
+  import Screen from '../../components/screen'
+
+  export default class OfflineCourse extends wepy.page {
+    mixins = [base, user, publicProcess]
+    config = {
+      navigationBarTitleText: '线下课程'
+    }
+    data = {
+      navigate: false,
+      offlineCourse: '',
+      content:'',
+      teachingTime:'',
+      publicTime:'',
+      courseid:'',
+      downType: false
+    }
+    async onLoad(query) {
+      this.courseid = query && query.id
+      let res = await wepy.request({
+         url: service.host + '/offline-courses/'+ this.courseid + '/detail',
+         method: 'GET'
+      })
+      const data = res.data
+      this.offlineCourse = data
+      this.content = this.convertHtmlToText(data.content)
+      this.teachingTime = this.formatDateTime(data.time)
+      this.publicTime = this.formatDateTime(data.posttime)
+      this.initPageData()
+      this.$apply()
+    }
+
+    onShow() {
+      //后退触发onShow
+      this.initPageData()
+    }
+    
+    onPullDownRefresh() {
+      this.initPageData()
+    }
+
+    computed = {
+      isLogin() {
+        if(this.$parent.globalData.userinfo !== null){
+         return true;
+        }else{
+          return false;
+        }
+      },
+      isFull(){
+        if(this.offlineCourse.currentnum>=this.offlineCourse.limit){
+          return true;
+        }else{
+          return false;
+        }
+      }
+      
+    }
+         
+     
+    initPageData() {
+      this.isDown()
+      wx.stopPullDownRefresh()
+    }
+    methods = {
+      login(){
+        wx.navigateTo({
+            url: `/pages/login/login`
+         })
+      },
+      register(){
+        wx.navigateTo({
+            url: `/pages/login/register`
+         })
+      },
+      async toAdd() {
+        if(this.downType){
+          wx.showToast({
+            title: '您已购买过该课程！',
+            icon: 'success',
+            duration: 2000
+          });
+        }else{
+          console.log("courseid:"+this.courseid)
+          let res = await wepy.request({
+           url: service.host2 + '/offline-courses/student/application', //开发者服务器接口地址",
+           data: {
+             'UserID' : this.$parent.globalData.id,
+             'course' : this.courseid
+           },
+           method: 'POST'
+         });
+         console.log(res)
+         if(res.data.result == 0){
+            wx.showToast({
+              title: '下载成功！',
+              icon: 'success',
+              duration: 800
+            });
+            setTimeout(() => {
+              this.$switch({url:'/pages/index'});
+            }, 800);
+          } else if (res.data.result === 1) {
+            wx.showToast({
+              title: '同时段已有其他课程',
+              icon: 'loading',
+              duration: 2000
+            });
+            setTimeout(() => {
+              this.$switch({url:'/pages/index'});
+            }, 2000);
+          }
+           else if (res.data.result === 2) {
+            wx.showToast({
+              title: '课程人数已满',
+              icon: 'loading',
+              duration: 2000
+            });
+           }
+            else{
+            wx.showToast({
+              title: '请确保余额充足！',
+              icon: 'loading',
+              duration: 2000
+            });
+          }
+        }
+         this.$apply()
+      }
+    }
+    async isDown(){
+      let res = await wepy.request({
+          url: service.host + '/offline-courses/student/courses', 
+          data:{
+            "UserID":this.$parent.globalData.id
+          },
+          method: 'GET'
+        });
+        this.getArray(res.data).map((item, index) => {
+          if(item.id == this.courseid){
+            this.downType = true;
+          }
+        })
+      }
+  components = {
+      Screen
+    }
+  }
+</script>
+
+<style lang="less">
+@import "../../styles/custom/fn.less";
+
+.main-detail{
+  .weui-cell__ft{
+    color: black;
+  }
+  .weui-cell{
+    margin:10rpx;
+  }
+  .detail-tags{
+    .h4();
+    padding: 0.4em 0;
+  }
+
+  
+  .btn-flex-1{
+    padding: 0;
+    width: 3.5em;
+    line-height: 1.6;
+    overflow: hidden;
+  }
+  .btn-flex-full{
+    flex: 1 1 auto;
+  }
+  .btn-text-bottom{
+    .h5();
+    line-height: 1;
+    color: #777;
+  }
+
+}
+</style>

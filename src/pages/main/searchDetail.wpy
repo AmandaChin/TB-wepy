@@ -1,0 +1,134 @@
+<template>
+  <view class="page-index">
+    <BookList :list.sync="list" :title.sync="title"
+     :loading.sync="loading" :noMore.sync="noMoreList"
+     :page.sync="pagetype" ></BookList>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import { service } from '../../config.js'
+import base from '../../mixins/base'
+import user from '../../mixins/user'
+import publicProcess from '../../mixins/publicProcess'
+import BookList from '../../components/bookList'
+
+export default class pageIndex extends wepy.page {
+  mixins = [base, user, publicProcess]
+  config = {
+    navigationBarTitleText: '查询结果',
+    navigationBarTextStyle: 'white',
+    navigationBarBackgroundColor: '#049BFF'
+  }
+  data = {
+    inputShowed: false,
+    noMoreList: false,
+    loading: false,
+    pagetype:'',
+    list: [],
+    page: 0,
+    size: 5,
+    search_filter:'',
+    title:''
+  }
+
+  async onLoad(query) {
+      console.log(Number(query.type))
+      console.log(query)
+      if(Number(query.type)==1){
+          this.title = "志愿者可提供服务"
+          this.pagetype = 'volunteerDetail'
+      }else if(Number(query.type)==0){
+          console.log("yes")
+          this.title = "老人被服务需求"
+          this.pagetype = 'demandDetail'
+      }
+      this.search_filter = query
+      this.initPageData()
+      this.$apply()
+  }
+  
+  onPullDownRefresh() {
+    this.initPageData()
+  }
+
+  onReachBottom() {
+    setTimeout(() => {
+      this.updateSearchList()
+    }, 200);
+  }
+   
+  // 初始化页面数据
+  async initPageData() {
+    var id = this.$parent.globalData.id
+    console.log("id:"+id)
+    // 请求列表
+    this.updateSearchList(id)
+    this.$apply()
+  }
+
+  async updateSearchList(id) {
+      var duration
+      if(this.search_filter.duration=='undefined'){
+          duration= ''
+      }else{
+          duration=this.search_filter.duration
+      }
+    let res = await wepy.request({
+        url: service.host + '/search/'+id,
+        data:{
+            type: this.search_filter.type,
+            serviceItem: this.search_filter.serviceItem,
+            startTime: this.search_filter.startTime,
+            duration:duration,
+            region:this.search_filter.region
+        },
+        method: 'GET'
+    })
+    const data = res.data
+    console.log(data)
+    // 请求到空列表后就认为没有更多了
+    if (data.length !== 0) {
+      this.noMoreList1 = true
+    }
+    this.list = this.getItems(data,data.length)
+    this.$apply()
+
+  }
+  
+  // 处理图书列表
+  getItems(data,len) {
+    return this.getArray(data).map((item, index) => {
+      // 拼接示例数据
+      return {
+        id: item.ServiceID,
+        title: item.serviceContent,
+        name: item.name,
+        authorID: item.UserID,
+        date: item.createdAt.substring(0,10),
+        time: item.createdAt.substring(11,19),
+        content: this.convertHtmlToText(item.remark),
+        duration: item.duration,
+        phone:item.phone
+      }
+    })
+    this.$apply()
+  }
+
+   
+
+  methods = {}
+
+  components = {
+    BookList : BookList
+  }
+}
+</script>
+
+<style lang="less">
+@import "../../styles/custom/fn.less";
+.page-index {
+  // some style
+}
+</style>

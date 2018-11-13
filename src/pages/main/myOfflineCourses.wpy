@@ -1,0 +1,169 @@
+<template>
+  <view class="main-detail">
+    <view class="weui-panel">
+      <view class="page__hd">
+        <view class="page__title" style="text-align:center;">{{demand.title}}</view>
+      </view>
+      <view class="page__bd">
+        <view class="weui-cells__title">课程详情：</view>
+        <view class="weui-cells weui-cells_after-title">
+          <view class="weui-cell">
+              <view class="weui-cell__bd">课程发布者：</view>
+              <view class="weui-cell__ft"> {{offlineCourse.teacher.name}}</view>
+          </view>
+          <view class="weui-cell">
+              <view class="weui-cell__bd">课程名称：</view>
+              <view class="weui-cell__ft">{{offlineCourse.title}}</view>
+          </view>
+          <view class="weui-cell">
+              <view class="weui-cell__bd">授课时间：</view>
+              <view class="weui-cell__ft">{{teachingTime}}</view>
+          </view>
+          <view class="weui-cell">
+              <view class="weui-cell__bd">授课地点：</view>
+              <view class="weui-cell__ft">{{offlineCourse.place}}</view>
+          </view>
+          <view class="weui-cell">
+              <view class="weui-cell__bd">课程时长：</view>
+              <view class="weui-cell__ft">{{offlineCourse.duration}}小时</view>
+          </view>
+          <view class="weui-cell">
+              <view class="weui-cell__bd">人数上限：</view>
+              <view class="weui-cell__ft">{{offlineCourse.limit}}人</view>
+          </view>
+          <view class="weui-cell">
+              <view class="weui-cell__bd">课程价格：</view>
+              <view class="weui-cell__ft">{{offlineCourse.price}}</view>
+          </view>
+          <view class="weui-cell">
+              <view class="weui-cell__bd">课程发布日期：</view>
+              <view class="weui-cell__ft">{{publicTime}}</view>
+          </view>
+          <view class="weui-cell">
+              <view class="weui-cell__bd">当前选课人数：</view>
+              <view class="weui-cell__ft">{{offlineCourse.currentnum}}人</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+   <!-- <Screen class="fixed-bottom">
+      <view >
+       <button @tap="comment()" disabled="{{offlineCourse.status==2}}" class="weui-btn btn-block btn-flex-full" type="primary">
+          <text wx:if="{{offlineCourse.status!=2}}">评 价 教 员</text>
+          <text wx:else>已 完 成</text>
+        </button>
+      </view>
+    </Screen> -->
+  </view>
+  
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import { service } from '../../config.js'
+  import base from '../../mixins/base'
+  import user from '../../mixins/user'
+  import publicProcess from '../../mixins/publicProcess'
+  import Screen from '../../components/screen'
+
+  export default class OfflineCourse extends wepy.page {
+    mixins = [base, user, publicProcess]
+    config = {
+      navigationBarTitleText: '线下课程'
+    }
+    data = {
+      navigate: false,
+      offlineCourse: '',
+      content:'',
+      teachingTime:'',
+      publicTime:'',
+      courseid:'',
+      downType: false
+    }
+    async onLoad(query) {
+      console.log(query)
+      this.courseid = query && query.id
+      let res = await wepy.request({
+         url: service.host + '/offline-courses/student/courses',
+         data:{
+           'UserID': parseInt(this.$parent.globalData.id)
+         },
+         method: 'GET'
+      })
+      console.log(res)
+      const data = res.data
+      for(var i=0;i<data.length;i++){
+        if(data[i].id == this.courseid){
+          this.offlineCourse = data[i]
+          this.content = this.convertHtmlToText(data[i].content)
+          this.teachingTime = this.formatDateTime(data[i].time)
+          this.publicTime = this.formatDateTime(data[i].posttime)
+          break
+        }
+      }
+      this.$apply()
+    }
+
+    onShow() {
+      //后退触发onShow
+      this.initPageData()
+    }
+    
+    onPullDownRefresh() {
+      this.initPageData()
+    }
+
+    computed = {
+     
+    }
+         
+     
+    initPageData() {
+      wx.stopPullDownRefresh()
+    }
+    methods = {
+      async comment() {
+        
+      }
+    }
+    
+  components = {
+      Screen
+    }
+  }
+</script>
+
+<style lang="less">
+@import "../../styles/custom/fn.less";
+
+.main-detail{
+  .weui-cell__ft{
+    color: black;
+  }
+  .weui-cell{
+    margin:10rpx;
+  }
+  .detail-tags{
+    .h4();
+    padding: 0.4em 0;
+  }
+
+  
+  .btn-flex-1{
+    padding: 0;
+    width: 3.5em;
+    line-height: 1.6;
+    overflow: hidden;
+  }
+  .btn-flex-full{
+    flex: 1 1 auto;
+  }
+  .btn-text-bottom{
+    .h5();
+    line-height: 1;
+    color: #777;
+  }
+
+}
+</style>

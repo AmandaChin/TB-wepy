@@ -1,10 +1,116 @@
 <template>
-  <view>注册页</view>
+  <view class="page-register">
+    <view class="weui-panel">
+      <view style="text-align:center; margin:25rpx;">请填写注册信息</view>
+    </view>
+   <view class="weui-panel">
+      <form bindsubmit='searchBox'>
+      <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__bd">
+          <view class="weui-label reset-label-left h3">用户名<span style="color:red;">*</span></view>
+        <view class="weui-cell__ft h3">
+          <input bindblur="username" class="weui-input"  placeholder="{{username}}" placeholder-style="color:#999;font-size:30rpx;" />
+        </view>
+        </view>
+       </view>
+
+      <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__bd">
+          <view class="weui-label reset-label-left h3">真实姓名<span style="color:red;">*</span></view>
+          <view class="weui-cell__ft h3">
+          <input bindblur="name" class="weui-input"  placeholder="请填写真实姓名" placeholder-style="color:#999;font-size:30rpx;" />
+        </view>
+        </view>
+      </view>
+
+      <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__bd">
+          <view class="weui-label reset-label-left h3">密码<span style="color:red;">*</span></view>
+          <view class="weui-cell__ft h3">
+          <input bindblur="password" password class="weui-input"  placeholder="请填写密码" placeholder-style="color:#999;font-size:30rpx;" />
+        </view>
+        </view>
+      </view>
+
+      <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__bd">
+          <view class="weui-label reset-label-left h3">确认密码<span style="color:red;">*</span></view>
+          <view class="weui-cell__ft h3">
+          <input bindblur="rePassword" password class="weui-input"  placeholder="请再次填写密码" placeholder-style="color:#999;font-size:30rpx;"/>
+        </view>
+        </view>
+      </view>
+
+       <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__bd">
+          <view class="weui-label reset-label-left h3">手机号<span style="color:red;">*</span></view>
+          <view class="weui-cell__ft h3">
+          <input bindblur="phone" type="number" class="weui-input" placeholder="请填写有效手机号" placeholder-style="color:#999;font-size:30rpx;"/>
+        </view>
+        </view>
+      </view>
+
+      <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__bd">
+          <view class="weui-label reset-label-left h3">注册邮箱<span style="color:red;">*</span></view>
+          <view class="weui-cell__ft h3">
+          <input bindblur="email" class="weui-input" placeholder="请填写有效邮箱地址" placeholder-style="color:#999;font-size:30rpx;"/>
+        </view>
+        </view>
+      </view>
+
+      <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__bd">
+          <view class="weui-label reset-label-left h3">性别<span style="color:red;">*</span></view>
+         <view class="weui-cell__ft">
+            <picker @change="bindGenderChange" value="{{genderIndex}}" range="{{genders}}">
+              <text wx:if="{{genderisundefined}}" style="color:#999;font-size:30rpx;">请选择性别</text>
+              <!-- <text wx:elif="{{genderisdefined}}" style="color:#999;font-size:30rpx;">{{sex}}</text> -->
+              <view wx:else><text class="weui-input">{{genders[genderIndex]}}</text></view>
+              </picker>
+            </view>
+        </view>
+     </view>
+
+    <!-- <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__bd">
+          <view class="weui-label reset-label-left h3">地址<span style="color:red;">*</span></view>
+         <view class="weui-cell__ft">
+            <picker @change="bindGenderChange" value="{{cityIndex}}" range="{{cityinfo.label}}">
+              <view><text class="weui-input">{{cityIndex}}</text></view>
+              </picker>
+            </view>
+        </view>
+     </view> -->
+
+
+      <!-- <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__bd">
+          <view class="weui-label reset-label-left h3">地址</view>
+         <view class="weui-cell__ft h3">
+          <input bindinput="typing" class="weui-input" value="{{receiver}}" placeholder="请填写地址" placeholder-style="color:#999;font-size:30rpx;" data-wpytyping-a="receiver"/>
+        </view>
+        </view>
+         </view> -->
+
+      <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__bd">
+          <view class="weui-label reset-label-left h3">身份证号</view>
+          <view class="weui-cell__ft h3">
+          <input bindblur="identityNum" type="idcard" class="weui-input" placeholder="{{identitynum}}" placeholder-style="color:#999;font-size:30rpx;" />
+        </view>
+        </view>
+      </view>
+
+      </form>
+    </view>
+      <button @tap="register" class="weui-btn btn-primary" type="primary">注册账户</button>
+    </view>
 </template>
 
 <script>
 import wepy from 'wepy'
-// import { service } from '../config.js'
+import { service } from '../../config.js'
 import http from '../../mixins/http'
 import base from '../../mixins/base'
 import user from '../../mixins/user'
@@ -16,39 +122,134 @@ export default class pageUser extends wepy.page {
     navigationBarTitleText: '注册',
     enablePullDownRefresh: false
   }
-  data = {}
+  data = {
+    genders: ['男', '女'],
+    genderIndex: 0,
+    genderisundefined: true,
+    genderisdefined: false,
+    sex: '',
+    username:'请填写用户名',
+    name:'',
+    password:'',
+    rePassword:'',
+    phone:'',
+    identitynum:'',
+    email:''
+  }
 
-  computed = {}
+  computed = {
+    
+  }
 
   onShow() {
-    // 初始化页面数据
-    this.$getUserInfo(info => {
-      const uinfo = this.getObject(info)
-      const userInfo = this.getObject(this.userInfo)
-      this.userInfo = Object.assign({}, userInfo, uinfo)
-      this.initPageData()
-    })
+    this.initUserInfo()
+    
   }
 
   onPullDownRefresh() {
-    this.initPageData()
   }
 
   // 初始化页面数据
-  initPageData() {
-    // 根据业务接口处理:获取最新个人信息并更新
-    // this.$get({url: service.user}, {
-    //   success: ({code, data}) => {},
-    //   fail: ({code, data}) => {}
-    // })
+  async initUserInfo() {
+    await this.getWeInfo();
+    const info = this.$parent.globalData.user
+    if(info.gender!=null){
+      this.genderisdefined = true
+      this.genderisundefined = false
+      this.username = info.nickName
+      if(parseInt(info.gender) == 1){
+        this.genderIndex = 0
+      }else{
+        this.genderIndex = 1
+      }
+    }
+    this.$apply()
   }
 
-  methods = {};
-
+  methods = {
+    username(e){
+      this.username = e.detail.value
+    },
+    name(e){
+      this.name = e.detail.value
+    },
+    bindGenderChange(e) {
+      this.genderisdefined = false
+      this.genderisundefined = false
+      this.genderIndex = e.detail.value
+    },
+    phone(e){
+      this.phone = e.detail.value
+    },
+    email(e){
+      this.email = e.detail.value
+    },
+    identityNum(e){
+      this.identitynum = e.detail.value
+    },
+    password(e){
+      this.password = e.detail.value
+    },
+    rePassword(e){
+      this.rePassword = e.detail.value
+    },
+    async register(){
+      if((this.password !== this.rePassword)){
+        wepy.showToast({
+          title: '密码输入不一致！',
+          icon:'loading',
+          duration: 2000
+        })
+      }
+      else if(this.username!==''&& this.name!=='' && this.phone!=='' && this.email!==''){
+         let res = await wepy.request({
+           url: service.host + '/register', 
+           data: {
+             'username' : this.username,
+             'password' : this.password,
+             'gender' : this.genders[this.genderIndex],
+             'avatar' : this.$parent.globalData.user.avatarUrl,
+             'name' : this.name,
+             'IDNumber' : this.identitynum,
+             'email' : this.email,
+             'phone' : this.phone
+           },
+           method: 'POST'
+         });
+         wepy.showToast({
+          title: '请稍等片刻',
+          icon:'loading',
+          duration: 20000
+        })
+         if(res.data.num===1){
+          wx.navigateTo({
+            url: `/pages/login/login`
+         })
+         }else{
+           wepy.showToast({
+          title: '用户名重复！',
+          icon:'loading',
+          duration: 2000
+        })
+         }
+      }
+      else{
+        wepy.showToast({
+          title: '请填写必填字段~',
+          icon:'loading',
+          duration: 2000
+        })
+      }
+      this.$apply()
+      
+    }
+    
+  };
   components = {}
 }
 </script>
 
 <style lang="less">
 @import "../../styles/custom/fn.less";
+
 </style>

@@ -9,16 +9,22 @@ export default class extends wepy.app {
       'pages/index',
       'pages/demand',
       'pages/user',
+      'pages/course',
       'pages/main/list',
       'pages/main/demandDetail',
+      'pages/main/volunteerDetail',
       'pages/main/historyDemand',
       'pages/main/historyService',
+      'pages/main/onlineCourses',
+      'pages/main/offlineCourses',
+      'pages/main/myOnlineCourses',
+      'pages/main/myOfflineCourses',
       'pages/main/search',
+      'pages/main/searchDetail',
       'pages/login/login',
       'pages/login/register',
       'pages/borrow/subscribe',
       'pages/borrow/result',
-      'pages/user/demand/c2v',
       'pages/user/demand/myDemand',
       'pages/user/demand/editMedal',
       'pages/user/demand/publish',
@@ -27,7 +33,6 @@ export default class extends wepy.app {
       'pages/user/userinfo/info',
       'pages/user/volunteer/apply',
       'pages/user/volunteer/myVolunteer',
-      'pages/user/volunteer/v2c',
       'pages/user/volunteer/succeed',
       'pages/user/userinfo/identity',
       'pages/user/notice/notice',
@@ -36,6 +41,8 @@ export default class extends wepy.app {
       'pages/demand/volunteerDemand',
       'pages/user/check/mycheck',
       'pages/user/check/checkdetail',
+      'pages/user/course/myCourse',
+      'pages/user/course/resource',
       'pages/main/check'
     ],
     window: {
@@ -56,12 +63,17 @@ export default class extends wepy.app {
         selectedIconPath: './images/tabbars/icon-mark-active@2x.png',
         iconPath: './images/tabbars/icon-mark@2x.png',
         text: '首页'
-      }, {
+      },{
         pagePath: 'pages/demand',
+        selectedIconPath: './images/icon/icon-edit-active.png',
+        iconPath: './images/icon/icon-edit.png',
+        text: '发布'
+      },{
+        pagePath: 'pages/course',
         selectedIconPath: './images/tabbars/icon-shelf-active@2x.png',
         iconPath: './images/tabbars/icon-shelf@2x.png',
-        text: '发布'
-      }, {
+        text: '课程'
+      },{
         pagePath: 'pages/user',
         selectedIconPath: './images/tabbars/icon-smile-active@2x.png',
         iconPath: './images/tabbars/icon-smile@2x.png',
@@ -69,18 +81,19 @@ export default class extends wepy.app {
       }]
     },
     networkTimeout: {
-      request: 5000,
+      request: 60000,
       downloadFile: 10000
     },
     debug: true
   }
 
   globalData = {
+    //微信信息
     user: null,
     openid: null,
-    id: -1,
+    id: 11,
+    //个人信息
     userinfo: null,
-    accountNum: 0
   }
 
   constructor () {

@@ -2,9 +2,9 @@
   <view class="radio-button">
     <view wx:if="{{hasTitle}}" class="radio-title">{{title}}</view>
     <radio-group style="margin-right: {{style_gutter_edge}}" @change="radioChange">
-      <view class="radio-wrapper" wx:for="{{list}}" wx:key="index" style="width:{{style_width}};padding-right: {{style_gutter}};margin-bottom: {{style_gutter}}">
-        <radio id="{{index}}" hidden value="{{item.value}}" checked="{{item.checked}}"></radio>
-        <label for="{{index}}" class="radio-item{{item.checked ? '-checked' : '' }}">
+      <view class="radio-wrapper" wx:for="{{list}}" wx:key="{{item.name}}" style="width:{{style_width}};padding-right: {{style_gutter}};margin-bottom: {{style_gutter}}">
+        <radio id="{{item.name}}" hidden value="{{item.value}}" checked="{{item.checked}}"></radio>
+        <label for="{{item.name}}" class="radio-item{{item.checked ? '-checked' : '' }}">
           <text>{{item.name}}</text>
         </label>
       </view>
@@ -48,7 +48,7 @@
     }
 
     data = {
-      unique: Math.random().toString(36).substring(2)
+
     }
 
     onLoad() {
@@ -81,7 +81,6 @@
     methods = {
       radioChange(e) {
         var valueArr = e.detail.value
-        console.log(valueArr)
         for (var i = 0; i < this.list.length; i++) {
           if (this.isValueEqual(valueArr, this.list[i].value)) {
             this.list[i].checked = true
@@ -96,7 +95,6 @@
 
     initRadio() {
       // 初始化已选项
-      console.log('initRadio'+this.title)
       const value = this.getString(this.value)
       console.log(value)
       for (var i = 0; i < this.list.length; i++) {

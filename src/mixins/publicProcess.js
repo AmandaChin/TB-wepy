@@ -40,10 +40,26 @@ export default class userMixin extends wepy.mixin {
         
         return returnText;
       }
-
+      //时间戳换时间
+      formatDateTime(inputTime) {
+        var date = new Date(inputTime)
+        var y = date.getFullYear()
+        var m = date.getMonth() + 1
+        m = m < 10 ? ('0' + m) : m
+        var d = date.getDate()
+        d = d < 10 ? ('0' + d) : d
+        var h = date.getHours()
+        h = h < 10 ? ('0' + h) : h
+        var minute = date.getMinutes()
+        var second = date.getSeconds()
+        minute = minute < 10 ? ('0' + minute) : minute
+        second = second < 10 ? ('0' + second) : second
+        return y + '-' + m + '-' + d + ' ' + h + ':' + minute + ':' + second
+    }
 
       //FormatDate 把时间延后8小时
-      formatDate(date, fmt) {
+      formatDate(inputDate, fmt) {
+        var date = new Date(inputDate)
         if (/(y+)/.test(fmt)) {
           fmt = fmt.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length))
         }
@@ -68,11 +84,12 @@ export default class userMixin extends wepy.mixin {
       }
 
       //FormatDateX 
-      formatDatex(date, fmt) {
+      formatDatex(inputDate, fmt) {
+        var date = new Date(inputDate)
         if (/(y+)/.test(fmt)) {
           fmt = fmt.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length))
         }
-      
+        console.log("date:"+date)
         var hours = date.getHours()
         var days = date.getDate()
         var month = date.getMonth() + 1

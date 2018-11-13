@@ -9,13 +9,12 @@
 import wepy from 'wepy'
 import { service } from '../../../config.js'
 import base from '../../../mixins/base'
-import http from '../../../mixins/http'
 import user from '../../../mixins/user'
-import { funImages } from '../../../mixins/demo'
+import publicProcess from '../../../mixins/publicProcess'
 import notice from '../../../components/notice'
 
 export default class Notice extends wepy.page {
-  mixins = [base, http,user]
+  mixins = [base, user, publicProcess]
   config = {
     navigationBarTitleText: '通知',
     navigationBarTextStyle: 'white',
@@ -62,27 +61,13 @@ export default class Notice extends wepy.page {
     }
   // 更新图书列表
   async updateDemandList(id) {
-    if (this.loading || this.noMoreList) return
     let res = await wepy.request({
-         url: service.host + '/noticeOperation',
-         data:{
-           'UserID': parseInt(id)
-         },
-         method: 'POST'
+         url: service.host + '/notices/'+id,
+         method: 'GET'
     })
-    console.log(res.data.list)
-    const list = res.data.list
-    const data = list.rows
-    if (this.list.length >= data.length) {
-      this.noMoreList = true
-      return
-    }
-    // 请求到空列表后就认为没有更多了
-    if (this.isArray(data) && data.length === 0) {
-      this.noMoreList = true
-      return
-       }
-    this.list = this.getItems(data)
+    console.log(res.data)
+    this.list = this.getItems(res.data)
+    this.noMoreList = true
     this.$apply()
 
   }
@@ -95,11 +80,11 @@ export default class Notice extends wepy.page {
       // 拼接示例数据
       return {
         id: xlen,
-        title: item.Title,
-        name: `作者:${item.WriterName}`,
-        time: `发布时间: ${item.ReleaseTime.substr(0,10)}`,
-        content: `内容简介:${item.Content}`,
-        status: xlen % 2
+        title: item.title,
+        name: item.author,
+        time: this.formatDateTime(item.createdAt),
+        content: this.convertHtmlToText(item.content),
+        checked: item.checked
       }
     })
   }

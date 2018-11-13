@@ -10,15 +10,15 @@
         <view class="weui-cells weui-cells_after-title">
           <view class="weui-cell">
               <view class="weui-cell__bd">服务日期：</view>
-              <view class="weui-cell__ft">{{demand.mydate}}</view>
+              <view class="weui-cell__ft">{{date}}</view>
           </view>
           <view class="weui-cell">
               <view class="weui-cell__bd">服务时间：</view>
-              <view class="weui-cell__ft">{{demand.mytime}}</view>
+              <view class="weui-cell__ft">{{time}}</view>
           </view>
           <view class="weui-cell">
               <view class="weui-cell__bd">服务对象：</view>
-              <view class="weui-cell__ft">{{demand.author}}</view>
+              <view class="weui-cell__ft">{{demand.name}}</view>
           </view>
           <view class="weui-cell">
               <view class="weui-cell__bd">服务内容：</view>
@@ -51,17 +51,17 @@
 
      <Screen class="fixed-bottom">
       <view style="display: flex;">
-        <button @tap="toDelete" disabled="{{demand.status!=0}}" class="weui-btn btn-block  btn-flex-full">
-          <block wx:if="{{demand.status==0}}">
+        <button @tap="toDelete" disabled="{{demand.status1!=0}}" class="btn-block  btn-flex-full">
+          <block wx:if="{{demand.status1==0}}">
             <image class="imgicon" src="{{icon_delete_active}}" mode="aspectFit"/>
           </block>
           <block wx:else>
             <image class="imgicon" src="{{icon_delete}}" mode="aspectFit"/>
           </block>
-          <view class="btn-text-bottom color-999">删除</view>
+          <view class="btn-text-bottom">删除</view>
         </button>
-        <button @tap="toEdit" disabled="{{demand.status!=0}}" class="weui-btn btn-block  btn-flex-full">
-          <block wx:if="{{demand.status==0}}">
+        <button @tap="toEdit" disabled="{{demand.status1!=0||demand.isOnDate=='true'}}" class="btn-block  btn-flex-full">
+          <block wx:if="{{demand.status1==0 && demand.isOnDate=='false'}}">
             <image class="imgicon" src="{{icon_edit_active}}" mode="aspectFit"/>
           </block>
           <block wx:else>
@@ -70,8 +70,8 @@
           <view class="btn-text-bottom">编辑</view>
         </button>
       <!-- <view style="display: flex;"> -->
-        <button @tap="toSee()" disabled="{{demand.status==0}}" class="weui-btn btn-block btn-flex-full" type="primary">
-          <text wx:if="{{demand.status==0}}">暂无响应者</text>
+        <button @tap="toSee()" disabled="{{demand.status1==0}}" class="weui-btn btn-block btn-flex-full" type="primary">
+          <text wx:if="{{demand.status1 == 0 }}">暂无响应者</text>
           <text wx:else>查看响应者</text>
         </button>
       <!-- </view> -->
@@ -85,16 +85,12 @@
 <script>
   import wepy from 'wepy'
   import { service } from '../../config.js'
-  import http from '../../mixins/http'
   import base from '../../mixins/base'
-  import cart from '../../mixins/cart'
   import user from '../../mixins/user'
-  import { funImages } from '../../mixins/demo'
-  import Swiper from '../../components/swiper'
   import Screen from '../../components/screen'
 
   export default class mainDetail extends wepy.page {
-    mixins = [base, http, cart, user]
+    mixins = [base, user]
     config = {
       navigationBarTitleText: '需求详情'
     }
@@ -104,6 +100,8 @@
       icon_edit: '/images/icon/icon-edit.png',
       icon_edit_active: '/images/icon/icon-edit-active.png',
       navigate: false,
+      date:'',
+      time:'',
       demand: {
         
       }
@@ -117,29 +115,10 @@
 
     async onLoad(query) {
       console.log(query)
-      const Serviceid = query && +query.id
-      const title = query && query.title
-      const author = query && query.name
-      const status = query && query.status
-      const mytime = query && query.time
-      const mydate = query && query.date
-      const content = query && query.content
-      const duration = query && query.duration
-      const phone = query && query.phone
-      const mutualtype = query && query.mutualtype
       setTimeout(() => {
-        this.demand = Object.assign({}, this.demand, {
-          Serviceid: Serviceid,
-          title: title,
-          author: author,
-          status: status,
-          mytime: mytime,
-          mydate: mydate,
-          content: content,
-          duration: duration,
-          phone: phone,
-          mutualtype: mutualtype
-        })
+        this.demand = query
+        this.date = this.demand.date.substring(0,10)
+        this.time = this.demand.date.substring(11,19)
         this.$apply()
       }, 300)
     }
@@ -172,8 +151,8 @@
     methods = {
       toEdit(){
         wx.navigateTo({
-          url: '/pages/user/demand/editMedal?Serviceid='+this.demand.Serviceid+'&time='+this.demand.mytime+
-          '&date='+this.demand.mydate+'&duration='+this.demand.duration+'&title='+this.demand.title+'&content='+this.demand.content,
+          url: '/pages/user/demand/editMedal?id='+this.demand.id+'&serviceItem='+this.demand.serviceItem+
+          '&date='+this.demand.date+'&duration='+this.demand.duration+'&title='+this.demand.title+'&content='+this.demand.content,
         })
       },
       async toDelete(){
@@ -185,13 +164,10 @@
         console.log(modal)
         if(modal.confirm){
               let res = await wepy.request({
-                url: service.host + '/deleteDemand', //开发者服务器接口地址",
-                data: {
-                  'serviceId': this.demand.Serviceid
-                },
-                method:'POST'
+                url: service.host + '/requirement/'+this.demand.id, //开发者服务器接口地址",
+                method:'DELETE'
               });
-              console.log(res)
+              console.log("删除需求："+res.data.num )
               if(res.data.num == 1){
                 wx.showToast({
                     title: '已删除',
@@ -213,19 +189,20 @@
       },
       async toSee() {
          let res = await wepy.request({
-           url: service.host + '/getUserByService', //开发者服务器接口地址",
+           url: service.host + '/service/userinfo', //开发者服务器接口地址",
            data: {
-             'ServiceID' : this.demand.Serviceid
+             'ServiceID' : this.demand.id,
+             'type' : 1
            },
-           method: 'POST'
+           method: 'GET'
          });
          console.log(res)
-         var volunteer = res.data.list
-         if(res.data.list!=null){
+         var volunteer = res.data
+         if(res.data!=null){
            wepy.showModal({
              title: '志愿者信息', //提示的标题,
-             content: '志愿者用户名：'+volunteer.UserName+'\r\n志愿者性别:'+volunteer.Gender+'\r\n志愿者姓名:'+volunteer.Name+'\r\n志愿者身份证号'+volunteer.IDNumber
-             +'\r\n邮箱地址'+volunteer.Email+'\r\n联系方式'+volunteer.Phone, //提示的内容,
+             content: '志愿者姓名:'+volunteer.name+'\r\n志愿者性别:'+volunteer.gender+'\r\n志愿者身份证号:'+volunteer.IDNumber
+             +'\r\n邮箱地址:'+volunteer.email+'\r\n联系方式:'+volunteer.phone, //提示的内容,
              showCancel: false, 
              confirmColor: '#049BFF'
            });
@@ -242,7 +219,6 @@
     }
 
     components = {
-      Swiper,
       Screen
     }
   }

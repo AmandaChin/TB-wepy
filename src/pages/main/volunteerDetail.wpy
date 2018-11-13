@@ -4,14 +4,14 @@
       <view wx:if="{{isOwn}}" class="text-center tip-page page-borrow-tip">
          <block>
           <icon class="tip-icon" type="cancel" size="70" color="#bbb"></icon>
-          <view class="h4">自己不可以响应自己的需求哦~</view>
+          <view class="h4">自己不可以响应自己的服务哦~</view>
         </block>
       </view>
       <view wx:else>
-        <view class="weui-panel">
-          <view class="page__hd">
+      <view class="weui-panel">
+        <view class="page__hd">
             <view class="page__title" style="text-align:center;">{{demand.title}}</view>
-          </view>
+        </view>
       <!-- <view class="weui-media-box weui-media-box_text weui-cells_in-small-appmsg">
         <view class="h2 color-333">{{demand.title}}</view>
         <view class="detail-tags">
@@ -61,6 +61,7 @@
           <text wx:else>申请</text>
         </button>
       </view>
+      <button slot="placeholder" class="weui-btn btn-block" type="primary">申请</button>
     </Screen>
     </view>
   </view>
@@ -83,22 +84,55 @@
   import { service } from '../../config.js'
   import base from '../../mixins/base'
   import user from '../../mixins/user'
+  import Swiper from '../../components/swiper'
   import Screen from '../../components/screen'
 
   export default class mainDetail extends wepy.page {
-    mixins = [base,user]
+    mixins = [base, user]
     config = {
-      navigationBarTitleText: '需求详情'
+      navigationBarTitleText: '服务详情'
     }
     data = {
       tags: [],
       navigate: false,
-      demand: ''
+      demand: {
+        Serviceid: '',
+        mytime:'',
+        mydate:'',
+        title:'',
+        author:'',
+        pubtime:'',
+        pubcompany:'',
+        status:'',
+        exist: 0
+      }
     }
 
     async onLoad(query) {
+      const Serviceid = query && +query.id
+      const title = query && query.title
+      const author = query && query.name
+      const status = query && query.status
+      const mytime = query && query.time
+      const mydate = query && query.date
+      const content = query && query.content
+      const duration = query && query.duration
+      const phone = query && query.phone
+      const authorID = query && query.authorID
       setTimeout(() => {
-        this.demand = query
+        this.demand = Object.assign({}, this.demand, {
+          Serviceid: Serviceid,
+          title: title,
+          author: author,
+          authorID: authorID,
+          status: status,
+          mytime: mytime,
+          mydate: mydate,
+          content: content,
+          duration: duration,
+          phone: phone,
+          stock: 1
+        })
         this.$apply()
       }, 300)
     }
@@ -116,8 +150,7 @@
 
     computed = {
       isEnabled() {
-        //if(this.demand.status1 == '1'||)
-        return Boolean(this.demand && +this.demand.status1 == '1')
+        return Boolean(this.demand && +this.demand.status == '0')
       },
       isLogin() {
         if(this.$parent.globalData.userinfo !== null){
@@ -137,6 +170,7 @@
      // 初始化页面数据
     initUserData() {
       //this.getInfo()
+      console.log('[global]'+this.$parent.globalData.user)
       
       this.$apply()
     }
@@ -161,9 +195,9 @@
          let res = await wepy.request({
            url: service.host + '/applicate', //开发者服务器接口地址",
            data: {
-             'volunteer' : this.$parent.globalData.id,
-             'beneficiary': this.demand.authorID,
-             'ServiceID' : this.demand.id
+             'volunteer' : this.demand.authorID,
+             'beneficiary': this.$parent.globalData.id,
+             'ServiceID' : this.demand.Serviceid
            },
            method: 'POST'
          });
@@ -189,6 +223,7 @@
     }
 
     components = {
+      Swiper,
       Screen
     }
   }

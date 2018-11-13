@@ -9,7 +9,24 @@ export default class userMixin extends wepy.mixin {
 
   /* ========================== 用户方法 ========================== */
   
-
+  async getWeInfo(){
+    // 取缓存信息
+    const user = this.$parent.globalData.user
+    // 不重复获取用户信息
+    if (user && user.nickName) {
+      console.log(user)
+      return 
+    }
+    let code = await wepy.login()
+    let res = await wepy.getUserInfo()
+    let openid = await wepy.request({
+       url:'https://api.weixin.qq.com/sns/jscode2session?appid=wx01aca083ef813dd0&secret=9c86a02eb57bb9a4db4f920036556c10&js_code='+code.code+'&grant_type=authorization_code',
+       method: 'POST'
+      })
+    this.$parent.globalData.user = res.userInfo
+    this.$parent.globalData.openid = openid.data.openid
+    this.$apply()
+  }
   //获取用户信息
   async getInfo() {
     // 取缓存信息
@@ -21,59 +38,29 @@ export default class userMixin extends wepy.mixin {
     }
     // 首次获取用户信息
     var auth = 0
-    let res = await wepy.showModal({
-      title: '授权提醒',
-      content: '时间银行想获取您的个人信息',
-      confirmColor: '#049BFF'
+    let code = await wepy.login()
+    let res = await wepy.getUserInfo()
+    let openid = await wepy.request({
+      url:'https://api.weixin.qq.com/sns/jscode2session?appid=wx01aca083ef813dd0&secret=9c86a02eb57bb9a4db4f920036556c10&js_code='+code.code+'&grant_type=authorization_code',
+      method: 'POST'
     })
-    if (res.confirm) {
-      let code = await wepy.login()
-      let res = await wepy.getUserInfo()
-      let openid = await wepy.request({
-       url:'https://api.weixin.qq.com/sns/jscode2session?appid=wx01aca083ef813dd0&secret=9c86a02eb57bb9a4db4f920036556c10&js_code='+code.code+'&grant_type=authorization_code',
-       method: 'POST'
-      })
-      this.userlogin(openid.data.openid)
-      let id = await wepy.request({
-          url: service.getUserID, //开发者服务器接口地址",
-          data: {
-            "Account": openid.data.openid
-          }, //请求的参数",
-          method: 'POST'
-        })
-      this.$parent.globalData.user = res.userInfo
-      console.log(this.$parent.globalData.user)
-      this.$parent.globalData.openid = openid.data.openid
-      this.$parent.globalData.id = id.data.UserID
-      console.log('[globalID]:'+this.$parent.globalData.id)
-      this.$apply()
-    } 
-    return 
-  }
-  //用户登录
-  async userlogin(account){
-    let password = '123456'
-    let res = await wepy.request({
-       url:service.log,
-       data:{
-         "Account":account,
-         "Password": password
-       },
-       method: 'POST'
-      })
-    if(res!=3){
-      let num = await wepy.request({
-        url: service.register, //开发者服务器接口地址",
+    this.userlogin(openid.data.openid)
+    let id = await wepy.request({
+        url: service.getUserID, //开发者服务器接口地址",
         data: {
-         "account":account,
-         "username":this.$parent.globalData.user.nickName,
-         "password": password
-       }, //请求的参数",
+          "Account": openid.data.openid
+        }, //请求的参数",
         method: 'POST'
       })
+    this.$parent.globalData.user = res.userInfo
+    console.log(this.$parent.globalData.user)
+    this.$parent.globalData.openid = openid.data.openid
+    this.$parent.globalData.id = id.data.UserID
+    console.log('[globalID]:'+this.$parent.globalData.id)
+    this.$apply()
+    return 
   }
-  return
-  }
+  
   //获取用户在数据库中的信息
   async getInfoInDB(id){
     const userinfo = this.$parent.globalData.userinfo
@@ -83,11 +70,11 @@ export default class userMixin extends wepy.mixin {
       return 
     }
     let res = await wepy.request({
-      url: service.host+'/getUserInfo',
+      url: service.host+'/info',
       data:{
-        'UserId':id
+        'UserID':id
       },
-      method:'POST'
+      method:'GET'
     })
     this.$parent.globalData.userinfo = res.data
   }

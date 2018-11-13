@@ -5,37 +5,41 @@
         <view class="h2 color-666">发布需求/服务信息</view>
       </view> -->
     </view>
-    <view class="weui-panel" style="text-align: center;">
+    <block>
+    <view class="weui-panel" style="text-align: center; padding:20rpx;">
       <navigator url="/pages/demand/oldmanDemand"  >
-        <image src="../../images/oldman.jpg" class="userinfo-avatar"/>
+        <image src="{{oldman_icon}}" class="userinfo-avatar"/>
       </navigator>
-      <button @tap="oldman" class="weui-btn btn-primary" style="width:70%;display: inline-block;" type="primary">我需要志愿服务</button>
+      <button @tap="oldman" class="weui-btn btn-primary" style="width:70%; display: inline-block;" type="primary">我需要志愿服务</button>
     </view>
+    </block>
+    <block>
     <view class="weui-panel" style="text-align: center;">
       <navigator url="/pages/demand/volunteerDemand" >
-        <image src="../../images/volunteer.png" class="userinfo-avatar" />
-        <button @tap="volunteer" class="weui-btn btn-primary" style="width:70%;display: inline-block;" type="primary">我可以提供志愿服务</button>
+        <image src="{{volunteer_icon}}" class="userinfo-avatar" />
+        <button @tap="volunteer" class="weui-btn btn-primary" style="width:70%; display: inline-block;" type="primary">我可以提供志愿服务</button>
       </navigator>
     </view>
+    </block>
   </view>
 </template>
 
 <script>
   import wepy from 'wepy'
   import { service } from '../config.js'
-  import http from '../mixins/http'
   import base from '../mixins/base'
   import user from '../mixins/user'
-  import cart from '../mixins/cart'
 
-  export default class pageBorrow extends wepy.page {
-    mixins = [base, http, user, cart]
+  export default class publicDemand extends wepy.page {
+    mixins = [base, user]
     config = {
       navigationBarTitleText: '需求发布',
       enablePullDownRefresh: false
     }
     components = {}
     data = {
+      oldman_icon: '../images/oldman.jpg',
+      volunteer_icon: '../images/volunteer.png',
       loaded: false,
       loading: false,
       timeIndex: 0
@@ -76,7 +80,7 @@
   @icon-font-size: 34rpx;
 
   .page-demand{
-    background: #FFFFFF;
+    background-color: #FFFFFF;
     .userinfo-avatar {
       display: inline-block;
       width: 300rpx;

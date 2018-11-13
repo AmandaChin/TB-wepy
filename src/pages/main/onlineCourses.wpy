@@ -1,13 +1,6 @@
 <template>
   <view class="main-detail">
     <view wx:if="{{isLogin}}">
-      <view wx:if="{{isOwn}}" class="text-center tip-page page-borrow-tip">
-         <block>
-          <icon class="tip-icon" type="cancel" size="70" color="#bbb"></icon>
-          <view class="h4">自己不可以响应自己的需求哦~</view>
-        </block>
-      </view>
-      <view wx:else>
         <view class="weui-panel">
           <view class="page__hd">
             <view class="page__title" style="text-align:center;">{{demand.title}}</view>
@@ -20,49 +13,47 @@
       </view> -->
     
       <view class="page__bd">
-        <view class="weui-cells__title">详情：</view>
+        <view class="weui-cells__title">课程详情：{{ownOrder}}</view>
         <view class="weui-cells weui-cells_after-title">
           <view class="weui-cell">
-              <view class="weui-cell__bd">服务日期：</view>
-              <view class="weui-cell__ft">{{demand.mydate}}</view>
+              <view class="weui-cell__bd">课程发布者姓名：</view>
+              <view class="weui-cell__ft"> {{onlineCourse.author.name}}</view>
           </view>
           <view class="weui-cell">
-              <view class="weui-cell__bd">服务时间：</view>
-              <view class="weui-cell__ft">{{demand.mytime}}</view>
+              <view class="weui-cell__bd">课程发布者类型：</view>
+              <view class="weui-cell__ft">{{onlineCourse.author.qualification.level}} , {{onlineCourse.author.qualification.tag}}</view>
           </view>
           <view class="weui-cell">
-              <view class="weui-cell__bd">服务对象：</view>
-              <view class="weui-cell__ft">{{demand.author}}</view>
+              <view class="weui-cell__bd">课程标题：</view>
+              <view class="weui-cell__ft">{{onlineCourse.title}}</view>
           </view>
           <view class="weui-cell">
-              <view class="weui-cell__bd">服务内容：</view>
-              <view class="weui-cell__ft">{{demand.title}}</view>
+              <view class="weui-cell__bd">课程类型：</view>
+              <view class="weui-cell__ft">{{onlineCourse.type}}</view>
           </view>
           <view class="weui-cell">
-              <view class="weui-cell__bd">具体事宜：</view>
-              <view class="weui-cell__ft">{{demand.content}}</view>
+              <view class="weui-cell__bd">课程价格：</view>
+              <view class="weui-cell__ft">{{onlineCourse.price}}</view>
           </view>
           <view class="weui-cell">
-              <view class="weui-cell__bd">服务时长：</view>
-              <view class="weui-cell__ft">{{demand.duration}}</view>
+              <view class="weui-cell__bd">课程描述：</view>
+              <view class="weui-cell__ft">{{abstract}}</view>
           </view>
           <view class="weui-cell">
-              <view class="weui-cell__bd">联系方式：</view>
-              <view class="weui-cell__ft">{{demand.phone}}</view>
+              <view class="weui-cell__bd">课程发布日期：</view>
+              <view class="weui-cell__ft">{{time}}</view>
           </view>
         </view>
       </view>
     </view>
 
-    <Screen class="fixed-bottom">
-      <view style="display: flex;">
-        <button @tap="toAdd()" disabled="{{!isEnabled}}" class="weui-btn btn-block btn-flex-full" type="primary">
-          <text wx:if="{{!isEnabled}}">已被申请</text>
-          <text wx:else>申请</text>
-        </button>
+   <Screen class="fixed-bottom">
+      <view >
+          <button @tap="toAdd()"  class="weui-btn btn-block btn-flex-full" type="primary">
+              <text> 下 载</text>
+          </button>
       </view>
     </Screen>
-    </view>
   </view>
   <view wx:else class="text-center tip-page page-borrow-tip">
     <block>
@@ -83,68 +74,61 @@
   import { service } from '../../config.js'
   import base from '../../mixins/base'
   import user from '../../mixins/user'
+  import publicProcess from '../../mixins/publicProcess'
   import Screen from '../../components/screen'
 
-  export default class mainDetail extends wepy.page {
-    mixins = [base,user]
+  export default class onlineCourse extends wepy.page {
+    mixins = [base, user, publicProcess]
     config = {
-      navigationBarTitleText: '需求详情'
+      navigationBarTitleText: '线上课程'
     }
     data = {
-      tags: [],
       navigate: false,
-      demand: ''
+      onlineCourse: '',
+      abstract:'',
+      time:'',
+      courseid:'',
+      downType: false
     }
-
     async onLoad(query) {
-      setTimeout(() => {
-        this.demand = query
-        this.$apply()
-      }, 300)
+      console.log(query)
+      this.courseid = query && query.id
+      let res = await wepy.request({
+         url: service.host + '/online-courses/'+ this.courseid,
+         method: 'GET'
+      })
+      const data = res.data
+      this.onlineCourse = data
+      this.abstract = this.convertHtmlToText(data.abstract)
+      this.time = this.formatDateTime(data.date)
+      this.initPageData()
+      this.$apply()
     }
 
     onShow() {
       //后退触发onShow
+      this.initPageData()
     }
-    onUnload(){
-
-    }
+    
     onPullDownRefresh() {
       this.initPageData()
-      //this.initUserData()
     }
 
     computed = {
-      isEnabled() {
-        //if(this.demand.status1 == '1'||)
-        return Boolean(this.demand && +this.demand.status1 == '1')
-      },
       isLogin() {
         if(this.$parent.globalData.userinfo !== null){
          return true;
         }else{
           return false;
         }
-      },
-      isOwn() {
-        if(this.$parent.globalData.id == this.demand.authorID){
-         return true;
-        }else{
-          return false;
-        }
       }
-    }
-     // 初始化页面数据
-    initUserData() {
-      //this.getInfo()
       
-      this.$apply()
     }
-
-    // 初始化页面数据
-    initPageData() {
-      wx.stopPullDownRefresh()
+         
      
+    initPageData() {
+      this.isDown()
+      wx.stopPullDownRefresh()
     }
     methods = {
       login(){
@@ -158,19 +142,26 @@
          })
       },
       async toAdd() {
-         let res = await wepy.request({
-           url: service.host + '/applicate', //开发者服务器接口地址",
+        if(this.downType){
+          wx.showToast({
+            title: '您已购买过该课程！',
+            icon: 'success',
+            duration: 2000
+          });
+        }else{
+          console.log("courseid:"+this.courseid)
+          let res = await wepy.request({
+           url: service.host2 + '/online-courses/buy', //开发者服务器接口地址",
            data: {
-             'volunteer' : this.$parent.globalData.id,
-             'beneficiary': this.demand.authorID,
-             'ServiceID' : this.demand.id
+             'UserID' : this.$parent.globalData.id,
+             'course' : this.courseid
            },
            method: 'POST'
          });
          console.log(res)
-         if(res.data.num=='1'){
+         if(res.data.result == true){
             wx.showToast({
-              title: '申请成功',
+              title: '下载成功！',
               icon: 'success',
               duration: 800
             });
@@ -179,16 +170,17 @@
             }, 800);
           }else{
             wx.showToast({
-              title: '申请失败',
+              title: '请确保余额充足！',
               icon: 'loading',
-              duration: 800
+              duration: 2000
             });
           }
+        }
          this.$apply()
       }
     }
-
-    components = {
+    
+  components = {
       Screen
     }
   }
