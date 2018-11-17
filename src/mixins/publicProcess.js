@@ -1,5 +1,6 @@
 import wepy from 'wepy'
 import { service } from '../config.js'
+import cityinfo from '../pages/login/cityInfo.js'
 
 export default class userMixin extends wepy.mixin {
     //富文本转普通文本
@@ -135,5 +136,54 @@ export default class userMixin extends wepy.mixin {
           }
         }
         return fmt
+      }
+
+      //找地址
+      findPosIndex(position){
+        var posIndex = [0,0,0]
+        var info = cityinfo.info.cityInfo;
+        for(var i=0;i<info.length;i++){
+          if(info[i].label == position[0]){
+            posIndex[0] = info[i].value
+            var city = info[i].children
+            for(var j=0;j<city.length;j++){
+              if(city[j].label == position[1]){
+                posIndex[1] = city[j].value
+                var district = city[j].children
+                for(var k=0;k<district.length;k++){
+                  if(district[k].label == position[2]){
+                    posIndex[2] = district[k].value
+                    break
+                  }
+                }
+              }
+            }
+          }
+        }
+        return posIndex
+      }
+      //根据地址ID找对应的名字
+      findPosition(posIndex){
+        var position = ['','','']
+        var info = cityinfo.info.cityInfo;
+        for(var i=0;i<info.length;i++){
+          if(info[i].value == posIndex[0]){
+            position[0] = info[i].label
+            var city = info[i].children
+            for(var j=0;j<city.length;j++){
+              if(city[j].value == posIndex[1]){
+                position[1] = city[j].label
+                var district = city[j].children
+                for(var k=0;k<district.length;k++){
+                  if(district[k].value == posIndex[2]){
+                    position[2] = district[k].label
+                    break
+                  }
+                }
+              }
+            }
+          }
+        }
+        return position
       }
 }

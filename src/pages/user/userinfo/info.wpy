@@ -13,9 +13,9 @@
       <form bindsubmit='searchBox'>
       <view class="weui-cell weui-cell_input">
         <view class="weui-cell__bd">
-          <view class="weui-label reset-label-left h3">昵称</view>
+          <view class="weui-label reset-label-left h3">用户名</view>
         <view class="weui-cell__ft h3">
-          <input bindblur="nickname" class="weui-input"  placeholder="{{nickName}}" placeholder-style="color:#999;font-size:30rpx;" data-wpytyping-a="receiver"/>
+          <input bindblur="username" class="weui-input" maxlength="30" value="{{username}}" placeholder="请输入用户名"  placeholder-style="color:#999;font-size:30rpx;" data-wpytyping-a="receiver"/>
         </view>
         </view>
        </view>
@@ -24,7 +24,7 @@
         <view class="weui-cell__bd">
           <view class="weui-label reset-label-left h3">真实姓名</view>
           <view class="weui-cell__ft h3">
-          <input bindblur="name" class="weui-input"  placeholder="{{name}}" placeholder-style="color:#999;font-size:30rpx;" data-wpytyping-a="receiver"/>
+          <input bindblur="name" class="weui-input"  value="{{name}}" placeholder="请输入真实姓名"  placeholder-style="color:#999;font-size:30rpx;" data-wpytyping-a="receiver"/>
         </view>
         </view>
       </view>
@@ -35,8 +35,7 @@
          <view class="weui-cell__ft">
             <picker @change="bindGenderChange" value="{{genderIndex}}" range="{{genders}}">
               <text wx:if="{{genderisundefined}}" style="color:#999;font-size:30rpx;">请选择性别</text>
-              <text wx:elif="{{genderisdefined}}" style="color:#999;font-size:30rpx;">{{sex}}</text>
-              <view wx:else><text class="weui-input">{{genders[genderIndex]}}</text></view>
+              <view wx:else><text class="weui-input" style="font-size:30rpx;">{{genders[genderIndex]}}</text></view>
               </picker>
             </view>
         </view>
@@ -46,7 +45,7 @@
         <view class="weui-cell__bd">
           <view class="weui-label reset-label-left h3">手机号</view>
           <view class="weui-cell__ft h3">
-          <input bindblur="phone" class="weui-input" placeholder="{{phone}}" placeholder-style="color:#999;font-size:30rpx;" data-wpytyping-a="receiver"/>
+          <input bindblur="phone" class="weui-input" value="{{phone}}" placeholder="请输入手机号"  placeholder-style="color:#999;font-size:30rpx;" data-wpytyping-a="receiver"/>
         </view>
         </view>
       </view>
@@ -55,10 +54,24 @@
         <view class="weui-cell__bd">
           <view class="weui-label reset-label-left h3">注册邮箱</view>
           <view class="weui-cell__ft h3">
-          <input bindblur="email" class="weui-input" placeholder="{{email}}" placeholder-style="color:#999;font-size:30rpx;" data-wpytyping-a="receiver"/>
+          <input bindblur="email" class="weui-input" value="{{email}}" placeholder="请输入注册邮箱" placeholder-style="color:#999;font-size:30rpx;"/>
         </view>
         </view>
       </view>
+
+      <view class="weui-cell weui-cell_input">
+      <view class="weui-cell__bd">
+        <view class="weui-label reset-label-left h3">地址<span style="color:red;">*</span></view>
+        <view class="weui-cell__ft">
+          <picker @change="changeRegin" mode = "region" value="{{region}}">
+            <view wx:if="{{regionisundefined}}" style="color:#999;font-size:30rpx;">请选择地址</view>
+            <view wx:else>
+              <text class="weui-input" style="font-size:30rpx;">{{region[0]}} - {{region[1]}} - {{region[2]}}</text>
+            </view>
+          </picker>
+          </view>
+      </view>
+     </view>
 
 
       <!-- <view class="weui-cell weui-cell_input">
@@ -74,7 +87,16 @@
         <view class="weui-cell__bd">
           <view class="weui-label reset-label-left h3">身份证号</view>
           <view class="weui-cell__ft h3">
-          <input bindblur="identityNum" class="weui-input" placeholder="{{identitynum}}" placeholder-style="color:#999;font-size:30rpx;" data-wpytyping-a="receiver"/>
+          <input bindblur="identityNum" class="weui-input" value="{{identitynum}}" placeholder="请输入身份证号码"  placeholder-style="color:#999;font-size:30rpx;" data-wpytyping-a="receiver"/>
+        </view>
+        </view>
+      </view>
+
+      <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__bd">
+          <view class="weui-label reset-label-left h3">当前积分为：</view>
+          <view class="weui-cell__ft h3">
+          <text class="weui-input"  placeholder-style="color:#999;font-size:30rpx;">{{score}}</text>
         </view>
         </view>
       </view>
@@ -95,18 +117,19 @@
 <script>
 import wepy from 'wepy'
 import { service } from '../../../config.js'
-import http from '../../../mixins/http'
 import base from '../../../mixins/base'
 import user from '../../../mixins/user'
+import publicProcess from '../../../mixins/publicProcess'
+
 export default class info extends wepy.page {
-  mixins = [base, http, user];
+  mixins = [base,  user,publicProcess];
   config = {
     navigationBarTitleText: '个人信息',
     enablePullDownRefresh: true
   }
   components = {}
   data = {
-    nickName: '请填写昵称',
+    username: '',
     avatarUrl: '../../../images/icon/icon-avatar@2x.png',
     genders: ['男', '女'],
     genderIndex: 0,
@@ -115,23 +138,17 @@ export default class info extends wepy.page {
       color: 'green'
     },
     genderisundefined: true,
-    genderisdefined: false,
-    sex: '',
-    name:'请填写真实姓名',
-    phone:'请填写有效手机号',
-    identitynum:'请填写您本人的身份证号',
-    email:'请填写有效邮箱地址'
+    score:'',
+    name:'',
+    phone:'',
+    identitynum:'',
+    email:'',
+    // 省市区三级联动初始化
+    region: [],
+    regionindex:[],
+    regionisundefined:true
   }
   computed = {
-    nickName() {
-      const info = this.$parent.globalData.user
-      if(info){
-        return info.nickName
-      }
-      else{
-        return '请填写昵称'
-      } 
-    },
     avatarUrl() {
       const info = this.$parent.globalData.user
       if(info){
@@ -143,13 +160,19 @@ export default class info extends wepy.page {
     }
   }
   methods = {
+    // 选择省市区函数
+     async changeRegin(e){
+      this.region = e.detail.value
+      this.regionisundefined = false
+      this.regionindex = await this.findPosIndex(this.region)
+     },
     saveInfo(){
       this.submit()
       this.$apply()
         //wx.switchTab({url: '/pages/user'})
     },
-    nickname(e){
-      this.nickName = e.detail.value
+    username(e){
+      this.username = e.detail.value
     },
     name(e){
       this.name = e.detail.value
@@ -175,46 +198,36 @@ export default class info extends wepy.page {
     this.$apply()
   }
   async submit(){
-    if (this.nickName =='请填写昵称'){
-      this.nickName = ''
-    }
-    if (this.name =='请填写真实姓名'){
-      this.nickName = ''
-    }
-    if (this.identitynum =='请填写您本人的身份证号'){
-      this.nickName = ''
-    }
-    if (this.email =='请填写有效邮箱地址'){
-      this.nickName = ''
-    }
-    if (this.phone =='请填写有效手机号'){
-      this.nickName = ''
-    }
     let res = await wepy.request({
-      url: service.host + '/changeUserInformation', //开发者服务器接口地址",
+      url: service.host + '/info/'+parseInt(this.$parent.globalData.id), 
       data: {
-        'UserID' :  parseInt(this.$parent.globalData.id),
-        'Gender' : this.sex,
-        'UserName' : this.nickName,
-        'Name': this.name,
-        'IDNumber': this.identitynum,
-        'Email': this.email,
-        'Phone': this.phone
-      }, //请求的参数
+        'gender' : this.genders[this.genderIndex],
+        'username': this.username,
+        'name':this.name,
+        'IDNumber':this.identitynum,
+        'email' :this.email,
+        'phone':this.phone,
+        'province':this.regionindex[0],
+        'city':this.regionindex[1],
+        'district':this.regionindex[2]
+      }, 
       method: 'POST',
     });
-    //console.log(res)
+    console.log(res)
     if(res.data.num==1){
       wx.showToast({
         title: '修改成功',
         icon: 'success',
         duration: 800
       });
+      setTimeout(() => {
+        this.$switch({url:'/pages/user'});
+      }, 800);
     }else{
       wx.showToast({
         title: '修改失败',
         icon: 'loading',
-        duration: 800
+        duration: 2000
       });
     }
     this.$apply()
@@ -223,38 +236,36 @@ export default class info extends wepy.page {
 
   // 初始化页面数据
   async initUserData() {
-    await this.getInfo()
-    await this.getInfoInDB(this.$parent.globalData.id)
-    var userinfo = this.$parent.globalData.userinfo
+    await this.getWeInfo()
     //console.log(userinfo)
+    let res = await wepy.request({
+      url: service.host + '/info', //开发者服务器接口地址",
+      data: {
+        'UserID' :  parseInt(this.$parent.globalData.id)
+      }, //请求的参数
+      method: 'GET',
+    });
+    console.log(res)
     //数据预处理
-    if(userinfo.UserName!=null){
-      this.nickName = userinfo.UserName
-    }
-    if(userinfo.Name!=null){
-      this.name = userinfo.Name
-    }
-    if(userinfo.Gender!=null){
-      this.sex = userinfo.Gender
-    }
-    if(userinfo.Phone!=null){
-      this.phone = userinfo.Phone
-    }
-    if(userinfo.Email!=null){
-      this.email = userinfo.Email
-    }
-    if(userinfo.IDNumber!=null){
-      this.identitynum = userinfo.IDNumber
-    }
-    var info = this.$parent.globalData.user
-    if(info.gender!=null){
-      this.genderisdefined = true
+    this.username = res.data.Account.username
+    this.name = res.data.name
+    this.sex = res.data.gender
+    if(res.data.gender!=null){
       this.genderisundefined = false
-      if(parseInt(info.gender) == 1){
-        this.sex = '男'
+      if(res.data.gender == '女'){
+        this.genderIndex = 1
       }else{
-        this.sex = '女'
+        this.genderIndex = 0
       }
+    }
+    this.phone = res.data.phone
+    this.email = res.data.email
+    this.identitynum = res.data.IDNumber
+    this.score = res.data.score
+    this.regionindex = [res.data.province,res.data.city,res.data.district]
+    this.region = await this.findPosition(this.regionindex)
+    if(this.region[2]!=''){
+      this.regionisundefined = false
     }
     this.$apply()
     

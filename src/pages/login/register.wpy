@@ -66,22 +66,33 @@
             <picker @change="bindGenderChange" value="{{genderIndex}}" range="{{genders}}">
               <text wx:if="{{genderisundefined}}" style="color:#999;font-size:30rpx;">请选择性别</text>
               <!-- <text wx:elif="{{genderisdefined}}" style="color:#999;font-size:30rpx;">{{sex}}</text> -->
-              <view wx:else><text class="weui-input">{{genders[genderIndex]}}</text></view>
+              <view wx:else><text class="weui-input" style="color:#999;font-size:30rpx;">{{genders[genderIndex]}}</text></view>
               </picker>
             </view>
         </view>
      </view>
 
     <!-- <view class="weui-cell weui-cell_input">
-        <view class="weui-cell__bd">
-          <view class="weui-label reset-label-left h3">地址<span style="color:red;">*</span></view>
-         <view class="weui-cell__ft">
-            <picker @change="bindGenderChange" value="{{cityIndex}}" range="{{cityinfo.label}}">
-              <view><text class="weui-input">{{cityIndex}}</text></view>
-              </picker>
+      <view class="tui-picker-name">地址</view>
+      <picker bindchange="changeRegin" mode = "region" value="{{region}}">
+      <view class="tui-picker-detail">{{region[0]}} - {{region[1]}} - {{region[2]}}</view>
+      </picker>
+    </view> -->
+
+    
+    <view class="weui-cell weui-cell_input">
+      <view class="weui-cell__bd">
+        <view class="weui-label reset-label-left h3">地址<span style="color:red;">*</span></view>
+        <view class="weui-cell__ft">
+          <picker @change="changeRegin" mode = "region" value="{{region}}">
+            <view wx:if="{{regionisundefined}}" style="color:#999;font-size:30rpx;">请选择地址</view>
+            <view wx:else>
+              <text class="weui-input" style="color:#999;font-size:30rpx;">{{region[0]}} - {{region[1]}} - {{region[2]}}</text>
             </view>
-        </view>
-     </view> -->
+          </picker>
+          </view>
+      </view>
+     </view>
 
 
       <!-- <view class="weui-cell weui-cell_input">
@@ -91,7 +102,7 @@
           <input bindinput="typing" class="weui-input" value="{{receiver}}" placeholder="请填写地址" placeholder-style="color:#999;font-size:30rpx;" data-wpytyping-a="receiver"/>
         </view>
         </view>
-         </view> -->
+      </view> -->
 
       <view class="weui-cell weui-cell_input">
         <view class="weui-cell__bd">
@@ -111,13 +122,14 @@
 <script>
 import wepy from 'wepy'
 import { service } from '../../config.js'
-import http from '../../mixins/http'
 import base from '../../mixins/base'
 import user from '../../mixins/user'
+import publicProcess from '../../mixins/publicProcess'
+import cityinfo from './cityInfo.js'
 
 
 export default class pageUser extends wepy.page {
-  mixins = [base, http, user]
+  mixins = [base,user,publicProcess]
   config = {
     navigationBarTitleText: '注册',
     enablePullDownRefresh: false
@@ -134,7 +146,11 @@ export default class pageUser extends wepy.page {
     rePassword:'',
     phone:'',
     identitynum:'',
-    email:''
+    email:'',
+    // 省市区三级联动初始化
+    region: [],
+    regionindex:[],
+    regionisundefined:true
   }
 
   computed = {
@@ -167,6 +183,12 @@ export default class pageUser extends wepy.page {
   }
 
   methods = {
+    // 选择省市区函数
+   async changeRegin(e){
+    this.region = e.detail.value
+    this.regionisundefined = false
+    this.regionindex = await this.findPosIndex(this.region)
+   },
     username(e){
       this.username = e.detail.value
     },
@@ -212,14 +234,17 @@ export default class pageUser extends wepy.page {
              'name' : this.name,
              'IDNumber' : this.identitynum,
              'email' : this.email,
-             'phone' : this.phone
+             'phone' : this.phone,
+             'province': this.regionindex[0],
+             'city': this.regionindex[1],
+             'district':this.regionindex[2]
            },
            method: 'POST'
          });
          wepy.showToast({
           title: '请稍等片刻',
           icon:'loading',
-          duration: 20000
+          duration: 2000
         })
          if(res.data.num===1){
           wx.navigateTo({
@@ -251,5 +276,23 @@ export default class pageUser extends wepy.page {
 
 <style lang="less">
 @import "../../styles/custom/fn.less";
+.page-register{
+  .tui-picker-content{
+  padding: 30rpx;
+  text-align: center;
+  }
+  .tui-picker-name{
+  height: 80rpx;
+  line-height: 80rpx;
+  }
+  .tui-picker-detail{
+  height: 80rpx;
+  line-height: 80rpx;
+  background-color: #fff;
+  font-size: 35rpx;
+  padding: 0 10px;
+  overflow: hidden;
+  }
+}
 
 </style>
