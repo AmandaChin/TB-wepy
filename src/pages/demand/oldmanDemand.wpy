@@ -182,7 +182,7 @@
         }
       },
       isLogin() {
-        if(this.$parent.globalData.userinfo !== null){
+        if(this.$parent.globalData.id !== -1){
           return true;
         }else{
           return false;

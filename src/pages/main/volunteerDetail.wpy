@@ -112,7 +112,6 @@
     }
     onPullDownRefresh() {
       this.initPageData()
-      //this.initUserData()
     }
 
     computed = {
@@ -120,7 +119,7 @@
         return Boolean(this.demand && +this.demand.status1 == 0)
       },
       isLogin() {
-        if(this.$parent.globalData.userinfo !== null){
+        if(this.$parent.globalData.id !== -1){
          return true;
         }else{
           return false;
@@ -134,13 +133,7 @@
         }
       }
     }
-     // 初始化页面数据
-    initUserData() {
-      //this.getInfo()
-      console.log('[global]'+this.$parent.globalData.user)
-      
-      this.$apply()
-    }
+     
 
     // 初始化页面数据
     initPageData() {

@@ -149,13 +149,14 @@
         }
       },
       isLogin() {
-        if(this.$parent.globalData.userinfo !== null){
+        if(this.$parent.globalData.id !== -1){
           return true;
         }else{
           return false;
         }
       }
     }
+
     methods = {
       login(){
         wx.navigateTo({
@@ -173,8 +174,7 @@
       bindtypeChange (e) {
         this.typeIndex = e.detail.value
         this.typeisnull = false
-      }
-    methods = {
+      },
       
       bindpaytypeChange (e) {
         this.paytypeIndex = e.detail.value

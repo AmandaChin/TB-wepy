@@ -57,20 +57,11 @@
     }
 
     onShow() {
-      // 初始化页面数据
-      // this.initUserData()
     }
 
     onPullDownRefresh() {
-      // this.initUserData()
     }
-     // 初始化页面数据
-    initUserData() {
-      this.getInfo()
-      this.$apply()
-      console.log(this.$parent.globalData.user)
-      console.log(this.$parent.globalData.id)
-    }
+    
 }
 </script>
 

@@ -91,7 +91,7 @@ export default class pageUser extends wepy.page {
         })
       }
       else if(res.data.num === 3){
-        await this.getWeInfo()
+        //await this.getWeInfo()
         this.$parent.globalData.id = res.data.UserID
         await this.getInfoInDB(res.data.UserID)
         wx.navigateBack()

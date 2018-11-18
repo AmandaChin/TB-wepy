@@ -236,7 +236,7 @@ export default class info extends wepy.page {
 
   // 初始化页面数据
   async initUserData() {
-    await this.getWeInfo()
+    //await this.getWeInfo()
     //console.log(userinfo)
     let res = await wepy.request({
       url: service.host + '/info', //开发者服务器接口地址",

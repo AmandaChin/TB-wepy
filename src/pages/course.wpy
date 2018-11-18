@@ -74,11 +74,7 @@ export default class pageIndex extends wepy.page {
       this.updateOffline()
     }, 200);
   }
-   // 初始化用户数据
-    initUserData() {
-      this.getInfo()
-      this.$apply()
-    }
+   
   // 初始化页面数据
   async initPageData() {
     var id = this.$parent.globalData.id

@@ -17,14 +17,14 @@ export default class userMixin extends wepy.mixin {
       console.log(user)
       return 
     }
-    let code = await wepy.login()
+    //let code = await wepy.login()
     let res = await wepy.getUserInfo()
-    let openid = await wepy.request({
-       url:'https://api.weixin.qq.com/sns/jscode2session?appid=wx01aca083ef813dd0&secret=9c86a02eb57bb9a4db4f920036556c10&js_code='+code.code+'&grant_type=authorization_code',
-       method: 'POST'
-      })
+    // let openid = await wepy.request({
+    //    url:'https://api.weixin.qq.com/sns/jscode2session?appid=wx01aca083ef813dd0&secret=9c86a02eb57bb9a4db4f920036556c10&js_code='+code.code+'&grant_type=authorization_code',
+    //    method: 'POST'
+    //   })
     this.$parent.globalData.user = res.userInfo
-    this.$parent.globalData.openid = openid.data.openid
+    //this.$parent.globalData.openid = openid.data.openid
     this.$apply()
   }
   //获取用户信息

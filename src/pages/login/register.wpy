@@ -167,7 +167,7 @@ export default class pageUser extends wepy.page {
 
   // 初始化页面数据
   async initUserInfo() {
-    await this.getWeInfo();
+    //await this.getWeInfo();
     const info = this.$parent.globalData.user
     if(info.gender!=null){
       this.genderisdefined = true

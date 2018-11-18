@@ -45,16 +45,10 @@ export default class Notice extends wepy.page {
       this.$apply()
     }, 200)
   }
-  // 初始化用户数据
-  async initUserData() {
-      await this.getInfo()
-      return this.$parent.globalData.id
-      this.$apply()
-    }
+
   
   //初始化列表
   async initPageData() {
-      var id = await this.initUserData()
       // 请求列表
       this.updateDemandList(id)
       this.$apply()
