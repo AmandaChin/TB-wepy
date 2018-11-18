@@ -31,7 +31,6 @@ export default class extends wepy.app {
       'pages/user/userinfo/info',
       'pages/user/volunteer/apply',
       'pages/user/volunteer/myVolunteer',
-      'pages/user/userinfo/identity',
       'pages/user/notice/notice',
       'pages/user/notice/detail',
       'pages/demand/oldmanDemand',

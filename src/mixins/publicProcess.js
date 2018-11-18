@@ -143,16 +143,16 @@ export default class userMixin extends wepy.mixin {
         var posIndex = [0,0,0]
         var info = cityinfo.info.cityInfo;
         for(var i=0;i<info.length;i++){
-          if(info[i].label == position[0]){
-            posIndex[0] = info[i].value
-            var city = info[i].children
+          if(info[i].l == position[0]){
+            posIndex[0] = info[i].v
+            var city = info[i].c
             for(var j=0;j<city.length;j++){
-              if(city[j].label == position[1]){
-                posIndex[1] = city[j].value
-                var district = city[j].children
+              if(city[j].l == position[1]){
+                posIndex[1] = city[j].v
+                var district = city[j].c
                 for(var k=0;k<district.length;k++){
-                  if(district[k].label == position[2]){
-                    posIndex[2] = district[k].value
+                  if(district[k].l == position[2]){
+                    posIndex[2] = district[k].v
                     break
                   }
                 }
@@ -167,16 +167,16 @@ export default class userMixin extends wepy.mixin {
         var position = ['','','']
         var info = cityinfo.info.cityInfo;
         for(var i=0;i<info.length;i++){
-          if(info[i].value == posIndex[0]){
-            position[0] = info[i].label
-            var city = info[i].children
+          if(info[i].v == posIndex[0]){
+            position[0] = info[i].l
+            var city = info[i].c
             for(var j=0;j<city.length;j++){
-              if(city[j].value == posIndex[1]){
-                position[1] = city[j].label
-                var district = city[j].children
+              if(city[j].v == posIndex[1]){
+                position[1] = city[j].l
+                var district = city[j].c
                 for(var k=0;k<district.length;k++){
-                  if(district[k].value == posIndex[2]){
-                    position[2] = district[k].label
+                  if(district[k].v == posIndex[2]){
+                    position[2] = district[k].l
                     break
                   }
                 }
