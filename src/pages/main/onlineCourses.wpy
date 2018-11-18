@@ -127,7 +127,6 @@
          
      
     initPageData() {
-      this.isDown()
       wx.stopPullDownRefresh()
     }
     methods = {

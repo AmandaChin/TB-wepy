@@ -24,7 +24,7 @@
         <view class="weui-cells weui-cells_after-title">
           <view class="weui-cell">
               <view class="weui-cell__bd">服务日期：</view>
-              <view class="weui-cell__ft">{{demand.mydate}}</view>
+              <view class="weui-cell__ft">{{demand.date}}</view>
           </view>
           <view class="weui-cell">
               <view class="weui-cell__bd">服务时间：</view>
@@ -32,7 +32,7 @@
           </view>
           <view class="weui-cell">
               <view class="weui-cell__bd">服务对象：</view>
-              <view class="weui-cell__ft">{{demand.author}}</view>
+              <view class="weui-cell__ft">{{demand.name}}</view>
           </view>
           <view class="weui-cell">
               <view class="weui-cell__bd">服务内容：</view>
@@ -96,45 +96,12 @@
       tags: [],
       navigate: false,
       demand: {
-        Serviceid: '',
-        mytime:'',
-        mydate:'',
-        title:'',
-        author:'',
-        pubtime:'',
-        pubcompany:'',
-        status:'',
-        exist: 0
+        
       }
     }
 
     async onLoad(query) {
-      const Serviceid = query && +query.id
-      const title = query && query.title
-      const author = query && query.name
-      const status = query && query.status
-      const mytime = query && query.time
-      const mydate = query && query.date
-      const content = query && query.content
-      const duration = query && query.duration
-      const phone = query && query.phone
-      const authorID = query && query.authorID
-      setTimeout(() => {
-        this.demand = Object.assign({}, this.demand, {
-          Serviceid: Serviceid,
-          title: title,
-          author: author,
-          authorID: authorID,
-          status: status,
-          mytime: mytime,
-          mydate: mydate,
-          content: content,
-          duration: duration,
-          phone: phone,
-          stock: 1
-        })
-        this.$apply()
-      }, 300)
+      this.demand = query
     }
 
     onShow() {
@@ -150,7 +117,7 @@
 
     computed = {
       isEnabled() {
-        return Boolean(this.demand && +this.demand.status == '0')
+        return Boolean(this.demand && +this.demand.status1 == 0)
       },
       isLogin() {
         if(this.$parent.globalData.userinfo !== null){

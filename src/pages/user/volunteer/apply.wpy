@@ -145,7 +145,7 @@ export default class apply extends wepy.page {
       },
       async chooseImage (e) {
           let result = await wepy.chooseImage({
-              count: 4
+              count: 1
           })
           console.log(result)
           for(var i=0;i<result.tempFilePaths.length;i++){
@@ -178,6 +178,11 @@ export default class apply extends wepy.page {
     
       async submit(){
           if(this.remark!=''&&this.files.length>0){
+              wx.showToast({
+                title: '稍等，请勿重复按',
+                icon:'loading',
+                duration: 15000
+                })
               await this.handleNullImg()
                var StartTimestamp = new Date(String(this.realdate) + ' ' + this.realstarttime)
                 var EndTimestamp = new Date(String(this.realdate) + ' ' + this.realendtime)

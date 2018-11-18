@@ -200,13 +200,14 @@ export default class pageIndex extends wepy.page {
         num: item.medal,
         image: this.image[i],
         transferHASH:item.transferHash,
-        time: this.formatDateTime(item.getmedaltime)
+        time: this.formatDateTime(item.getmedaltime),
+        title:'勋章币'
       }
     })
     this.$apply()
   }
   //处理宝石列表
-  getItems(data,i) {
+  getItems2(data,i) {
     //const len = this.list.length
     return this.getArray(data).map((item, index) => {
       // 拼接示例数据
@@ -215,7 +216,8 @@ export default class pageIndex extends wepy.page {
         num: 1,
         image: this.image[i],
         transferHASH:item.transferHash,
-        time: this.formatDateTime(item.getjeweltime)
+        time: this.formatDateTime(item.getjeweltime),
+        title:'宝石币'
       }
     })
     this.$apply()

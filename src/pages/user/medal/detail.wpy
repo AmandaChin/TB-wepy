@@ -1,6 +1,8 @@
 <template>
   <view class="page-hash">
-      <view class="weui-cell weui-cell_input" style="margin-top:20%">
+    <view wx:if="{{type==1}}" class="weui-cells__title" style="font-size: larger;text-align: center;color: #10aefe;">勋章详情</view>
+    <view wx:else class="weui-cells__title" style="font-size: larger;text-align: center;color: #10aefe;">宝石详情</view>
+      <view class="weui-cell weui-cell_input" >
         <view class="weui-cell__bd">
           <view class="weui-label reset-label-left h3">交易区块编号</view>
           <view class="weui-cell__ft h3">
@@ -83,11 +85,11 @@ export default class v2c extends wepy.page {
   async initPageData(){
     if(this.type=='1'){
       let res = await wepy.request({
-         url: service.host + '/transactions'+this.id,
+         url: service.host + '/transactions/'+this.id,
          method: 'GET'
       })
       console.log(res)
-      this.temp = res.data
+      this.temp = res.data.transaction
     }else{
       let res = await wepy.request({
          url: service.host + '/jeweltransactionInfo',
@@ -98,7 +100,7 @@ export default class v2c extends wepy.page {
          method: 'GET'
       })
       console.log(res)
-      this.temp = res.data
+      this.temp = res.data.transaction
     }
     this.$apply()
 

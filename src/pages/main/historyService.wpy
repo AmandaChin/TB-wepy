@@ -19,35 +19,43 @@
                 <view wx:else>我发布的</view>
               </view>
           </view>
-          <view class="weui-cell">
+           <view wx:if="{{serviceList.status1==0}}" class="weui-cell">
+              <view class="weui-cell__bd">志愿者姓名:</view>
+              <view class="weui-cell__ft">{{serviceList.name}}</view>
+          </view>
+          <view wx:if="{{serviceList.status1==0}}" class="weui-cell">
+              <view class="weui-cell__bd">志愿者联系方式:</view>
+              <view class="weui-cell__ft">{{serviceList.phone}}</view>
+          </view>
+          <view wx:if="{{serviceList.status1!=0}}" class="weui-cell">
               <view class="weui-cell__bd">志愿者姓名:</view>
               <view class="weui-cell__ft">{{volunteer.name}}</view>
           </view>
-          <view class="weui-cell">
+          <view wx:if="{{serviceList.status1!=0}}"  class="weui-cell">
               <view class="weui-cell__bd">志愿者性别:</view>
               <view class="weui-cell__ft">{{volunteer.gender}}</view>
           </view>
-          <view class="weui-cell">
+          <view wx:if="{{serviceList.status1!=0}}" class="weui-cell">
               <view class="weui-cell__bd">志愿者身份证号:</view>
               <view class="weui-cell__ft">{{volunteer.IDNumber}}</view>
           </view>
-          <view class="weui-cell">
+          <view wx:if="{{serviceList.status1!=0}}" class="weui-cell">
               <view class="weui-cell__bd">志愿者邮箱地址:</view>
               <view class="weui-cell__ft">{{volunteer.email}}</view>
           </view>
-          <view class="weui-cell">
+          <view wx:if="{{serviceList.status1!=0}}" class="weui-cell">
               <view class="weui-cell__bd">志愿者联系方式:</view>
               <view class="weui-cell__ft">{{volunteer.phone}}</view>
           </view>
-          <view class="weui-cell">
+          <view wx:if="{{serviceList.status1!=0}}" class="weui-cell">
               <view class="weui-cell__bd">服务用户:</view>
               <view class="weui-cell__ft">{{beneficiary.name}}</view>
           </view>
-          <view class="weui-cell">
+          <view wx:if="{{serviceList.status1!=0}}" class="weui-cell">
               <view class="weui-cell__bd">服务用户联系方式:</view>
               <view class="weui-cell__ft">{{beneficiary.phone}}</view>
           </view>
-          <view class="weui-cell">
+          <view wx:if="{{serviceList.status1!=0}}" class="weui-cell">
               <view class="weui-cell__bd">服务用户邮箱地址:</view>
               <view class="weui-cell__ft">{{beneficiary.email}}</view>
           </view>
@@ -104,7 +112,7 @@
           <view class="btn-text-bottom">删除</view>
         </button>
         <button @tap="toEdit" disabled="{{serviceList.status1!=0||this.isOnDate=='true'}}" class="btn-block  btn-flex-full">
-          <block wx:if="{{serviceList.status1==0 && this.isOnDate=='false'}}">
+          <block wx:if="{{serviceList.status1==0}}">
             <image class="imgicon" src="{{icon_edit_active}}" mode="aspectFit"/>
           </block>
           <block wx:else>
@@ -112,8 +120,9 @@
           </block>
           <view class="btn-text-bottom">编辑</view>
         </button>
-        <button @tap="handle()" disabled="{{serviceList.status2==2}}" class="weui-btn btn-block btn-flex-full" type="primary">
-          <text  wx:if="{{serviceList.status2==0}}">申请勋章</text>
+        <button @tap="handle()" disabled="{{serviceList.status2==2||serviceList.status1==0}}" class="weui-btn btn-block btn-flex-full" type="primary">
+          <text  wx:if="{{serviceList.status1==0}}">暂无申请</text>
+          <text  wx:elif="{{serviceList.status2==0}}">申请勋章</text>
           <text  wx:elif="{{serviceList.status2==1}}">查看已审核人数</text>
           <text wx:else>交易已完成</text>
         </button>
@@ -186,24 +195,26 @@
           if(new Date(this.serviceList.endTime).getTime()<new Date().getTime()){
             this.isOnDate = 'true'
           }
-          let beneficiary = await wepy.request({
-            url: service.host + '/service/userinfo', 
-            data: {
-              'ServiceID': Serviceid,
-              'type': 0
-            }, //请求的参数",
-            method: 'GET'
-          });
-          this.beneficiary = beneficiary.data
-          let volunteer = await wepy.request({
-            url: service.host + '/service/userinfo', 
-            data: {
-              'ServiceID': Serviceid,
-              'type': 1
-            }, //请求的参数",
-            method: 'GET'
-          });
-          this.volunteer = volunteer.data
+          if(list[i].status1==1){
+            let beneficiary = await wepy.request({
+              url: service.host + '/service/userinfo', 
+              data: {
+                'ServiceID': Serviceid,
+                'type': 0
+              }, //请求的参数",
+              method: 'GET'
+            });
+            this.beneficiary = beneficiary.data
+            let volunteer = await wepy.request({
+              url: service.host + '/service/userinfo', 
+              data: {
+                'ServiceID': Serviceid,
+                'type': 1
+              }, //请求的参数",
+              method: 'GET'
+            });
+            this.volunteer = volunteer.data
+          }
           break;
         }
       }

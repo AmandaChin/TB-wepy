@@ -24,7 +24,7 @@
         <view class="weui-cells weui-cells_after-title">
           <view class="weui-cell">
               <view class="weui-cell__bd">服务日期：</view>
-              <view class="weui-cell__ft">{{demand.mydate}}</view>
+              <view class="weui-cell__ft">{{demand.date}}</view>
           </view>
           <view class="weui-cell">
               <view class="weui-cell__bd">服务时间：</view>
@@ -32,7 +32,7 @@
           </view>
           <view class="weui-cell">
               <view class="weui-cell__bd">服务对象：</view>
-              <view class="weui-cell__ft">{{demand.author}}</view>
+              <view class="weui-cell__ft">{{demand.name}}</view>
           </view>
           <view class="weui-cell">
               <view class="weui-cell__bd">服务内容：</view>
@@ -84,7 +84,6 @@
   import base from '../../mixins/base'
   import user from '../../mixins/user'
   import Screen from '../../components/screen'
-
   export default class mainDetail extends wepy.page {
     mixins = [base,user]
     config = {
@@ -97,6 +96,8 @@
     }
 
     async onLoad(query) {
+      console.log('demandDetail')
+      console.log(query)
       setTimeout(() => {
         this.demand = query
         this.$apply()
@@ -117,7 +118,7 @@
     computed = {
       isEnabled() {
         //if(this.demand.status1 == '1'||)
-        return Boolean(this.demand && +this.demand.status1 == '1')
+        return Boolean(this.demand && +this.demand.status1 == '0')
       },
       isLogin() {
         if(this.$parent.globalData.userinfo !== null){

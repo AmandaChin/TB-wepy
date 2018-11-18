@@ -56,15 +56,20 @@
     }
     methods = {
       async saveInfo(){
+        wx.showToast({
+          title: '稍等，请勿重复按',
+          icon:'loading',
+          duration: 50000
+        })
         let res = await wepy.request({
             url: service.host + '/score',
             data:{
               'UserID': parseInt(this.$parent.globalData.id),
               'ServiceID': parseInt(this.serviceID),
-              'Score1': parseInt(this.value1),
-              'Score2': parseInt(this.value2),
-              'Score3': parseInt(this.value3),
-              'Score4': parseInt(this.value4),
+              'score1': parseInt(this.value1),
+              'score2': parseInt(this.value2),
+              'score3': parseInt(this.value3),
+              'score4': parseInt(this.value4),
             },
             method: 'POST'
         })
@@ -85,6 +90,9 @@
           duration: 2000
         });
         }
+        setTimeout(() => {
+            wepy.navigateTo({ url: '/pages/user/check/mycheck' });
+        }, 150000);
         this.$apply()
       }
     }

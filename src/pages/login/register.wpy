@@ -227,7 +227,7 @@ export default class pageUser extends wepy.page {
          wepy.showToast({
           title: '请稍等片刻',
           icon:'loading',
-          duration: 2000
+          duration: 20000
         })
          let res = await wepy.request({
            url: service.host + '/register', 

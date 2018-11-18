@@ -13,7 +13,11 @@
       src:"http://www.baidu.com"
     }
     async onLoad(query) {
-      this.src = query.url
+      var src_http = query.url
+      var src_https = 'https'
+      src_https = src_https.concat(src_http.substring(4,src_http.length))
+      console.log(src_https)
+      this.src = src_https
       this.$apply()
     }
   }

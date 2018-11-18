@@ -132,14 +132,16 @@ export default class pageIndex extends wepy.page {
   // 处理图书列表
   getItems(data,len) {
     return this.getArray(data).map((item, index) => {
+      var createdAt = this.formatDateTime(item.createdAt)
+      console.log(createdAt.substring(11,19))
       // 拼接示例数据
       return {
         id: item.ServiceID,
         title: item.serviceContent,
         name: item.name,
         authorID: item.UserID,
-        date: item.createdAt.substring(0,10),
-        time: item.createdAt.substring(11,19),
+        date: createdAt.substring(0,10),
+        mytime: createdAt.substring(11,19),
         content: this.convertHtmlToText(item.remark),
         duration: item.duration,
         phone:item.phone

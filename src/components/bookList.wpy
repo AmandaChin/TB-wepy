@@ -3,7 +3,7 @@
     <view wx:if="{{title}}" class="booklist-name">{{title}}</view>
     <block wx:if="{{list.length > 0}}">
       <block wx:for="{{list}}" wx:key="index">
-        <navigator url="/pages/main/{{page}}?id={{item.id}}&title={{item.title}}&status1={{item.status1}}&status2={{item.status2}}&serviceItem={{item.serviceItem}}&date={{item.date}}&name={{item.name}}&authorID={{item.authorID}}&content={{item.content}}&duration={{item.duration}}&phone={{item.phone}}&mutualtype={{item.mutualtype}}&type={{item.type}}&isOnDate={{item.isOnDate}}" 
+        <navigator url="/pages/main/{{page}}?id={{item.id}}&mytime={{item.mytime}}&title={{item.title}}&status1={{item.status1}}&status2={{item.status2}}&serviceItem={{item.serviceItem}}&date={{item.date}}&name={{item.name}}&authorID={{item.authorID}}&content={{item.content}}&duration={{item.duration}}&phone={{item.phone}}&mutualtype={{item.mutualtype}}&type={{item.type}}&isOnDate={{item.isOnDate}}" 
         class="booklist-item clearfix">
           <view class="booklist-cover-wrapper">
             <image src="{{item.image}}" mode="widthFix" style="width:100%;" />
