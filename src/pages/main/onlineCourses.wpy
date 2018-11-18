@@ -151,7 +151,7 @@
         }else{
           console.log("courseid:"+this.courseid)
           let res = await wepy.request({
-           url: service.host2 + '/online-courses/buy', //开发者服务器接口地址",
+           url: service.host + '/online-courses/buy', //开发者服务器接口地址",
            data: {
              'UserID' : this.$parent.globalData.id,
              'course' : this.courseid

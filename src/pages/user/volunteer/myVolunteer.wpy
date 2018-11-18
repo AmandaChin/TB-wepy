@@ -10,7 +10,6 @@
 import booklist from '../../../components/bookList'
 import wepy from 'wepy'
 import { service } from '../../../config.js'
-import { funImages } from '../../../mixins/demo'
 import base from '../../../mixins/base'
 import user from '../../../mixins/user'
 import publicProcess from '../../../mixins/publicProcess'

@@ -245,7 +245,7 @@
         }
         else if(this.serviceList.status2==1){
           let res = await wepy.request({
-           url: service.host2 + '/check/'+ this.serviceList.id, //开发者服务器接口地址",
+           url: service.host + '/check/'+ this.serviceList.id, //开发者服务器接口地址",
            method: 'GET'
             });
          console.log(res)

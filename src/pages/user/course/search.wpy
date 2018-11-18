@@ -1,0 +1,214 @@
+<template>
+  <view class="main-list">
+    <!-- <view class="main-list-title clearfix" wx:if="{{keywords && keywords.length}}">
+      <view class="pull-left width-8p">
+        <block wx:for="{{keywords}}" wx:key="index">
+          <text wx:if="{{index > 0}}">，</text>
+          <text>{{item}}</text>
+        </block>
+      </view>
+      <text @tap="clearSearch" class="link link-blue pull-right">清空筛选</text>
+    </view> -->
+    <CourseList1 :list.sync="list0" title="线上课程"
+     :loading.sync="loading1" :noMore.sync="noMoreList1"
+     :page.sync="pagetype1" :OrderType.sync="OrderType" ></CourseList1>
+     <CourseList2 :list.sync="list1" title="线下课程"
+     :loading.sync="loading2" :noMore.sync="noMoreList2"
+     :page.sync="pagetype2" :OrderLocation.sync="OrderLocation" ></CourseList2>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import { service } from '../../../config.js'
+  import base from '../../../mixins/base'
+  import publicProcess from '../../../mixins/publicProcess'
+  import CourseList from '../../../components/courseList'
+
+  export default class mainList extends wepy.page {
+    mixins = [base,publicProcess]
+    config = {
+      navigationBarTitleText: '查询课程'
+    }
+    data = {
+      params: '',
+      pagetype1:'onlineCourses',
+    pagetype2:'offlineCourses',
+    noMoreList1: false,
+    loading1: false,
+    noMoreList2: false,
+    loading2: false,
+    list0: [],
+    list1: [],
+      page: 0,
+      size: 5
+    }
+
+    onLoad(query) {
+      let params = query && query.params
+      try {
+        params = JSON.parse(params)
+      } catch (e) {
+        params = {}
+      }
+      this.params = params
+      this.initPageData()
+    }
+
+    onReady() {
+      this.initPageData()
+    }
+
+    onPullDownRefresh() {
+      this.initPageData()
+    }
+
+    onReachBottom() {
+      setTimeout(() => {
+        this.initPageData()
+        this.$apply()
+      }, 200)
+    }
+
+    methods = {
+      clearSearch() {
+        // 清空参数
+        this.params = {}
+        // 初始化页面
+        this.initPageData()
+      }
+    }
+
+    computed = {
+      keywords() {
+        const title = this.params && this.params.title
+        const words = this.params && this.params.key_word
+        const keywords = this.getString(words || title).split(/\s+/g)
+        return keywords.filter((item) => item) || []
+      }
+    }
+
+    // 初始化页面数据
+  initPageData() {
+    // 请求列表
+    this.updateOnline()
+    this.updateOffline()
+  }
+
+  // 更新图书列表
+  async updateOnline() {
+    let res = await wepy.request({
+         url: service.host + '/online-courses',
+         method: 'GET'
+    })
+    var data = res.data
+    console.log(data)
+    // 请求到空列表后就认为没有更多了
+    if (data.length !== 0) {
+      this.noMoreList1 = true
+    }
+    var list = []
+    await this.handlelist1(data,list)
+    this.list0 = this.getItems(list)
+    this.$apply()
+  }
+    async handlelist1(data,list){
+        var input = this.params.key_word
+        for(var i=0;i<data.length;i++){
+        var str = data[i]
+       if (data[i].author.name.match(input)||
+          data[i].author.qualification.tag.match(input)||
+          data[i].author.qualification.level.match(input)||
+          data[i].title.match(input)||
+          data[i].type.match(input)||
+          data[i].abstract.match(input)) {
+            list.push(data[i])
+          }   
+        }
+        this.$apply()
+    }
+
+  async updateOffline() {
+    let res = await wepy.request({
+         url: service.host + '/offline-courses',
+         method: 'GET'
+    })
+    const data = res.data
+    console.log(data)
+    // 请求到空列表后就认为没有更多了
+    if (data.length !== 0) {
+      this.noMoreList2 = true
+    }
+    var list = []
+    await this.handlelist2(data,list)
+    this.list1 = this.getItems(list)
+    this.$apply()
+  }
+
+  async handlelist2(data,list){
+        var input = this.params.key_word
+        for(var i=0;i<data.length;i++){
+        var str = data[i]
+        if (data[i].teacher.name.match(input)||
+          data[i].teacher.qualification.tag.match(input)||
+          data[i].teacher.qualification.level.match(input)||
+          data[i].title.match(input)||
+          data[i].place.match(input)||
+          data[i].content.match(input)) {
+            list.push(data[i])
+          }   
+        this.$apply()
+    }
+  }
+
+    // 处理图书列表
+    getItems(data) {
+    return this.getArray(data).map((item, index) => {
+        var time
+        if(item.date){
+            time = this.formatDateTime(item.date)
+        }else if(item.time){
+            time = this.formatDateTime(item.time)
+        }
+        // 拼接示例数据
+        return {
+            id: item.id,
+            title: item.title,
+            teacher: item.teacher,
+            author: item.author,
+            price: item.price,
+            time: time,
+            content: this.convertHtmlToText(item.content),
+            abstract: this.convertHtmlToText(item.abstract),
+            place: item.place,
+            currentnum:item.currentnum,
+            limit:item.limit,
+            type:item.type
+        }
+    })
+    this.$apply()
+  }
+
+    components = {
+        CourseList1 : CourseList,
+        CourseList2 : CourseList
+    }
+
+  }
+</script>
+
+<style lang="less">
+@import "../../../styles/weui/base/fn.wxss";
+
+.main-list{
+  .width-8p{
+    width: 80% !important;
+  }
+
+  .main-list-title {
+    padding: 1em @weuiCellGapH;
+    color: @weuiTextColorGray;
+    font-size: @weuiCellTipsFontSize;
+  }
+}
+</style>

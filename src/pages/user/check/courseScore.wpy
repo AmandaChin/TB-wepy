@@ -57,7 +57,7 @@
     methods = {
       async saveInfo(){
         let res = await wepy.request({
-            url: service.host2 + '/score',
+            url: service.host + '/score',
             data:{
               'UserID': parseInt(this.$parent.globalData.id),
               'ServiceID': parseInt(this.serviceID),

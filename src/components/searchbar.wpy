@@ -51,7 +51,7 @@
           key_word: this.inputVal || this.placeholder
         }
         wx.navigateTo({
-          url: `/pages/main/list?params=${JSON.stringify(params)}`
+          url: `/pages/user/course/search?params=${JSON.stringify(params)}`
         })
       },
       clearInput (cb) {

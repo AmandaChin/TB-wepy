@@ -188,10 +188,7 @@ export default class apply extends wepy.page {
                   data: {
                       'UserID': parseInt(this.$parent.globalData.id),
                     'ServiceID': this.id,
-                    'material1': this.files[0],
-                    'material2': this.files[1],
-                    'material3': this.files[2],
-                    'material4': this.files[3],
+                    'material': this.files,
                     'startTime': finalbegin,
                     'endTime': finalend,
                     'remark': this.remark

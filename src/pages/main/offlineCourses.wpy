@@ -176,7 +176,7 @@
         }else{
           console.log("courseid:"+this.courseid)
           let res = await wepy.request({
-           url: service.host2 + '/offline-courses/student/application', 
+           url: service.host + '/offline-courses/student/application', 
            data: {
              'UserID' : this.$parent.globalData.id,
              'course' : this.courseid

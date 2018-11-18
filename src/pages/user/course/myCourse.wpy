@@ -13,11 +13,11 @@
                     <view class="weui-tab__content" hidden="{{activeIndex != 0}}">
                       <CourseList1 :list.sync="list1" title=""
                       :page.sync="pagetype1" :OrderType.sync="OrderType" :ownOrder.sync="ownOrder"
-                      :loading.sync="loading" :noMore.sync="noMoreList"> </CourseList1>
+                      :loading.sync="loading1" :noMore.sync="noMoreList1"> </CourseList1>
                     </view>
                     <view class="weui-tab__content" hidden="{{activeIndex != 1}}">
                       <CourseList2 :list.sync="list2" title=""
-                      :loading.sync="loading" :noMore.sync="noMoreList" :ownOrder.sync="ownOrder"
+                      :loading.sync="loading2" :noMore.sync="noMoreList2" :ownOrder.sync="ownOrder"
                       :page.sync="pagetype2" :OrderLocation.sync="OrderLocation"> </CourseList2>
                     </view>
                 </view>
@@ -53,8 +53,10 @@ export default class pageIndex extends wepy.page {
     sliderLeft: 0,
     pagetype1:'myOnlineCourses',
     pagetype2:'myOfflineCourses',
-    noMoreList: false,
-    loading: false,
+    noMoreList1: false,
+    loading1: false,
+    noMoreList2: false,
+    loading2: false,
     list1: [],
     list2: [],
     page: 0,
@@ -111,7 +113,7 @@ export default class pageIndex extends wepy.page {
     const data = res.data
     // 请求到空列表后就认为没有更多了
     if (this.isArray(data) && data.length === 0) {
-      this.noMoreList = true
+      this.noMoreList1 = true
       return
        }
     this.list1 = this.getItems(data,data.length)
@@ -130,7 +132,7 @@ export default class pageIndex extends wepy.page {
     const data = res.data
     // 请求到空列表后就认为没有更多了
     if (this.isArray(data) && data.length === 0) {
-      this.noMoreList = true
+      this.noMoreList2 = true
       return
     }
     this.list2 = this.getItems(data,data.length)

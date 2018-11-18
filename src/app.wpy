@@ -42,6 +42,7 @@ export default class extends wepy.app {
       'pages/user/check/courseScore',
       'pages/user/course/myCourse',
       'pages/user/course/resource',
+      'pages/user/course/search',
       'pages/main/check'
     ],
     window: {
@@ -90,7 +91,7 @@ export default class extends wepy.app {
     //微信信息
     user: null,
     openid: null,
-    id: 20,
+    id: -1,
     //个人信息
     userinfo: null,
   }

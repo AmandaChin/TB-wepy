@@ -230,7 +230,7 @@ export default class pageUser extends wepy.page {
           duration: 2000
         })
          let res = await wepy.request({
-           url: service.host2 + '/register', 
+           url: service.host + '/register', 
            data: {
              'username' : this.username,
              'password' : this.password,

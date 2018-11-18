@@ -28,25 +28,21 @@
         <navigator url="/pages/user/demand/myDemand" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
           <view class="weui-cell__bd">我的需求</view>
           <view class="weui-cell__ft weui-cell__ft_in-access">
-            <!-- <text class="color-green">5</text> -->
           </view>
         </navigator>
         <navigator url="/pages/user/volunteer/myVolunteer" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
           <view class="weui-cell__bd">我的服务</view>
           <view class="weui-cell__ft weui-cell__ft_in-access">
-            <!-- <text class="color-green">20</text> -->
           </view>
         </navigator>
         <navigator url="/pages/user/course/myCourse" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
           <view class="weui-cell__bd">我的课程</view>
           <view class="weui-cell__ft weui-cell__ft_in-access">
-            <!-- <text class="color-green">20</text> -->
           </view>
         </navigator>
         <navigator url="/pages/user/check/mycheck" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
           <view class="weui-cell__bd">
             <view style="display: inline-block; vertical-align: middle">我的审核</view>
-            <view class="weui-badge" style="margin-left: 5px;">New</view> 
           </view>
           <view class="weui-cell__ft weui-cell__ft_in-access">
             <!-- <text class="color-green">1</text> -->
@@ -55,7 +51,7 @@
         <navigator url="/pages/user/notice/notice" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
           <view class="weui-cell__bd">
             <view style="display: inline-block; vertical-align: middle">我的通知</view>
-            <view class="weui-badge" style="margin-left: 5px;">New</view> 
+            <!-- <view class="weui-badge" style="margin-left: 5px;">New</view>  -->
           </view>
           <view class="weui-cell__ft weui-cell__ft_in-access">
             <!-- <text class="color-green">1</text> -->
@@ -98,12 +94,12 @@ export default class pageUser extends wepy.page {
 
   computed = {
     isLogin() {
-        // if(this.$parent.globalData.userinfo !== null){
-        //   return true;
-        // }else{
-        //   return false;
-        // }
-        return true;
+        if(this.$parent.globalData.userinfo !== null){
+          return true;
+        }else{
+          return false;
+        }
+        //return true;
     },
     nickName() {
       const info = this.$parent.globalData.userinfo
@@ -153,7 +149,7 @@ export default class pageUser extends wepy.page {
   async getUserAccount(){
     console.log('get account!')
     let res = await wepy.request({
-      url: service.host2 + '/wallet/'+this.$parent.globalData.id, //开发者服务器接口地址",
+      url: service.host + '/wallet/'+this.$parent.globalData.id, //开发者服务器接口地址",
       method: 'GET'
     });
     this.accountNum = res.data.coins

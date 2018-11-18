@@ -11,12 +11,14 @@
                 </view>
                 <view class="weui-tab__panel">
                     <view class="weui-tab__content" hidden="{{activeIndex != 0}}">
-                      <MedalList1 :list.sync="list1" title=""
-                      :loading.sync="loading" :noMore.sync="noMoreList"> </MedalList1>
+                      <MedalList1 :list.sync="list1" :title.sync="medalnum" type="1"
+                      :loading.sync="loading1" :noMore.sync="noMoreList1"> </MedalList1>
+                      <JewelList1 :list.sync="jlist1" :title.sync="jewelnum" type="0"
+                      :loading.sync="jloading1" :noMore.sync="jnoMoreList1"> </JewelList1>
                     </view>
                     <view class="weui-tab__content" hidden="{{activeIndex != 1}}">
-                      <MedalList2 :list.sync="list2" title=""
-                      :loading.sync="loading" :noMore.sync="noMoreList"> </MedalList2>
+                      <MedalList2 :list.sync="list2" :title.sync="medalnum" type="1"
+                      :loading.sync="loading2" :noMore.sync="noMoreList2"> </MedalList2>
                     </view>
                 </view>
             </view>
@@ -29,13 +31,11 @@
 import wepy from 'wepy'
 import { service } from '../../../config.js'
 import base from '../../../mixins/base'
-import http from '../../../mixins/http'
 import publicProcess from '../../../mixins/publicProcess'
-import { funImages } from '../../../mixins/demo'
 import MedalList from '../../../components/MedalList'
 const sliderWidth = 96; // 需要设置slider的宽度，用于计算中间位置
 export default class pageIndex extends wepy.page {
-  mixins = [base, http,publicProcess]
+  mixins = [base,publicProcess]
   config = {
     navigationBarTitleText: '我的勋章',
     navigationBarTextStyle: 'white',
@@ -47,10 +47,18 @@ export default class pageIndex extends wepy.page {
     activeIndex: 0,
     sliderOffset: 0,
     sliderLeft: 0,
-    noMoreList: false,
-    loading: false,
+    noMoreList1: false,
+    loading1: false,
+    jnoMoreList1: false,
+    jloading1: false,
+    noMoreList2: false,
+    loading2: false,
+    medalnum:'勋章币余额：0.00',
+    jewelnum:'宝石币余额：0.00',
     list1: [],
     list2: [],
+    jlist1: [],
+    jlist2: [],
     image:['http://timebank-icon.oss-cn-beijing.aliyuncs.com/finish.png','http://timebank-icon.oss-cn-beijing.aliyuncs.com/out.png'],
     page: 0,
     size: 5
@@ -94,67 +102,120 @@ export default class pageIndex extends wepy.page {
     // 请求列表
     this.updateHaveGotList()
     this.updateApplyList()
+    this.updateJewelHaveGotList()
+    this.getMedalNum()
+    this.getJewelNum()
   }
-   // 更新图书列表
+  //获取勋章及宝石币余额
+  async getMedalNum(){
+    let res = await wepy.request({
+         url: service.host + '/wallet/'+ parseInt(this.$parent.globalData.id),
+         method: 'GET'
+    })
+    var num = res.data.coins
+    this.medalnum = '勋章币余额：'+ parseFloat(num).toFixed(2)
+    this.$apply()
+  }
+  async getJewelNum(){
+    let res = await wepy.request({
+         url: service.host + '/jewelwallet/'+parseInt(this.$parent.globalData.id),
+         method: 'GET'
+    })
+    var num = res.data.coins
+    this.jewelnum = '宝石币余额：'+ parseFloat(num).toFixed(2)
+    this.$apply()
+  }
+   //更新勋章列表
   async updateHaveGotList() {
     //if (this.loading || this.noMoreList) return
     let res = await wepy.request({
-         url: service.host + '/getGetInfo',
+         url: service.host + '/transactions',
          data:{
-           //'UserID': 2
-           'UserID': parseInt(this.$parent.globalData.id)
+           'UserID': parseInt(this.$parent.globalData.id),
+           'type' : 1
          },
-         method: 'POST'
+         method: 'GET'
     })
     console.log(res)
-    const list = res.data.list
-    const data = list.rows
+    const list = res.data
     // 请求到空列表后就认为没有更多了
-    if (this.isArray(data) && data.length === 0) {
-      this.noMoreList = true
+    if (this.isArray(list) && list.length === 0) {
+      this.noMoreList1 = true
       return
        }
-    this.list1 = this.getItems(data,0)
+    this.list1 = this.getItems(list,0)
     this.$apply()
 
   }
   async updateApplyList() {
     //if (this.loading || this.noMoreList) return
     let res = await wepy.request({
-         url: service.host + '/getGiveInfo',
+         url: service.host + '/transactions',
          data:{
-           //'UserID': 2
-           'UserID': parseInt(this.$parent.globalData.id)
+           'UserID': parseInt(this.$parent.globalData.id),
+           'type': 0
          },
-         method: 'POST'
+         method: 'GET'
     })
-    console.log('update')
     console.log(res)
-    const list = res.data.list
-    const data = list.rows
+    const list = res.data
     // 请求到空列表后就认为没有更多了
-    if (this.isArray(data) && data.length === 0) {
-      this.noMoreList = true
+    if (this.isArray(list) && list.length === 0) {
+      this.noMoreList2 = true
       return
        }
-    this.list2 = this.getItems(data,1)
+    this.list2 = this.getItems(list,1)
     this.$apply()
 
   }
+  //更新宝石列表
+   async updateJewelHaveGotList() {
+    //if (this.loading || this.noMoreList) return
+    let res = await wepy.request({
+         url: service.host + '/jeweltransactions',
+         data:{
+           'UserID': parseInt(this.$parent.globalData.id)
+         },
+         method: 'GET'
+    })
+    console.log(res)
+    const list = res.data
+    // 请求到空列表后就认为没有更多了
+    if (this.isArray(list) && list.length === 0) {
+      this.jnoMoreList1 = true
+      return
+       }
+    this.jlist1 = this.getItems2(list,0)
+    this.$apply()
+  }
 
-  // 处理列表
+
+  // 处理勋章列表
   getItems(data,i) {
     //const len = this.list.length
     return this.getArray(data).map((item, index) => {
       // 拼接示例数据
       return {
         serviceId: item.ServiceID,
-        userId: item.volunteerID,
-        title: '交易信息',
-        num: item.medalnum,
+        num: item.medal,
         image: this.image[i],
-        transferHASH:item.TransferHASH,
-        time: item.getmedaltime.substring(0,10)
+        transferHASH:item.transferHash,
+        time: this.formatDateTime(item.getmedaltime)
+      }
+    })
+    this.$apply()
+  }
+  //处理宝石列表
+  getItems(data,i) {
+    //const len = this.list.length
+    return this.getArray(data).map((item, index) => {
+      // 拼接示例数据
+      return {
+        serviceId: item.ServiceID,
+        num: 1,
+        image: this.image[i],
+        transferHASH:item.transferHash,
+        time: this.formatDateTime(item.getjeweltime)
       }
     })
     this.$apply()
@@ -162,7 +223,8 @@ export default class pageIndex extends wepy.page {
 
   components = {
     MedalList1 : MedalList,
-    MedalList2 : MedalList
+    MedalList2 : MedalList,
+    JewelList1 : MedalList
   }
 }
 </script>

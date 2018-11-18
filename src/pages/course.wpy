@@ -1,7 +1,7 @@
 <template>
   <view class="page-index">
-    <!-- <SearchBar :placeholder="searchText"></SearchBar> -->
-    <navigator url="/pages/main/search" redirect="false" hover-class="navigator-hover" open-type="navigate|redirect|switchTab">
+    <SearchBar :placeholder="searchText" ></SearchBar>
+    <!-- <navigator url="/pages/main/searchCourse" redirect="false" hover-class="navigator-hover" open-type="navigate|redirect|switchTab">
     <view class="weui-search-bar">
       <view class="weui-search-bar__form">
         <view class="weui-search-bar__box">
@@ -14,7 +14,7 @@
         </label>
       </view>
     </view>
-    </navigator>
+    </navigator> -->
     <CourseList1 :list.sync="list0" title="线上课程"
      :loading.sync="loading1" :noMore.sync="noMoreList1"
      :page.sync="pagetype1" :OrderType.sync="OrderType" ></CourseList1>
@@ -41,6 +41,7 @@ export default class pageIndex extends wepy.page {
     navigationBarBackgroundColor: '#049BFF'
   }
   data = {
+    searchText:'搜索感兴趣的课程信息',
     OrderType:true,
     OrderLocation:true,
     inputShowed: false,

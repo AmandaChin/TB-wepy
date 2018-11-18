@@ -3,7 +3,7 @@
     <view wx:if="{{title}}" class="booklist-name">{{title}}</view>
     <block wx:if="{{list.length > 0}}">
       <block wx:for="{{list}}" wx:key="index">
-        <navigator url="/pages/user/medal/detail?id={{item.userId}}&transferHASH={{item.transferHASH}}" 
+        <navigator url="/pages/user/medal/detail?id={{item.ServiceID}}&type={{type}}" 
         class="booklist-item clearfix">
           <view class="booklist-cover-wrapper">
             <image src="{{item.image}}" mode="widthFix" style="width:100%;" />

@@ -1,6 +1,6 @@
 <template>
   <view class="page-index">
-    <view class="navbar page">
+    <view wx:if="{{canCheck}}" class="navbar page">
         <view class="page__bd">
             <view class="weui-tab">
                 <view class="weui-navbar">
@@ -38,6 +38,12 @@
             </view>
         </view>
     </view>
+    <view wx:else class="text-center tip-page page-borrow-tip">
+      <block>
+        <icon class="tip-icon" type="cancel" size="70" color="#bbb"></icon>
+        <view class="h4">您没有审核权限哦~</view>
+      </block>
+   </view>
   </view>
 </template>
 
@@ -84,7 +90,8 @@ export default class pageIndex extends wepy.page {
     pagetype3:'teacherdetail',
     image:['http://timebank-icon.oss-cn-beijing.aliyuncs.com/finish.png','http://timebank-icon.oss-cn-beijing.aliyuncs.com/out.png'],
     page: 0,
-    size: 5
+    size: 5,
+    canCheck:''
   }
   methods = {
     tabClick (e) {
@@ -98,6 +105,15 @@ export default class pageIndex extends wepy.page {
     this.sliderLeft = (res.windowWidth / this.tabs.length - sliderWidth) / 2;
     this.sliderOffset = res.windowWidth / this.tabs.length * this.activeIndex;
 
+    let judgeCheck = await wepy.request({
+      url: service.host + '/judge', //开发者服务器接口地址",
+      data: {
+        'id': parseInt(this.$parent.globalData.id)
+      },
+      method: 'GET'
+      
+    });
+    this.canCheck = judgeCheck.data.num
     this.initPageData()
     this.$apply()
   }
@@ -194,6 +210,15 @@ export default class pageIndex extends wepy.page {
     this.$apply()
   }
 
+  computed ={
+    canCheck() {
+        if(this.canCheck == 1){
+          return true;
+        }else{
+          return false;
+        }
+    },
+  }
 
   //更新待审核列表
   async getServiceCheckingList() {

@@ -29,7 +29,8 @@
 
       <view class="weui-cell weui-cell_input">
         <view class="weui-cell__bd">
-          <view class="weui-label reset-label-left h3">勋章去向</view>
+          <view wx:if="{{type==1}}" class="weui-label reset-label-left h3">勋章去向</view>
+          <view wx:else class="weui-label reset-label-left h3">宝石币去向</view>
           <view class="weui-cell__ft h3">
           <view style=" word-break: break-all">{{temp.to}}</view>
         </view>
@@ -41,41 +42,26 @@
 <script>
 import wepy from 'wepy'
 import base from '../../../mixins/base'
-import http from '../../../mixins/http'
 import { service } from '../../../config.js'
 
 export default class v2c extends wepy.page {
-  mixins = [base, http]
+  mixins = [base]
   config = {
     navigationBarTitleText: '勋章详情',
     enablePullDownRefresh: false
   }
   components = {}
   data = {
-    info:{
-      id:'',
-      transferHASH:''
-    },
-    temp: {
-        blockNumber:"加载中",
-        blockHash: "加载中",
-        transactionHash:"加载中",
-        to:"加载中",
-         }
+    id:'',
+    type:'',
+    temp:''
   }
   computed = {}
   async onLoad(query) {
       console.log(query)
-      const id = query && +query.id
-      const transferHASH = query && query.transferHASH
-      setTimeout(() => {
-        this.info = Object.assign({}, this.info, {
-          id: id,
-          transferHASH: transferHASH
-        })
-        this.initPageData()
-        this.$apply()
-      }, 300)
+      this.id = query && +query.id
+      this.type =  query.type
+      this.initPageData()
     }
 
   onShow() {
@@ -95,23 +81,25 @@ export default class v2c extends wepy.page {
 
   // 初始化页面数据
   async initPageData(){
-    console.log('updateDetail'+this.info.id)
-    console.log(this.info.transferHASH)
-    //if (this.loading || this.noMoreList) return
-    let res = await wepy.request({
-         url: service.host + '/getTransactionInfo',
+    if(this.type=='1'){
+      let res = await wepy.request({
+         url: service.host + '/transactions'+this.id,
+         method: 'GET'
+      })
+      console.log(res)
+      this.temp = res.data
+    }else{
+      let res = await wepy.request({
+         url: service.host + '/jeweltransactionInfo',
          data:{
-           'UserId': this.info.id,
-           'transactionHash': this.info.transferHASH
+           "UserID":  parseInt(this.$parent.globalData.id),
+          "ServiceID": this.id
          },
-         method: 'POST'
-    })
-    console.log(res)
-    const data = res.data.list
-    this.temp.blockNumber = data.blockNumber
-    this.temp.blockHash = data.blockHash
-    this.temp.transactionHash = data.transactionHash
-    this.temp.to = data.to
+         method: 'GET'
+      })
+      console.log(res)
+      this.temp = res.data
+    }
     this.$apply()
 
   }
