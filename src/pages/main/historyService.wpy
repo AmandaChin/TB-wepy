@@ -2,7 +2,7 @@
   <view class="main-detail">
     <view class="weui-panel">
       <view class="page__hd">
-            <view class="page__title" style="text-align:center;">服务信息</view>
+            <view class="page__title" style="font-size: larger;text-align: center;color: #10aefe;">服务信息</view>
         </view>
     
       <view class="page__bd">
@@ -15,28 +15,74 @@
           <view class="weui-cell">
               <view class="weui-cell__bd">订单属性：</view>
               <view class="weui-cell__ft">
-                <view wx:if="{{serviceList.mutualtype}} == 0">我响应的</view>
+                <view wx:if="{{serviceList.type== 0}}">我响应的</view>
                 <view wx:else>我发布的</view>
               </view>
+          </view>
+          <view class="weui-cell">
+              <view class="weui-cell__bd">志愿者姓名:</view>
+              <view class="weui-cell__ft">{{volunteer.name}}</view>
+          </view>
+          <view class="weui-cell">
+              <view class="weui-cell__bd">志愿者性别:</view>
+              <view class="weui-cell__ft">{{volunteer.gender}}</view>
+          </view>
+          <view class="weui-cell">
+              <view class="weui-cell__bd">志愿者身份证号:</view>
+              <view class="weui-cell__ft">{{volunteer.IDNumber}}</view>
+          </view>
+          <view class="weui-cell">
+              <view class="weui-cell__bd">志愿者邮箱地址:</view>
+              <view class="weui-cell__ft">{{volunteer.email}}</view>
+          </view>
+          <view class="weui-cell">
+              <view class="weui-cell__bd">志愿者联系方式:</view>
+              <view class="weui-cell__ft">{{volunteer.phone}}</view>
+          </view>
+          <view class="weui-cell">
+              <view class="weui-cell__bd">服务用户:</view>
+              <view class="weui-cell__ft">{{beneficiary.name}}</view>
+          </view>
+          <view class="weui-cell">
+              <view class="weui-cell__bd">服务用户联系方式:</view>
+              <view class="weui-cell__ft">{{beneficiary.phone}}</view>
+          </view>
+          <view class="weui-cell">
+              <view class="weui-cell__bd">服务用户邮箱地址:</view>
+              <view class="weui-cell__ft">{{beneficiary.email}}</view>
           </view>
           <view class="weui-cell">
               <view class="weui-cell__bd">服务内容：</view>
               <view class="weui-cell__ft">{{serviceList.serviceContent}}</view>
           </view>
           <view class="weui-cell">
-              <view class="weui-cell__bd">开始时间：</view>
-              <view class="weui-cell__ft">{{DemandStartTime}}</view>
+              <view class="weui-cell__bd">服务日期</view>
+              <view class="weui-cell__ft">{{mydate}}</view>
           </view>
           <view class="weui-cell">
-              <view class="weui-cell__bd">结束时间:</view>
-              <view class="weui-cell__ft">{{DemandEndTime}}</view>
+              <view class="weui-cell__bd">服务时段:</view>
+              <view class="weui-cell__ft">{{DemandStartTime}} -- {{DemandEndTime}}</view>
+          </view>
+          <view class="weui-cell">
+              <view class="weui-cell__bd">服务时长:</view>
+              <view class="weui-cell__ft">{{serviceList.duration}}小时</view>
+          </view>
+          <view class="weui-cell">
+          <view class="weui-cell__bd">
+              <view wx:if="{{serviceList.type==0}}" class="weui-label reset-label-left">老人需求详情</view>
+              <view wx:else class="weui-label reset-label-left">志愿者提供服务详情</view>
+              <view class="weui-cell__ft">
+                  <view style=" word-break: break-all">{{remark}}</view>
+              </view>
+          </view>
           </view>
           <view class="weui-cell">
               <view class="weui-cell__bd">当前状态:</view>
               <view class="weui-cell__ft">
                 <view class="color-green" wx:if="{{serviceList.status1 == 0}}">未响应</view>                
-                <view class="color-green" wx:if="{{serviceList.status2==0}}">未完成勋章申请</view>
-                <view class="color-blue" wx:elif="{{serviceList.status2==1}} ">已完成勋章申请</view>
+                <view class="color-green" wx:elif="{{serviceList.status2 == 0}}">未完成勋章申请</view>
+                <view class="color-blue" wx:elif="{{serviceList.status2 == 1}} ">已完成勋章申请</view>
+                <view class="color-gray" wx:elif="{{serviceList.status2 == -1}} ">审核未通过</view>
                 <view wx:else>交易已完成</view>
               </view>
           </view>
@@ -73,15 +119,6 @@
         </button>
       </view>
     </Screen>
-     <!-- <Screen class="fixed-bottom">
-      <view style="display: flex;">
-          <button @tap="handle()" disabled="{{serviceList.status2==2}}" class="weui-btn btn-block btn-flex-full" type="primary">
-            <text  wx:if="{{serviceList.status2==0}}">申请勋章</text>
-            <text  wx:elif="{{serviceList.status2==1}}">查看已审核人数</text>
-            <text wx:else>交易已完成</text>
-          </button>
-      </view>
-    </Screen> -->
 
   </view>
 </template>
@@ -101,7 +138,10 @@
     }
 
     data = {
+      beneficiary:'',
+      volunteer:'',
       createtime:'',
+      mydate:'',
       DemandStartTime:'',
       DemandEndTime:'',
       serviceList:[],
@@ -111,6 +151,7 @@
       icon_edit_active: '/images/icon/icon-edit-active.png',
       navigate: false,
       demand: {},
+      remark:'',
       isOnDate: 'false'
     }
 
@@ -136,12 +177,33 @@
       for(var i=0;i<list.length;i++){
         if(list[i].id == Serviceid){
           this.serviceList = list[i]
+          console.log(list[i])
           this.createtime = this.IsformatDate(this.serviceList.createdAt)
-          this.DemandStartTime = this.IsformatDate(this.serviceList.startTime)
-          this.DemandEndTime = this.IsformatDate(this.serviceList.endTime)
+          this.mydate = this.IsformatDate(this.serviceList.startTime).substring(0,10)
+          this.DemandStartTime = this.IsformatDate(this.serviceList.startTime).substring(11,19)
+          this.DemandEndTime = this.IsformatDate(this.serviceList.endTime).substring(11,19)
+          this.remark = this.convertHtmlToText(this.serviceList.remark)
           if(new Date(this.serviceList.endTime).getTime()<new Date().getTime()){
             this.isOnDate = 'true'
           }
+          let beneficiary = await wepy.request({
+            url: service.host + '/service/userinfo', 
+            data: {
+              'ServiceID': Serviceid,
+              'type': 0
+            }, //请求的参数",
+            method: 'GET'
+          });
+          this.beneficiary = beneficiary.data
+          let volunteer = await wepy.request({
+            url: service.host + '/service/userinfo', 
+            data: {
+              'ServiceID': Serviceid,
+              'type': 1
+            }, //请求的参数",
+            method: 'GET'
+          });
+          this.volunteer = volunteer.data
           break;
         }
       }
@@ -178,7 +240,7 @@
       async handle() {
         if(this.serviceList.status2==0){
           wx.navigateTo({
-            url: '/pages/user/volunteer/apply?Serviceid='+this.serviceList.id
+            url: '/pages/user/volunteer/apply?Serviceid='+this.serviceList.id+'&date='+this.mydate+'&starttime='+this.DemandStartTime+'&endtime='+this.DemandEndTime
           })
         }
         else if(this.serviceList.status2==1){

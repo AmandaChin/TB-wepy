@@ -1,0 +1,264 @@
+<template>
+  <view class="page-service">
+    <view class="weui-panel">
+      <view class="page__bd">
+        <view class="weui-cells__title" style="font-size: larger;text-align: center;color: #10aefe;">服务记录</view>
+        <view class="weui-cells weui-cells_after-title">
+          <view class="weui-cell">
+            <view class="weui-cell__bd">服务用户</view>
+            <view class="weui-cell__ft">{{applyInfo.OldManName}}</view>
+          </view>
+          <view class="weui-cell">
+            <view class="weui-cell__bd">志愿者</view>
+            <view class="weui-cell__ft">{{applyInfo.volunteerName}}</view>
+          </view>
+          <view class="weui-cell">
+            <view class="weui-cell__bd">服务日期</view>
+            <view class="weui-cell__ft">{{mydate}}</view>
+          </view>
+          <view class="weui-cell">
+            <view class="weui-cell__bd">服务时段</view>
+            <view class="weui-cell__ft">{{starttime+"-"+endtime}}</view>
+          </view>
+          <view class="weui-cell">
+            <view class="weui-cell__bd">服务时长</view>
+            <view class="weui-cell__ft">{{applyInfo.duration+"h"}}</view>
+          </view>
+          <view class="weui-cell">
+            <view class="weui-cell__bd">服务内容</view>
+            <view class="weui-cell__ft">{{applyInfo.content}}</view>
+          </view>
+          <view class="weui-cell">
+            <view class="weui-cell__bd">
+              <view class="weui-label reset-label-left h3">志愿者自述</view>
+              <view class="weui-cell__ft h3">
+              <view style=" word-break: break-all">{{ remark }}</view>
+            </view>
+            </view>
+          </view>
+          <view class="weui-cell">
+            <view class="weui-cell__bd">
+              <view class="weui-label reset-label-left h3">审核材料</view>
+              <view class="weui-cell__ft h3">
+              <image src="{{meterial.Material1}}"/>
+              <image src="{{meterial.Material2}}"/>
+              <image src="{{meterial.Material3}}"/>
+              <image src="{{meterial.Material4}}"/>
+            </view>
+        </view>
+      </view>
+        </view>
+      </view>
+    </view>
+    <Screen class="fixed-bottom">
+      <view wx:if="{{status==1}}" style="display: flex;">
+        <button @tap="check()" class="weui-btn btn-block btn-flex-full" type="primary">
+          <text>审 核</text>
+        </button>
+      </view>
+    </Screen>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import base from '../../../mixins/base'
+import publicProcess from '../../../mixins/publicProcess'
+import Screen from '../../../components/screen'
+import { service } from '../../../config.js'
+export default class serviceDetail extends wepy.page {
+  mixins = [base, publicProcess]
+  config = {
+    navigationBarTitleText: '审核详情',
+    enablePullDownRefresh: false
+  }
+  components = {}
+  data = {
+    serviceid:'',
+    status:'',
+    applyInfo: '',
+    starttime:'',
+    endtime:'',
+    mydate:'',
+    remark:'',
+    meterial:''
+  }
+  computed = {}
+  async onLoad(query) {
+      this.serviceid = query.id
+      this.status = query.status
+      let serviceRes = await wepy.request({
+         url: service.host + '/reviwer/list',
+         data:{
+           'UserID': parseInt(this.$parent.globalData.id),
+           'status': 1-parseInt(this.status)
+         },
+         method: 'GET'
+     })
+      await this.findList(serviceRes.data,query.id)
+      let meterial = await wepy.request({
+         url: service.host + '/material/'+query.id,
+         method: 'GET'
+     })
+     console.log(meterial)
+     this.meterial = meterial.data
+      this.$apply()
+    }
+
+  async findList(list,id){
+    for(var i=0;i<list.length;i++){
+      if(list[i].serviceId == id){
+        this.applyInfo = list[i]
+        console.log(list[i])
+        var starttime = this.formatDateTime(list[i].startTime)
+        var endtime = this.formatDateTime(list[i].endTime)
+        this.mydate = starttime.substring(0,10)
+        this.starttime = starttime.substring(11,19)
+        this.endtime = endtime.substring(11,19)
+        this.remark = this.convertHtmlToText(list[i].remark)
+        break
+      }
+    }
+    this.$apply()
+  }
+
+  methods = {
+    check(){
+      wx.navigateTo({
+        url: '/pages/user/check/courseScore?id='+this.serviceid,
+      })
+    }
+  }
+
+  onShow() {
+  }
+
+  onPullDownRefresh() {
+  }
+
+  onReachBottom() {
+    
+  }
+
+  components = {
+      Screen
+  }
+}
+</script>
+
+
+<style lang="less">
+@import "../../../styles/custom/fn.less";
+
+.page-service{
+  .weui-cell__ft{
+    color: black;
+  }
+  .weui-cell{
+    margin:10rpx;
+  }
+  .detail-tags{
+    .h4();
+    padding: 0.4em 0;
+  }
+  .btn-flex-1{
+    padding: 0;
+    width: 3.5em;
+    line-height: 1.6;
+    overflow: hidden;
+  }
+  .btn-flex-full{
+    flex: 1 1 auto;
+  }
+  .btn-text-bottom{
+    .h5();
+    line-height: 1;
+    color: #777;
+  }
+.toast-box {
+    width: 100%;
+    height: 100%;
+    opacity: 1;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+}
+ 
+.toastbg {
+    opacity: 0.2;
+    background-color: black;
+    position: absolute;
+    width: 100%;
+    min-height: 100vh;
+}
+ 
+.showToast {
+    position: absolute;
+    opacity: 1;
+    width: 70%;
+    margin-left: 15%;
+    margin-top: 40%;
+}
+ 
+.toast-title {
+    padding-left: 5%;
+    background-color: #2196f3;
+    color: white;
+    padding-top: 2vh;
+    padding-bottom: 2vh;
+    border-top-right-radius: 16rpx;
+    border-top-left-radius: 16rpx;
+}
+ 
+.toast-main {
+    padding-top: 2vh;
+    padding-bottom: 2vh;
+    background-color: white;
+    text-align: center;
+}
+ 
+.toast-input {
+    margin-left: 5%;
+    margin-right: 5%;
+    border: 1px solid #ddd;
+    padding-left: 2vh;
+    padding-right: 2vh;
+    padding-top: 1vh;
+    padding-bottom: 1vh;
+}
+ 
+.toast-button {
+    display: flex;
+}
+ 
+.button1 {
+    width: 50%;
+}
+ 
+.button2 {
+    width: 50%;
+}
+ 
+.button1 button {
+    width: 100%;
+    background-color: white;
+    color: red;
+    border-radius: 0px;
+    border-bottom-left-radius: 16rpx;
+}
+ 
+.button2 button{
+    width: 100%;
+    background-color: white;
+    color: black;
+    border-radius: 0px;
+    border-bottom-right-radius: 16rpx;
+}
+ 
+.picker {
+    padding-top: 1vh;
+    padding-bottom: 1vh;
+}
+}
+</style>
+

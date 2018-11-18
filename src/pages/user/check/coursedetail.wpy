@@ -1,0 +1,355 @@
+<template>
+  <view class="page-service">
+    <view class="weui-panel">
+      <view class="weui-cells__title" style="font-size: larger;text-align: center;color: #10aefe;">课程审核</view>      
+      <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__bd">
+          <view class="weui-label reset-label-left h3">课程标题</view>
+          <view class="weui-cell__ft h3">
+          <view style=" word-break: break-all">{{ temp.course.title }}</view>
+        </view>
+        </view>
+      </view>
+
+      <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__bd">
+          <view class="weui-label reset-label-left h3">姓名</view>
+          <view class="weui-cell__ft h3">
+          <view style=" word-break: break-all">{{temp.author.name }}</view>
+        </view>
+        </view>
+      </view>
+
+      <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__bd">
+          <view class="weui-label reset-label-left h3">授课时间</view>
+          <view class="weui-cell__ft h3">
+          <view style=" word-break: break-all">{{coursetime }}</view>
+        </view>
+        </view>
+      </view>
+
+      <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__bd">
+          <view class="weui-label reset-label-left h3">上传时间</view>
+          <view class="weui-cell__ft h3">
+          <view style=" word-break: break-all">{{posttime}}</view>
+        </view>
+        </view>
+      </view>
+
+      <view wx:if="{{status==0}}" class="weui-cell weui-cell_input">
+        <view class="weui-cell__bd">
+          <view class="weui-label reset-label-left h3">审核结果</view>
+          <view class="weui-cell__ft h3">
+          <view wx:if="{{temp.result==1}}" style=" word-break: break-all;" class="color-green">通过</view>
+          <view wx:else style=" word-break: break-all;" class = "color-red">未通过</view>
+        </view>
+        </view>
+      </view>
+
+       <view wx:if="{{status==0}}" class="weui-cell weui-cell_input">
+        <view class="weui-cell__bd">
+          <view class="weui-label reset-label-left h3">审核评价</view>
+          <view class="weui-cell__ft h3">
+          <view style=" word-break: break-all">{{temp.remark}}</view>
+        </view>
+        </view>
+      </view>
+
+      <view wx:if="{{status==1}}" class="weui-cell weui-cell_input">
+        <view class="weui-cell__bd">
+          <view class="weui-label reset-label-left h3">审核材料</view>
+          <view class="weui-cell__ft h3">
+          <image src="{{temp.material1}}"/>
+          <image src="{{temp.material2}}"/>
+          <image src="{{temp.material3}}"/>
+        </view>
+        </view>
+      </view>
+    </view>
+    <Screen class="fixed-bottom">
+      <view wx:if="{{status==1}}" style="display: flex;">
+        <button @tap="check()" class="weui-btn btn-block btn-flex-full" type="primary">
+          <text>审 核</text>
+        </button>
+      </view>
+    </Screen>
+    
+    <view class='toast-box' hidden='{{!check}}'>
+      <view class='toastbg'></view>
+      <view class='showToast'>
+          <view class='toast-title'>
+              <text>提交审核</text>
+          </view>
+          <view class='toast-main'>
+            <view class="weui-cells weui-cells_after-title">
+                <radio-group @change="radioChange">
+                    <label class="weui-cell weui-check__label" wx:for="{{radioItems}}" wx:key="value">
+                        <radio class="weui-check" value="{{item.value}}" checked="{{item.checked}}"/>
+                        <view class="weui-cell__bd">{{item.name}}</view>
+                        <!-- <view class="weui-cell__ft weui-cell__ft_in-radio" wx:if="{{item.checked}}">
+                            <icon class="weui-icon-radio" type="success_no_circle" size="16"></icon>
+                        </view> -->
+                    </label>
+                </radio-group>
+            </view>
+            <view class='toast-input'>
+                <input  @input="bindTextAreaInput" placeholder='请填写备注评价'  style="height: 3.0em" />
+            </view>
+          </view>
+          <view class='toast-button'>
+              <view class='button1'>
+                  <button @tap='cancel'>取消</button>
+              </view>
+              <view class='button2'>
+                  <button @tap='confirm'>确定</button>
+              </view>
+          </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import base from '../../../mixins/base'
+import publicProcess from '../../../mixins/publicProcess'
+import Screen from '../../../components/screen'
+import { service } from '../../../config.js'
+
+export default class serviceDetail extends wepy.page {
+  mixins = [base, publicProcess]
+  config = {
+    navigationBarTitleText: '审核详情',
+    enablePullDownRefresh: false
+  }
+  components = {}
+  data = {
+    id:'',
+    status:'',
+    temp: '',
+    coursetime:'',
+    posttime:'',
+    check:false,
+    radioItems: [
+      {name: '通过', value: '1', checked: true},
+      {name: '不通过', value: '0', checked: false}
+    ],
+    checkRes:1,
+    content:''
+  }
+  computed = {
+    
+  }
+  async onLoad(query) {
+      this.id = query.id
+      this.status = query.status
+      var API=''
+      if(this.status==0){
+        API = '/offline-courses/checked'
+      }else{
+        API = '/offline-courses/unchecked'
+      }
+      let courseRes = await wepy.request({
+         url: service.host + API,
+         data:{
+           'UserID': parseInt(this.$parent.globalData.id)
+         },
+         method: 'GET'
+      })
+      await this.findList(courseRes.data,query.id)
+      this.$apply()
+    }
+
+  async findList(list,id){
+    for(var i=0;i<list.length;i++){
+      if(list[i].id == id){
+        this.temp = list[i]
+        this.posttime = this.formatDateTime(list[i].course.posttime)
+        this.coursetime = this.formatDateTime(list[i].course.time)
+        break
+      }
+    }
+    this.$apply()
+  }
+
+  onShow() {
+  }
+
+  onPullDownRefresh() {
+    this.initPageData()
+  }
+
+  onReachBottom() {
+    
+  }
+  methods = {
+    radioChange (e) {
+        this.checkRes = e.detail.value
+    },
+    bindTextAreaInput (e) {
+      this.content = e.detail.value
+    },
+    check(){
+      this.check = true
+    },
+    cancel(){
+      this.check = false
+    },
+    async confirm(){
+      if(this.checkRes!='' && this.content!=''){
+        let res = await wepy.request({
+          url:service.host+'/offline-courses/check',
+          data:{
+            'id': parseInt(this.id),
+            'result': this.checkRes,
+            'remark': this.content
+          },
+          method:'POST'
+        })
+        console.log(res)
+        if(res){
+          wx.showToast({
+            title: '已提交',
+            icon: 'success',
+            duration: 800
+          });
+          setTimeout(() => {
+              wx.navigateTo({url:'/pages/user/check/mycheck'});
+            }, 800);
+        }
+      }else{
+        wx.showToast({
+          title: '请填写评价',
+          icon: 'loading',
+          duration: 2000
+        });
+      }
+      this.$apply()
+  }
+}
+
+components = {
+      Screen
+  }
+}
+</script>
+
+
+<style lang="less">
+@import "../../../styles/custom/fn.less";
+
+.page-service{
+  .weui-cell__ft{
+    color: black;
+  }
+  .weui-cell{
+    margin:10rpx;
+  }
+  .detail-tags{
+    .h4();
+    padding: 0.4em 0;
+  }
+  .btn-flex-1{
+    padding: 0;
+    width: 3.5em;
+    line-height: 1.6;
+    overflow: hidden;
+  }
+  .btn-flex-full{
+    flex: 1 1 auto;
+  }
+  .btn-text-bottom{
+    .h5();
+    line-height: 1;
+    color: #777;
+  }
+.toast-box {
+    width: 100%;
+    height: 100%;
+    opacity: 1;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+}
+ 
+.toastbg {
+    opacity: 0.2;
+    background-color: black;
+    position: absolute;
+    width: 100%;
+    min-height: 100vh;
+}
+ 
+.showToast {
+    position: absolute;
+    opacity: 1;
+    width: 70%;
+    margin-left: 15%;
+    margin-top: 40%;
+}
+ 
+.toast-title {
+    padding-left: 5%;
+    background-color: #2196f3;
+    color: white;
+    padding-top: 2vh;
+    padding-bottom: 2vh;
+    border-top-right-radius: 16rpx;
+    border-top-left-radius: 16rpx;
+}
+ 
+.toast-main {
+    padding-top: 2vh;
+    padding-bottom: 2vh;
+    background-color: white;
+    text-align: center;
+}
+ 
+.toast-input {
+    margin-left: 5%;
+    margin-right: 5%;
+    border: 1px solid #ddd;
+    padding-left: 2vh;
+    padding-right: 2vh;
+    padding-top: 1vh;
+    padding-bottom: 1vh;
+}
+ 
+.toast-button {
+    display: flex;
+}
+ 
+.button1 {
+    width: 50%;
+}
+ 
+.button2 {
+    width: 50%;
+}
+ 
+.button1 button {
+    width: 100%;
+    background-color: white;
+    color: red;
+    border-radius: 0px;
+    border-bottom-left-radius: 16rpx;
+}
+ 
+.button2 button{
+    width: 100%;
+    background-color: white;
+    color: black;
+    border-radius: 0px;
+    border-bottom-right-radius: 16rpx;
+}
+ 
+.picker {
+    padding-top: 1vh;
+    padding-bottom: 1vh;
+}
+
+}
+</style>
+

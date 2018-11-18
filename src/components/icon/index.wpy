@@ -1,7 +1,13 @@
-<style lang="less" src="./index.less"></style>
+<style>
+
+</style>
+
 <template>
-  <text class="kai-iconfont kai-icon-{{type}}" catchtap="iconTap" data-event="{{event}}"></text>
+
+  <text  @tap="iconTap" data-event="{{event}}">★</text>
+
 </template>
+
 <script>
   import wepy from 'wepy'
   export default class Grid extends wepy.component {

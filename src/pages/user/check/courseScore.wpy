@@ -15,6 +15,14 @@
             <view class="padding-10">
               <rate4  title="服务能力评价" :value.sync="value4" />
             </view>
+            <view class="weui-cell">
+            <view class="weui-cell__bd">
+                <view class="weui-label reset-label-left h3">勋章数量</view>
+                <view class="weui-cell__ft h3">
+                    <view style=" word-break: break-all">{{(value1+value2+value3+value4)*0.025 }}</view>
+                </view>
+            </view>
+            </view>
         <view>
           <button @tap="saveInfo" class="weui-btn btn-primary" type="primary">提 交</button>
         </view>
@@ -24,8 +32,8 @@
 </template>
 <script>
   import wepy from 'wepy'
-  import { service } from '../../config.js'
-  import Rate from '../../components/rate/index'
+  import { service } from '../../../config.js'
+  import Rate from '../../../components/rate/index'
   export default class CheckPage extends wepy.page {
     config = {
       navigationBarTitleText: '审核界面',
@@ -45,27 +53,22 @@
       value4: 0
     }
     computed = {
-
     }
     methods = {
-      saveInfo(){
-        this.checkService(this.value1,this.value2,this.value3,this.value4)
-        this.$apply()
-      }
-    }
-    async checkService(value1,value2,value3,value4) {
+      async saveInfo(){
         let res = await wepy.request({
-            url: service.host + '/score',
+            url: service.host2 + '/score',
             data:{
               'UserID': parseInt(this.$parent.globalData.id),
               'ServiceID': parseInt(this.serviceID),
-              'Score1': parseInt(value1),
-              'Score2': parseInt(value2),
-              'Score3': parseInt(value3),
-              'Score4': parseInt(value4),
+              'Score1': parseInt(this.value1),
+              'Score2': parseInt(this.value2),
+              'Score3': parseInt(this.value3),
+              'Score4': parseInt(this.value4),
             },
             method: 'POST'
         })
+        console.log(res)
         if(res.data.code==1){
             wx.showToast({
             title:'提交成功!',
@@ -82,10 +85,10 @@
           duration: 2000
         });
         }
-        
         this.$apply()
+      }
+    }
 
-   }
     async onLoad(query) {
      this.serviceID = query.id
      console.log(this.serviceID)
@@ -101,7 +104,7 @@
 
 
 <style lang="less">
-  @import "../../styles/custom/fn.less";
+  @import "../../../styles/custom/fn.less";
   @userinfoHeight: 150rpx;
   @userinfoSpace: 8rpx;
 

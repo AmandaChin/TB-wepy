@@ -2,43 +2,16 @@
 <view class="page_apply">
     <view class="weui-panel">
          <view class="page__hd">
-            <view class="page__title color-green h3" style="text-align:center;">服务信息</view>
+            <view class="page__title" style="font-size: larger;text-align: center;color: #10aefe;">请填写申请信息</view>
         </view> 
-        <view class="weui-cells weui-cells_after-title">
-          <view class="weui-cell">
-              <view class="weui-cell__bd">服务用户：</view>
-              <view class="weui-cell__ft">{{serviceList.Name}}</view>
-          </view>
-          <view class="weui-cell">
-              <view class="weui-cell__bd">服务内容：</view>
-              <view class="weui-cell__ft">{{serviceList.Content}}</view>
-          </view>
-          <view class="weui-cell">
-              <view class="weui-cell__bd">服务日期：</view>
-              <view class="weui-cell__ft">{{startdate}}</view>
-          </view>
-          <view class="weui-cell">
-              <view class="weui-cell__bd">服务时段</view>
-              <view class="weui-cell__ft">{{starttime}} - {{endtime}}</view>
-          </view>
-          <view class="weui-cell">
-              <view class="weui-cell__bd">服务时长：</view>
-              <view class="weui-cell__ft">{{serviceList.Duration}}小时</view>
-          </view>
-        </view>
-    </view>
-    <view class="weui-panel">
-         <view class="page__hd">
-            <view class="page__title color-green h3" style="text-align:center;">请填写申请信息</view>
-        </view> 
+
       <view class="weui-cell ">
         <view class="weui-cell__bd">
           <view class="weui-label reset-label-left h3">真实服务日期</view>
         </view>
         <view class="weui-cell__ft">
-          <picker mode="date" value="{{realdate}}" start="{{today}}" end="{{endday}}" @change="bindDateChange">
-            <!-- <text wx:if="{{dateisnull}}" style="color:#999;font-size:30rpx;"> {{}}</text> -->
-            <view ><text class="weui-input">{{realdate}}</text></view>
+          <picker mode="date" value="{{realdate}}" end="{{today}}"  @change="bindDateChange">
+            <view ><text class="weui-select weui-select_in-select-after h3">{{realdate}}</text></view>
           </picker>
         </view>
       </view>
@@ -48,10 +21,9 @@
           <view class="weui-label reset-label-left h3">真实开始时间</view>
         </view>
         <view class="weui-cell__ft">
-          <picker mode="time" value="{{realstarttime}}" start="09:01" end="21:01" @change="bindTimeChange">
-            <!-- <text wx:if="{{starttimeisnull}}" style="color:#999;font-size:30rpx;"> {{}}</text> -->
-            <view ><text class="weui-input">{{realstarttime}}</text></view>
-          </picker>
+            <picker @change="bindBeginChange" value="{{beginIndex}}" range="{{begintimes}}">
+              <text class="weui-select weui-select_in-select-after h3">{{realstarttime}}</text>
+            </picker>
         </view>
       </view>
       <view class="weui-cell">
@@ -59,18 +31,17 @@
           <view class="weui-label reset-label-left h3">真实结束时间</view>
         </view>
         <view class="weui-cell__ft">
-          <picker mode="time" value="{{realendtime}}" start="09:01" end="21:01" @change="bindTimeChange">
-            <!-- <text wx:if="{{endtimeisnull}}" style="color:#999;font-size:30rpx;"> {{}}</text> -->
-            <view ><text class="weui-input">{{realendtime}}</text></view>
-          </picker>
+            <picker @change="bindEndChange" value="{{endIndex}}" range="{{endtimes}}">
+              <text class="weui-select weui-select_in-select-after h3">{{realendtime}}</text>
+            </picker>
+         
         </view>
       </view>
         <view class="weui-cells weui-cells_after-title">
             <view class="weui-media-box weui-media-box_text borrow-address">
-                <view class="weui-media-box__title h3 color-666">{{title}}</view>
-                    <view class="weui-cell__bd h3" style="height: 200rpx;">
-                    <textarea bindinput="typing" class="weui-textarea" data-wpytyping-a="address" placeholder="请输入描述信息" value=""  style="height: 150rpx;">
-                    </textarea>
+                <view class="weui-media-box__title h3 color-666">详细信息</view>
+                <view class="weui-cell__bd h3">
+                    <textarea @input="bindTextAreaInput" class="weui-textarea h3" value="{{remark}}" placeholder="请输入详细描述" style="height: 3.3em" />
                 </view>
             </view>
         </view> 
@@ -100,7 +71,7 @@
             </view>
         </view>
         </view>
-     <button @tap="handle()"  class="weui-btn btn-block btn-flex-full" type="primary">申请</button>
+     <button @tap="submit()"  class="weui-btn btn-block btn-flex-full" type="primary">申请</button>
     </view>
 </view>
 </template>
@@ -108,85 +79,169 @@
 <script>
 import wepy from 'wepy'
   import { service } from '../../../config.js'
-  import http from '../../../mixins/http'
   import base from '../../../mixins/base'
   import user from '../../../mixins/user'
   import publicProcess from '../../../mixins/publicProcess'
 export default class apply extends wepy.page {
-    mixins = [base, http, user,publicProcess]
+    mixins = [base, user,publicProcess]
   config = {
     navigationBarTitleText: '申请勋章',
     enablePullDownRefresh: false
   }
   data = {
-    startdate:'',
-    starttime:'',
-    endtime:'',
-    createtime:'',
-    DemandStartTime:'',
-    DemandEndTime:'',
-    serviceList:[],
-    title: '详细信息',
+    id:'',
     files:[],
-    dateisnull: true,
     starttimeisnull : true,
     endtimeisnull: true,
     realdate:'',
     realendtime:'',
-    realstarttime:''
+    realstarttime:'',
+    begintimes: ['5:30','6:00','6:30','7:00','7:30','8:00','8:30','9:00','9:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00','18:30','19:00','19:30','20:00'],
+    beginIndex: -1,
+    endtimes: ['5:30','6:00','6:30','7:00','7:30','8:00','8:30','9:00','9:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00','18:30','19:00','19:30','20:00'],
+    endIndex: -1,
+    remark:''
   }
-  
+  computed = {
+      today(){
+        var today = new Date() - 8*3600*1000
+        return Date(today)
+      },
+      begin(){
+        return this.begintimes[this.beginIndex]
+      }
+    //   endtimes(){
+    //       var list = []
+    //       if(this.beginIndex==this.begintimes.length-1){
+    //           return list
+    //       }else{
+    //         for(var i=this.beginIndex;i<this.begintimes.length;i++){
+    //             list.push(this.begintimes[i])
+    //             if(i==this.begintimes.length-1){
+    //                 return list
+    //             }
+    //         }
+    //       }
+          
+    //   }
+  }
   methods = {
+      bindDateChange (e) {
+        this.realdate = e.detail.value
+      },
+      bindBeginChange (e) {
+        this.beginIndex = e.detail.value
+        this.starttimeisnull = false
+        this.realstarttime = this.begintimes[this.beginIndex]
+        this.endIndex = this.beginIndex
+      },
+      bindEndChange (e) {
+        this.endIndex = e.detail.value
+        this.endtimeisnull = false
+        this.realendtime = this.endtimes[this.endIndex]
+      },
+      bindTextAreaInput(e) {
+         this.remark = e.detail.value
+      },
       async chooseImage (e) {
           let result = await wepy.chooseImage({
-              count: 1
+              count: 4
           })
           console.log(result)
-          var tempFilePaths = result.tempFilePaths[0]
-          this.files = this.files.concat(tempFilePaths)
-          let res = await wepy.uploadFile({
-              url: service + '/uploadFile',
-              filePath: tempFilePaths,
-              name:'wxtest',
-              // header: {}, // 设置请求的 header
-              // formData: {}, // HTTP 请求中其他额外的 form data
-          })
-          console.log(res)
+          for(var i=0;i<result.tempFilePaths.length;i++){
+              var tempFilePaths = result.tempFilePaths[0]
+            let res = await wepy.uploadFile({
+                url: service.host + '/uploadFile',
+                filePath: tempFilePaths,
+                name:'wxUpload'
+            })
+            if(res.statusCode==200){
+                var url = JSON.parse( res.data ).url
+                this.files.push(url)
+            }else{
+                wx.showToast({
+                    title: '请重传图片',
+                    icon: 'loading',
+                    duration: 2000
+                });
+            }
+          }
           this.$apply()
         },
         
       previewImage (e) {
-          wepy.previewImage({
-              current: e.currentTarget.id, // 当前显示图片的http链接
-              urls: this.props.files // 需要预览的图片http链接列表
-              })
-            }
+        wepy.previewImage({
+            current: e.currentTarget.id, // 当前显示图片的http链接
+            urls: this.props.files // 需要预览的图片http链接列表
+            })
+        },
+    
+      async submit(){
+          if(this.remark!=''&&this.files.length>0){
+              await this.handleNullImg()
+               var StartTimestamp = new Date(String(this.realdate) + ' ' + this.realstarttime)
+                var EndTimestamp = new Date(String(this.realdate) + ' ' + this.realendtime)
+                var finalbegin = this.formatDateTime(StartTimestamp.getTime())
+                var finalend = this.formatDateTime(EndTimestamp.getTime())
+                let res = await wepy.request({
+                  url: service.host+'/application', //开发者服务器接口地址",
+                  data: {
+                      'UserID': parseInt(this.$parent.globalData.id),
+                    'ServiceID': this.id,
+                    'material1': this.files[0],
+                    'material2': this.files[1],
+                    'material3': this.files[2],
+                    'material4': this.files[3],
+                    'startTime': finalbegin,
+                    'endTime': finalend,
+                    'remark': this.remark
+                  }, 
+                  method: 'POST',
+                });
+                if(res.data.num==1){ 
+                    wx.showToast({
+                    title: '申请成功',
+                    icon: 'success',
+                    duration: 800
+                    });
+                    setTimeout(() => {
+                        this.$switch({url:'/pages/user'});
+                    }, 800);
+                }else{
+                    wx.showToast({
+                        title: '申请失败',
+                        icon: 'loading',
+                        duration: 800
+                    });
+          }
+                
+          }else{
+              wx.showToast({
+                    title: '请完善信息',
+                    icon: 'loading',
+                    duration: 2000
+                });
+          }
+      }
     }
-   
-    async onLoad(query) {
-      console.log(query)
-      const Serviceid = query && +query.Serviceid
-      this.getList(Serviceid)
-      this.$apply()
-    }
-    async getList(Serviceid){
-      let res = await wepy.request({
-         url: service.host + '/FindServiceByServiceID',
-         data:{
-           'serviceID': parseInt(Serviceid)
-         },
-         method: 'POST'
-        })
-        console.log(res)
-        this.serviceList = res.data.list.rows[0]
-        this.startdate = this.serviceList.DemandStartTime.substring(0,10)
-        this.starttime = this.serviceList.DemandStartTime.substring(11,19)
-        this.endtime = this.serviceList.DemandEndTime.substring(11,19)
-        this.realdate = this.startdate
-        this.realstarttime = this.starttime
-        this.realendtime = this.endtime
+    async handleNullImg() {
+        if (this.files.length < 4) {
+          var len = this.files.length
+          for (var i = 0; i < 4 - len; i++) {
+            this.files.push('')
+          }
+        }
         this.$apply()
     }
+    async onLoad(query) {
+      console.log(query)
+      this.id = query && +query.Serviceid
+      this.realdate = query.date
+      this.realstarttime = query.starttime
+      this.realendtime = query.endtime
+      this.$apply()
+    }
+
     onShow(){
     }
 
@@ -195,13 +250,9 @@ export default class apply extends wepy.page {
 
 <style lang="less">
 @import "../../../styles/weui/widget/weui-cell/weui-uploader.wxss";
+
+@import "../../../styles/custom/fn.less";
 .page-apply {
-  .weui-cell__ft{
-      color: black;
-  }
-  .weui-input{
-      color:gray;
-  }
  
 }
 </style>

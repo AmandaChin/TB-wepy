@@ -3,16 +3,19 @@
     <view wx:if="{{title}}" class="booklist-name">{{title}}</view>
     <block wx:if="{{list.length > 0}}">
       <block wx:for="{{list}}" wx:key="index">
-        <navigator url="/pages/main/check?serviceID={{item.serviceId}}&oldMan={{item.oldManName}}&volunteer={{item.volunteerName}}&mydate={{item.mydate}}&starttime={{item.starttime}}&endtime={{item.endtime}}&duration={{item.duration}}&content={{item.content}}&remark={{item.remark}}" 
+        <navigator url="/pages/user/check/{{page}}?id={{item.id}}&status={{item.status}}" 
         class="booklist-item clearfix">
           <view class="booklist-cover-wrapper">
             <image src="{{item.image}}" mode="widthFix" style="width:100%;" />
           </view>
           <view class="booklist-content-wrapper" >
-            <view class="booklist-title">{{item.title}}</view>
-            <view class="booklist-abstract">服务内容: {{item.content}}</view>
-            <view class="booklist-abstract">志愿者: {{item.volunteerName}}</view>
-            <!-- <view class="booklist-abstract">详情:{{item.content}}</view> -->
+            <view class="booklist-title color-green">{{item.type}}</view>
+            <!-- <view class="booklist-abstract color-green">审核内容:{{item.type}}</view> -->
+            <view class="booklist-abstract">审核者姓名: {{item.name}}</view>
+            <view class="booklist-abstract">申请时间: {{item.time}}</view>
+            <view wx:if="{{item.status==1}}">
+              <view class="booklist-abstract">已等待{{item.waitday}}天{{item.waithour}}小时{{item.waitminues}}分钟</view>
+            </view>
           </view>
         </navigator>
       </block>
@@ -24,15 +27,14 @@
       </view>
     </block>
     <block wx:elif="{{noMore}}">
-      <view class="weui-loadmore weui-loadmore_line weui-loadmore_dot">
+      <view class="weui-loadmore weui-loadmore_line">
+      <view class="weui-loadmore__tips weui-loadmore__tips_in-line">暂无审核任务</view>
+    </view>
+    </block>
+  <block wx:else>
+    <view class="weui-loadmore weui-loadmore_line weui-loadmore_dot">
         <view class="weui-loadmore__tips weui-loadmore__tips_in-line weui-loadmore__tips_in-dot"></view>
       </view>
-    </block>
-  </block>
-  <block wx:else>
-    <view class="weui-loadmore weui-loadmore_line">
-      <view class="weui-loadmore__tips weui-loadmore__tips_in-line">暂无数据</view>
-    </view>
   </block>
   </view>
 </template>
@@ -42,10 +44,9 @@
   import {
     service
   } from '../config.js'
-  import http from '../mixins/http'
   import base from '../mixins/base'
   export default class checkedlist extends wepy.component {
-    mixins = [base, http]
+    mixins = [base]
     props = {
       list: {
         type: Object,
@@ -73,16 +74,16 @@
        */
       type: {
         type: String,
-        default: 'list'
+        default: null
       }
     }
     data = {
-      icon_eye: '/images/icon/icon-eye@2x.png',
-      icon_eye_active: '/images/icon/icon-eye-active@2x.png',
-      icon_star: '/images/icon/icon-star@2x.png',
-      icon_star_active: '/images/icon/icon-star-active@2x.png'
+      waitday:0,
+      waithour:0,
+      waitminues:0
     }
     computed = {
+
     }
     methods = {
     }

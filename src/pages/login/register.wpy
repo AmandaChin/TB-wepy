@@ -224,8 +224,13 @@ export default class pageUser extends wepy.page {
         })
       }
       else if(this.username!==''&& this.name!=='' && this.phone!=='' && this.email!==''){
+         wepy.showToast({
+          title: '请稍等片刻',
+          icon:'loading',
+          duration: 2000
+        })
          let res = await wepy.request({
-           url: service.host + '/register', 
+           url: service.host2 + '/register', 
            data: {
              'username' : this.username,
              'password' : this.password,
@@ -241,15 +246,18 @@ export default class pageUser extends wepy.page {
            },
            method: 'POST'
          });
-         wepy.showToast({
-          title: '请稍等片刻',
-          icon:'loading',
-          duration: 2000
-        })
          if(res.data.num===1){
-          wx.navigateTo({
-            url: `/pages/login/login`
-         })
+           wx.showToast({
+              title: '注册成功',
+              icon: 'success',
+              duration: 800
+            });
+            setTimeout(() => {
+                 wx.navigateBack();
+            }, 800);
+        //   wx.navigateTo({
+        //     url: `/pages/login/login`
+        //  })
          }else{
            wepy.showToast({
           title: '用户名重复！',

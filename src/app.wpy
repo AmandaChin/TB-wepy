@@ -23,8 +23,6 @@ export default class extends wepy.app {
       'pages/main/searchDetail',
       'pages/login/login',
       'pages/login/register',
-      'pages/borrow/subscribe',
-      'pages/borrow/result',
       'pages/user/demand/myDemand',
       'pages/user/demand/editMedal',
       'pages/user/demand/publish',
@@ -33,14 +31,15 @@ export default class extends wepy.app {
       'pages/user/userinfo/info',
       'pages/user/volunteer/apply',
       'pages/user/volunteer/myVolunteer',
-      'pages/user/volunteer/succeed',
       'pages/user/userinfo/identity',
       'pages/user/notice/notice',
       'pages/user/notice/detail',
       'pages/demand/oldmanDemand',
-      'pages/demand/volunteerDemand',
       'pages/user/check/mycheck',
-      'pages/user/check/checkdetail',
+      'pages/user/check/servicedetail',
+      'pages/user/check/coursedetail',
+      'pages/user/check/teacherdetail',
+      'pages/user/check/courseScore',
       'pages/user/course/myCourse',
       'pages/user/course/resource',
       'pages/main/check'
@@ -91,7 +90,7 @@ export default class extends wepy.app {
     //微信信息
     user: null,
     openid: null,
-    id: 11,
+    id: 20,
     //个人信息
     userinfo: null,
   }

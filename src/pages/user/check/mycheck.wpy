@@ -11,12 +11,28 @@
                 </view>
                 <view class="weui-tab__panel">
                     <view class="weui-tab__content" hidden="{{activeIndex != 0}}">
-                      <MedalList1 :list.sync="list1" title=""
-                      :loading.sync="loading" :noMore.sync="noMoreList"> </MedalList1>
+                      <CheckList1 :list.sync="servicelist1" title="服务审核"
+                      :loading.sync="loading1" :noMore.sync="noMoreList1" :page.sync="pagetype1"> </CheckList1>
+                    </view>
+                    <view hidden="{{activeIndex != 0}}">
+                      <CheckList2 :list.sync="courselist1" title="课程审核"
+                      :loading.sync="loading2" :noMore.sync="noMoreList2" :page.sync="pagetype2"> </CheckList2>
+                    </view>
+                    <view hidden="{{activeIndex != 0}}">
+                      <CheckList3 :list.sync="teacherlist1" title="教员审核"
+                      :loading.sync="loading3" :noMore.sync="noMoreList3" :page.sync="pagetype3"> </CheckList3>
                     </view>
                     <view class="weui-tab__content" hidden="{{activeIndex != 1}}">
-                      <MedalList2 :list.sync="list2" title=""
-                      :loading.sync="loading" :noMore.sync="noMoreList"> </MedalList2>
+                      <CheckList4 :list.sync="servicelist2" title="服务审核"
+                      :loading.sync="loading4" :noMore.sync="noMoreList4" :page.sync="pagetype1"> </CheckList4>
+                    </view>
+                    <view hidden="{{activeIndex != 1}}">
+                      <CheckList5 :list.sync="courselist2" title="课程审核"
+                      :loading.sync="loading5" :noMore.sync="noMoreList5" :page.sync="pagetype2"> </CheckList5>
+                    </view>
+                    <view hidden="{{activeIndex != 1}}">
+                      <CheckList6 :list.sync="teacherlist2" title="教员审核"
+                      :loading.sync="loading6" :noMore.sync="noMoreList6" :page.sync="pagetype3"> </CheckList6>
                     </view>
                 </view>
             </view>
@@ -29,14 +45,11 @@
 import wepy from 'wepy'
 import { service } from '../../../config.js'
 import base from '../../../mixins/base'
-import http from '../../../mixins/http'
 import publicProcess from '../../../mixins/publicProcess'
-import MedalList from '../../../components/MedalList'
-import checkedlist from '../../../components/checkedlist'
-import checkinglist from '../../../components/checkinglist'
+import checklist from '../../../components/checklist'
 const sliderWidth = 96; // 需要设置slider的宽度，用于计算中间位置
 export default class pageIndex extends wepy.page {
-  mixins = [base, http,publicProcess]
+  mixins = [base, publicProcess]
   config = {
     navigationBarTitleText: '我的审核',
     navigationBarTextStyle: 'white',
@@ -48,10 +61,27 @@ export default class pageIndex extends wepy.page {
     activeIndex: 0,
     sliderOffset: 0,
     sliderLeft: 0,
-    noMoreList: false,
-    loading: false,
-    list1: [],
-    list2: [],
+    noMoreList1: false,
+    loading1: false,
+    noMoreList2: false,
+    loading2: false,
+    noMoreList3: false,
+    loading3: false,
+    noMoreList4: false,
+    loading4: false,
+    noMoreList5: false,
+    loading5: false,
+    noMoreList6: false,
+    loading6: false,
+    servicelist1: [],
+    servicelist2: [],
+    courselist1:[],
+    courselist2:[],
+    teacherlist1:[],
+    teacherlist2:[],
+    pagetype1:'servicedetail',
+    pagetype2:'coursedetail',
+    pagetype3:'teacherdetail',
     image:['http://timebank-icon.oss-cn-beijing.aliyuncs.com/finish.png','http://timebank-icon.oss-cn-beijing.aliyuncs.com/out.png'],
     page: 0,
     size: 5
@@ -69,6 +99,7 @@ export default class pageIndex extends wepy.page {
     this.sliderOffset = res.windowWidth / this.tabs.length * this.activeIndex;
 
     this.initPageData()
+    this.$apply()
   }
 
   onShow() {
@@ -89,113 +120,210 @@ export default class pageIndex extends wepy.page {
   }
 
   // 初始化页面数据
-  initPageData() {
+  async initPageData() {
     // 初始化参数
     this.page = 0
     // 请求列表
-    this.getCheckedList()
-    this.getCheckingList()
+    await this.getServiceCheckedList()
+    await this.getCourseCheckedList()
+    await this.getTeacherCheckedList()
+    await this.getServiceCheckingList()
+    await this.getCourseCheckingList()
+    await this.getTeacherCheckingList()
+    this.$apply()
   }
-   // 更新图书列表
-  async getCheckedList() {
-    //if (this.loading || this.noMoreList) return
-    let res = await wepy.request({
-         url: service.host + '/getCheckList',
+   //更新已审核列表
+  async getServiceCheckedList() {
+   //服务
+    let serviceRes = await wepy.request({
+         url: service.host + '/reviwer/list',
          data:{
-           //'UserID': 2
            'UserID': parseInt(this.$parent.globalData.id),
            'status': parseInt(1)
          },
-         method: 'POST'
+         method: 'GET'
     })
-   // console.log('updatechecklist1')
-   // console.log(res.data.list)
-    const data = res.data.list
-    //const data = list.rows
-    // console.log('this is data')
-   // console.log(data)
+    console.log(serviceRes)
+    const serviceData = serviceRes.data
     // 请求到空列表后就认为没有更多了
-    if (this.isArray(data) && data.length === 0) {
-      this.noMoreList = true
+    if (this.isArray(serviceData) && serviceData.length === 0) {
+      this.noMoreList1 = true
       return
        }
-    this.list1 = this.getItems2(data,0)
+    this.servicelist1 = this.getServiceItems(serviceData,0,'志愿服务')
     this.$apply()
-
   }
-  async getCheckingList() {
-    //if (this.loading || this.noMoreList) return
-    let res = await wepy.request({
-         url: service.host + '/getCheckList',
+
+  async getCourseCheckedList() {
+    //课程
+    let courseRes = await wepy.request({
+      url: service.host + '/offline-courses/checked',
+      data:{
+        'UserID': parseInt(this.$parent.globalData.id)
+      },
+        method: 'GET'
+      })
+    console.log(courseRes)
+    const courseData = courseRes.data
+    // 请求到空列表后就认为没有更多了
+    if (this.isArray(courseData) && courseData.length === 0) {
+      this.noMoreList2 = true
+      return
+    }
+    this.courselist1 = this.getCourseItems(courseData,0,'培训课程')
+    this.$apply()
+  }
+
+  async getTeacherCheckedList() {
+    //教员
+    let teacherRes = await wepy.request({
+      url: service.host + '/qualification/checked',
+      data:{
+        'UserID': parseInt(this.$parent.globalData.id)
+      },
+      method: 'GET'
+    })
+    console.log(teacherRes)
+    const teacherData = teacherRes.data
+    // 请求到空列表后就认为没有更多了
+    if (this.isArray(teacherData) && teacherData.length === 0) {
+    this.noMoreList3 = true
+    return
+    }
+    this.teacherlist1 = this.getTeacherItems(teacherData,0,'教员审核')
+    this.$apply()
+  }
+
+
+  //更新待审核列表
+  async getServiceCheckingList() {
+    //服务
+    let serviceRes = await wepy.request({
+         url: service.host + '/reviwer/list',
          data:{
-           //'UserID': 2
            'UserID': parseInt(this.$parent.globalData.id),
            'status': parseInt(0)
          },
-         method: 'POST'
+         method: 'GET'
     })
-    //console.log('update')
-    //console.log(res)
-    const data = res.data.list
-   // const data = list.rows
+    console.log(serviceRes)
+    const serviceData = serviceRes.data
     // 请求到空列表后就认为没有更多了
-    if (this.isArray(data) && data.length === 0) {
-      this.noMoreList = true
+    if (this.isArray(serviceData) && serviceData.length === 0) {
+      this.noMoreList4 = true
       return
        }
-    this.list2 = this.getItems(data,1)
+    this.servicelist2 = this.getServiceItems(serviceData,1,'志愿服务')
     this.$apply()
+  }
 
+  async getCourseCheckingList() {
+    //课程
+    let courseRes = await wepy.request({
+         url: service.host + '/offline-courses/unchecked',
+         data:{
+           'UserID': parseInt(this.$parent.globalData.id)
+         },
+         method: 'GET'
+    })
+    console.log(courseRes)
+    const courseData = courseRes.data
+    // 请求到空列表后就认为没有更多了
+    if (this.isArray(courseData) && courseData.length === 0) {
+      this.noMoreList5 = true
+      return
+       }
+    this.courselist2 = this.getCourseItems(courseData,1,'培训课程')
+    this.$apply()
+  }
+
+  async getTeacherCheckingList() {
+    //教员
+    let teacherRes = await wepy.request({
+         url: service.host + '/qualification/unchecked',
+         data:{
+           'UserID': parseInt(this.$parent.globalData.id)
+         },
+         method: 'GET'
+    })
+    console.log(teacherRes)
+    const teacherData = teacherRes.data
+    // 请求到空列表后就认为没有更多了
+    if (this.isArray(teacherData) && teacherData.length === 0) {
+      this.noMoreList6 = true
+      return
+       }
+    this.teacherlist2 = this.getTeacherItems(teacherData,1,'教员审核')
+    this.$apply()
   }
 
   // 处理列表
-  getItems(data,i) {
-
-    //const len = this.list.length
+  getServiceItems(data,i,type) {
+    //type为审核服务类型
     return this.getArray(data).map((item, index) => {
+      var applyTime = this.formatDateTime(item.applyTime)
       // 拼接示例数据
-      //console.log('this is startTime' + item.startTime)
       return {
-        serviceId: item.serviceId,
-        content: item.content,
-        duration: item.duration,
-        remark: this.convertHtmlToText(item.remark),
-        volunteerName: item.volunteerName,
-        oldManName: item.oldManName,
-        title: '待审核信息',
-        mydate: item.startTime.substring(0,10),
-        starttime: item.startTime.substring(11,19),
-        endtime: item.endTime.substring(11,19),
-        image: this.image[i]
-      }
-      //console.log('this is Time2' + item.starttime)
-    })
-    this.$apply()
-  }
-
-   // 处理列表
-  getItems2(data,i) {
-     //console.log('updatechecklist2')
-    //const len = this.list.length
-    return this.getArray(data).map((item, index) => {
-      // 拼接示例数据
-      //console.log('this is startTime' + item.startTime)
-      return {
-        content: item.content,
-        volunteer: item.volunteerName,
-        title: '已审核信息',
-        mydate: item.startTime.substring(0,10),
-        starttime: item.startTime.substring(11,19),
-        endtime: item.endTime.substring(11,19),
-        image: this.image[i]
+        id:item.serviceId,
+        type: type,
+        time: this.formatDateTime(item.applyTime),
+        name: item.volunteerName,
+        image: this.image[i],
+        //0为checked,1为checking
+        status: i,
+        waitday : Math.floor((new Date().getTime() - Date.parse(applyTime))/(24*3600*1000)),
+        waithour : Math.floor((( new Date().getTime() - Date.parse(applyTime))%(24*3600*1000))/(3600*1000)),
+        waitminues : Math.floor((((new Date().getTime() - Date.parse(applyTime))%(24*3600*1000))%(3600*1000))/(60*1000))
       }
     })
-    this.$apply()
   }
+  getCourseItems(data,i,type) {
+    //type为审核服务类型
+    return this.getArray(data).map((item, index) => {
+      // 拼接示例数据
+      var applyTime = this.formatDateTime(item.createdAt)
+      return {
+        id:item.id,
+        type: type,
+        time: this.formatDateTime(item.createdAt),
+        name: item.author.name,
+        image: this.image[i],
+        //0为checked,1为checking
+        status: i,
+        waitday : Math.floor((new Date().getTime() - Date.parse(applyTime))/(24*3600*1000)),
+        waithour : Math.floor((( new Date().getTime() - Date.parse(applyTime))%(24*3600*1000))/(3600*1000)),
+        waitminues : Math.floor((((new Date().getTime() - Date.parse(applyTime))%(24*3600*1000))%(3600*1000))/(60*1000))
+      }
+    })
+  }
+  getTeacherItems(data,i,type) {
+    //type为审核服务类型
+    return this.getArray(data).map((item, index) => {
+      var applyTime = this.formatDateTime(item.createdAt)
+      // 拼接示例数据
+      return {
+        id:item.id,
+        type: type,
+        time: this.formatDateTime(item.createdAt),
+        name: item.author.name,
+        image: this.image[i],
+        //0为checked,1为checking
+        status: i,
+        waitday : Math.floor((new Date().getTime() - Date.parse(applyTime))/(24*3600*1000)),
+        waithour : Math.floor((( new Date().getTime() - Date.parse(applyTime))%(24*3600*1000))/(3600*1000)),
+        waitminues : Math.floor((((new Date().getTime() - Date.parse(applyTime))%(24*3600*1000))%(3600*1000))/(60*1000))
+      }
+    })
+  }
+
 
   components = {
-    MedalList1 : checkedlist,
-    MedalList2 : checkinglist
+    CheckList1 : checklist,
+    CheckList2 : checklist,
+    CheckList3 : checklist,
+    CheckList4 : checklist,
+    CheckList5 : checklist,
+    CheckList6 : checklist
   }
 }
 </script>
