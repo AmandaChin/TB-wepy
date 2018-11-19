@@ -174,21 +174,21 @@ export default class pageUser extends wepy.page {
     
   }
   onShow() {
-    if(this.$parent.globalData.user !== null){
+    if(this.$parent.globalData.id !== -1){
       this.initUserData()
     }
      
   }
 
   onPullDownRefresh() {
-    if(this.$parent.globalData.user !== null){
+    if(this.$parent.globalData.id !== -1){
       this.initUserData()
     }
   }
   
   // 初始化页面数据
   initUserData() {
-    this.getWeInfo()
+    //this.getWeInfo()
     this.getUserAccount()
     this.$apply()
   }
